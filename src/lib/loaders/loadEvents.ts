@@ -5,10 +5,7 @@ import { Event } from "../../struct/event";
 
 export async function loadEvents(): Promise<void> {
   const dir = path.join(__dirname, "../../events");
-  const tsMatches = await glob(`${dir}/**/*.ts`);
-  const jsMatches = await glob(`${dir}/**/*.js`);
-
-  const matches = [...tsMatches, ...jsMatches];
+  const matches = await glob(`${dir}/**/*.[jt]s`);
 
   for (let match of matches) {
     try {

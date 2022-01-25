@@ -4,10 +4,7 @@ import { Component } from "../../struct/component";
 
 export async function loadComponents() {
   const dir = path.join(__dirname, "../../components");
-  const tsMatches = await glob(`${dir}/**/*.ts`);
-  const jsMatches = await glob(`${dir}/**/*.js`);
-
-  const matches = [...tsMatches, ...jsMatches];
+  const matches = await glob(`${dir}/**/*.[jt]s`);
 
   const components: Component[] = [];
 
