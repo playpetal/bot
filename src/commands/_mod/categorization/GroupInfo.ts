@@ -30,7 +30,7 @@ async function run(interaction: CommandInteraction) {
     }**\nGender: **${group.gender || "None"}**\nAliases: **${
       group.aliases.length > 0
         ? group.aliases.map((a) => a.alias).join(", ")
-        : ""
+        : "None"
     }**\nID: ${group.id}`
   );
 
