@@ -24,10 +24,21 @@ async function run(interaction: CommandInteraction) {
     });
   }
 
+  const birthday = character.birthday
+    ? new Date(character.birthday).toLocaleString("en-us", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+    : "None";
+
   const embed = new Embed().setDescription(
-    `**Character Info**\nName: **${character.name}**\nBirthday: **${
-      character.birthday || "None"
-    }**\nGender: **${character.gender || "None"}**\nID: **${character.id}**`
+    `**Character Info**\nName: **${
+      character.name
+    }**\nBirthday: **${birthday}**\nGender: **${
+      character.gender || "None"
+    }**\nID: **${character.id}**`
   );
 
   await interaction.createMessage({ embeds: [embed] });
