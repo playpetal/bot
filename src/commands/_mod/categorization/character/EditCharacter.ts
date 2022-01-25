@@ -53,7 +53,9 @@ async function run(interaction: CommandInteraction) {
 
   if (!newName && birthday === undefined && gender === undefined) {
     return await interaction.createMessage({
-      embeds: [new ErrorEmbed("you didn't change anything about the group.")],
+      embeds: [
+        new ErrorEmbed("you didn't change anything about the character."),
+      ],
       flags: 64,
     });
   }
