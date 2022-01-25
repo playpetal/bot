@@ -11,8 +11,12 @@ export class Bot extends Client {
   public components: Component[] = [];
 
   async start() {
+    console.log("Starting...");
+    console.log("Loading events...");
     await loadEvents();
+    console.log("Loading components...");
     this.components = await loadComponents();
+    console.log("Loading slash commands...");
     this.commands = await loadSlashCommands();
 
     setInterval(async () => {
