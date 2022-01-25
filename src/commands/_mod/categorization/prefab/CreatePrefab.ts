@@ -88,7 +88,24 @@ async function run(interaction: CommandInteraction) {
       `\n\nTo upload an image, please **mention petal** with your image attached.`
   );
 
-  await interaction.createFollowup({ embeds: [embed] });
+  const message = await interaction.createFollowup({ embeds: [embed] });
+
+  setTimeout(async () => {
+    const instance = prefabCreationManager.getInstance(
+      interaction.member!.user
+    );
+
+    if (instance) {
+      prefabCreationManager.deleteInstance(interaction.member!.user);
+      await message.edit({
+        embeds: [
+          embed.setDescription(
+            embed.description + `\n__**This prefab creation has timed out.**__`
+          ),
+        ],
+      });
+    }
+  }, 60000);
 }
 
 async function runAutocomplete(interaction: AutocompleteInteraction) {
