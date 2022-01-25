@@ -4,7 +4,10 @@ import { SlashCommand } from "../../struct/command";
 
 export async function loadSlashCommands() {
   const dir = path.join(__dirname, "../../commands");
-  const matches = await glob(`${dir}/**/*.ts`);
+  const tsMatches = await glob(`${dir}/**/*.ts`);
+  const jsMatches = await glob(`${dir}/**/*.js`);
+
+  const matches = [...tsMatches, ...jsMatches];
 
   const commands: SlashCommand[] = [];
 
