@@ -69,7 +69,7 @@ async function run(interaction: CommandInteraction) {
   await interaction.createMessage({
     embeds: [
       new Embed().setDescription(
-        `the group **${group.name}** has been updated!\ncheck **/groupinfo \`${newGroup.name}\`** to see the new info!`
+        `the group **${newGroup.name}** has been updated!\ncheck **/groupinfo \`${newGroup.name}\`** to see the new info!`
       ),
     ],
   });

@@ -56,7 +56,7 @@ async function run(interaction: CommandInteraction) {
   await interaction.createMessage({
     embeds: [
       new Embed().setDescription(
-        `the subgroup **${subgroup.name}** has been updated!\ncheck **/subgroupinfo \`${newSubgroup.name}\`** to see the new info!`
+        `the subgroup **${newSubgroup.name}** has been updated!\ncheck **/subgroupinfo \`${newSubgroup.name}\`** to see the new info!`
       ),
     ],
   });

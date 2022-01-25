@@ -70,7 +70,7 @@ async function run(interaction: CommandInteraction) {
   await interaction.createMessage({
     embeds: [
       new Embed().setDescription(
-        `the character **${character.name}** has been updated!\ncheck **/characterinfo \`${newCharacter.name}\`** to see the new info!`
+        `the character **${newCharacter.name}** has been updated!\ncheck **/characterinfo \`${newCharacter.name}\`** to see the new info!`
       ),
     ],
   });
