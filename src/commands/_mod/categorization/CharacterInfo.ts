@@ -12,8 +12,8 @@ import { Embed, ErrorEmbed } from "../../../struct/embed";
 async function run(interaction: CommandInteraction) {
   const options = interaction.data.options as InteractionDataOptionsWithValue[];
 
-  const name = options.find((o) => o.name === "character")!.value as string;
-  const character = (await getCharacters({ name: name }))[0];
+  const id = options.find((o) => o.name === "character")!.value as string;
+  const character = (await getCharacters({ id: parseInt(id, 10) }))[0];
 
   if (!character) {
     return await interaction.createMessage({
@@ -56,7 +56,7 @@ async function runAutocomplete(interaction: AutocompleteInteraction) {
   const characters = await searchCharacters(focused.value);
 
   const choices = characters.map((g) => {
-    return { name: g.name, value: g.name };
+    return { name: g.name, value: g.id.toString() };
   });
 
   await interaction.acknowledge(choices);
