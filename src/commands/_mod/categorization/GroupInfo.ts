@@ -24,10 +24,21 @@ async function run(interaction: CommandInteraction) {
     });
   }
 
+  const creation = group.creation
+    ? new Date(group.creation).toLocaleString("en-us", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+    : "None";
+
   const embed = new Embed().setDescription(
-    `**Group Info**\nName: **${group.name}**\nCreation: **${
-      group.creation || "None"
-    }**\nGender: **${group.gender || "None"}**\nAliases: **${
+    `**Group Info**\nName: **${
+      group.name
+    }**\nCreation: **${creation}**\nGender: **${
+      group.gender || "None"
+    }**\nAliases: **${
       group.aliases.length > 0
         ? group.aliases.map((a) => a.alias).join(", ")
         : "None"

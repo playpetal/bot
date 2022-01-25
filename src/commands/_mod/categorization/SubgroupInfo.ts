@@ -25,10 +25,17 @@ async function run(interaction: CommandInteraction) {
     });
   }
 
+  const creation = subgroup.creation
+    ? new Date(subgroup.creation).toLocaleString("en-us", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+    : "None";
+
   const embed = new Embed().setDescription(
-    `**Subgroup Info**\nName: **${subgroup.name}**\nCreation: **${
-      subgroup.creation || "None"
-    }**\nID: **${subgroup.id}**`
+    `**Subgroup Info**\nName: **${subgroup.name}**\nCreation: **${creation}**\nID: **${subgroup.id}**`
   );
 
   await interaction.createMessage({ embeds: [embed] });
