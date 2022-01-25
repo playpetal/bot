@@ -36,6 +36,6 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "rimraf dist && yarn tsc",
-    "pm2": "NODE_ENV=production pm2 start dist/index.js --watch -i 1"
+    "pm2": "NODE_ENV=production pm2 start dist/index.js --watch"
   }
 }
