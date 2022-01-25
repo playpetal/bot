@@ -5,7 +5,6 @@ import {
   InteractionDataOptionsWithValue,
 } from "eris";
 import { updateCharacter } from "../../../../lib/graphql/mutation/UPDATE_CHARACTER";
-import { updateGroup } from "../../../../lib/graphql/mutation/UPDATE_GROUP";
 import { getUser } from "../../../../lib/graphql/query/GET_USER";
 import { searchCharacters } from "../../../../lib/graphql/query/SEARCH_CHARACTERS";
 import { SlashCommand } from "../../../../struct/command";
