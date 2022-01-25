@@ -18,4 +18,8 @@ export const bot = new Bot(process.env.DISCORD_BOT_TOKEN, {
   restMode: true,
 });
 
-bot.start().then(async () => await bot.connect());
+bot.start().then(async () => {
+  console.log("attempting to connect...");
+  await bot.connect();
+  console.log("Connected!");
+});

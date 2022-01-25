@@ -18,6 +18,7 @@ export class Bot extends Client {
     this.components = await loadComponents();
     console.log("Loading slash commands...");
     this.commands = await loadSlashCommands();
+    console.log("All loaded");
 
     setInterval(async () => {
       try {
