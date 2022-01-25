@@ -16,7 +16,11 @@ export class Bot extends Client {
     this.commands = await loadSlashCommands();
 
     setInterval(async () => {
-      if ((await gts.getStackLength()) < 100) await gts.requestSong();
+      try {
+        if ((await gts.getStackLength()) < 100) await gts.requestSong();
+      } catch (e) {
+        // log later
+      }
     }, 5000);
   }
 }
