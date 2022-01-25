@@ -22,7 +22,6 @@ async function run(interaction: ComponentInteraction) {
     const prefab = await createPrefab(interaction.member!.id, instance);
 
     id = prefab.id;
-    console.log(`ID: ${id}`);
   } catch (e) {
     console.log(e);
     return await interaction.createFollowup({
@@ -36,7 +35,6 @@ async function run(interaction: ComponentInteraction) {
       id: id.toString(),
     });
 
-    console.log(upload.data);
     url = upload.data.url;
   } catch (e) {
     return await interaction.createFollowup({

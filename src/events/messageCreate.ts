@@ -5,14 +5,11 @@ import { Embed } from "../struct/embed";
 import { Event } from "../struct/event";
 
 const run = async function (msg: Message) {
-  console.log("Message received");
   if (msg.guildID !== process.env.STAFF_SERVER_ID) return;
   if (!msg.mentions.find((u) => u.id === bot.user.id)) return;
 
   const instance = prefabCreationManager.getInstance(msg.author);
   if (!instance) return;
-
-  console.log("Instance found");
 
   const attachment = msg.attachments[0];
   if (!attachment) return;

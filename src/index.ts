@@ -19,7 +19,5 @@ export const bot = new Bot(process.env.DISCORD_BOT_TOKEN, {
 });
 
 bot.start().then(async () => {
-  console.log("attempting to connect...");
   await bot.connect();
-  console.log("Connected!");
 });
