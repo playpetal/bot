@@ -56,7 +56,7 @@ async function runAutocomplete(interaction: AutocompleteInteraction) {
   const characters = await searchCharacters(focused.value);
 
   const choices = characters.map((g) => {
-    return { name: g.name, value: g.id.toString() };
+    return { name: `${g.name} (${g.id})`, value: g.id.toString() };
   });
 
   await interaction.acknowledge(choices);
