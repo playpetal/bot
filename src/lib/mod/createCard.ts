@@ -30,6 +30,7 @@ export type Prefab = {
   maxCards?: number;
   rarity?: number;
   imageUrl?: string;
+  isEdit?: boolean;
 };
 
 export const prefabCreationManager = new PrefabCreationManager();

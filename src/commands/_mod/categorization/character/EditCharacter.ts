@@ -11,7 +11,7 @@ import { SlashCommand } from "../../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../../struct/embed";
 
 async function run(interaction: CommandInteraction) {
-  const account = (await getUser(interaction.member!.user.id))!;
+  const account = (await getUser({ discordId: interaction.member!.user.id }))!;
 
   if (!account.groups.find((g) => g.group.name === "Release Manager"))
     return await interaction.createMessage({

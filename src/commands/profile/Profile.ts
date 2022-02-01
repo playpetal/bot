@@ -16,7 +16,7 @@ const run = async function (interaction: CommandInteraction) {
     (options?.find((o) => o.name === "user")?.value as string | undefined) ||
     interaction.member!.user.id;
 
-  const user = await getUser(targetId);
+  const user = await getUser({ discordId: targetId });
 
   if (!user) {
     await interaction.createMessage({ content: "no profile" });
@@ -25,9 +25,11 @@ const run = async function (interaction: CommandInteraction) {
 
   const embed = new Embed()
     .setDescription(
-      `${displayName(user)}` +
-        `\n*a player for a year and 24 days*` +
+      `<:user:930918872473796648> ${displayName(user)}` +
+        `\nregistered <t:${Math.floor(user.createdAt / 1000)}:R>` +
         (user.bio ? `\n\n${user.bio}` : ``) +
+        `\n\n<:petals:930918815225741383> **${user.currency.toLocaleString()}**` +
+        `\n<:petal:917578760449060995> **${user.cardCount.toLocaleString()}** cards` +
         `\n\n[[view on website]](https://playpetal.com/profile/${user.id})`
     )
     .setThumbnail("https://cdn.playpetal.com/avatars/default.png")

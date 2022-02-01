@@ -11,7 +11,7 @@ import { SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 async function run(interaction: CommandInteraction) {
-  const account = (await getUser(interaction.member!.user.id))!;
+  const account = (await getUser({ discordId: interaction.member!.user.id }))!;
 
   if (!account.groups.find((g) => g.group.name === "Developer"))
     return await interaction.createMessage({
@@ -32,7 +32,7 @@ async function run(interaction: CommandInteraction) {
   }
 
   const targetUserId = options.find((o) => o.name === "user")!.value as string;
-  const targetUser = await getUser(targetUserId);
+  const targetUser = await getUser({ discordId: targetUserId });
 
   if (!targetUser) {
     return await interaction.createMessage({

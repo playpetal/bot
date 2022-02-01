@@ -12,7 +12,7 @@ const run = async function (
   const titles = await getUserTitles(user.id);
 
   const embed = new Embed().setDescription(
-    `<:title:930918843537309776> ${displayName(user)}'s titles\n\n${
+    `<:user:930918872473796648> ${displayName(user)}'s titles\n\n${
       titles.length === 0
         ? "you don't have any titles :("
         : titles
@@ -30,10 +30,6 @@ const run = async function (
   await interaction.createMessage({ embeds: [embed] });
 };
 
-const command = new SlashCommand(
-  "titles",
-  "View a list of the titles you own",
-  run
-);
+const command = new SlashCommand("titles", "shows you the titles you own", run);
 
 export default command;

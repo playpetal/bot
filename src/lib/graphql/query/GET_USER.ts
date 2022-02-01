@@ -8,6 +8,8 @@ const GET_USER = gql`
       username
       createdAt
       bio
+      currency
+      cardCount
       title {
         title {
           title
@@ -22,11 +24,15 @@ const GET_USER = gql`
   }
 `;
 
-export async function getUser(
-  discordId?: string,
-  id?: number,
-  username?: string
-) {
+export async function getUser({
+  id,
+  discordId,
+  username,
+}: {
+  id?: number;
+  discordId?: string;
+  username?: string;
+}) {
   const query = (await graphql.query({
     query: GET_USER,
     variables: { discordId, id, username },
@@ -34,8 +40,10 @@ export async function getUser(
     user: Maybe<{
       id: number;
       username: string;
+      currency: number;
+      cardCount: number;
       title: { title: { title: string } } | null;
-      createdAt: string;
+      createdAt: number;
       bio: string;
       groups: { group: { name: string } }[];
     }>;
