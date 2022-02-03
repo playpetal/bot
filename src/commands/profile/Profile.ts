@@ -2,12 +2,11 @@ import Eris, {
   CommandInteraction,
   InteractionDataOptionsWithValue,
 } from "eris";
+import { getProfileEmbed } from "../../lib/embed/Profile";
 import { getUser } from "../../lib/graphql/query/GET_USER";
-import { displayName } from "../../lib/util/displayName";
-import { SlashCommand } from "../../struct/command";
-import { Embed } from "../../struct/embed";
+import { Run, SlashCommand } from "../../struct/command";
 
-const run = async function (interaction: CommandInteraction) {
+const run: Run = async function ({ interaction }) {
   const options = interaction.data.options as
     | InteractionDataOptionsWithValue[]
     | undefined;
@@ -23,30 +22,36 @@ const run = async function (interaction: CommandInteraction) {
     return;
   }
 
-  const embed = new Embed()
-    .setDescription(
-      `<:user:930918872473796648> ${displayName(user)}` +
-        `\nregistered <t:${Math.floor(user.createdAt / 1000)}:R>` +
-        (user.bio ? `\n\n${user.bio}` : ``) +
-        `\n\n<:petals:930918815225741383> **${user.currency.toLocaleString()}**` +
-        `\n<:petal:917578760449060995> **${user.cardCount.toLocaleString()}** cards` +
-        `\n\n[[view on website]](https://playpetal.com/profile/${user.id})`
-    )
-    .setThumbnail("https://cdn.playpetal.com/avatars/default.png")
-    .setImage("https://cdn.playpetal.com/banners/default.png");
-
   await interaction.createMessage({
-    embeds: [embed],
+    embeds: [getProfileEmbed(user)],
+    components: [
+      {
+        type: 1,
+        components: [
+          {
+            type: 2,
+            label: "view profile",
+            custom_id: `view_profile?${user.id}`,
+            style: 2,
+            disabled: true,
+          },
+          {
+            type: 2,
+            label: "view stats",
+            custom_id: `view_stats?${user.id}`,
+            style: 2,
+          },
+        ],
+      },
+    ],
   });
 };
 
-const command = new SlashCommand("profile", "View someone's profile", run, [
-  {
-    type: Eris.Constants.ApplicationCommandOptionTypes.USER,
+export default new SlashCommand("profile")
+  .desc("view someone's profile")
+  .run(run)
+  .option({
+    type: "user",
     name: "user",
-    description:
-      "The user whose profile you wish to view. To view your profile, you can leave this blank.",
-  },
-]);
-
-export default command;
+    description: "the user whose profile you'd like to view",
+  });

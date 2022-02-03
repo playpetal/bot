@@ -1,14 +1,12 @@
-import { CommandInteraction, Constants } from "eris";
-import { PartialUser } from "petal";
-import { gts } from "../../../lib/fun/gts";
-import { GTSGameState, gtsGameStateManager } from "../../../lib/fun/gts/state";
-import { SlashCommand } from "../../../struct/command";
-import { Embed } from "../../../struct/embed";
+import { CommandInteraction } from "eris";
+import { SlashCommandOption } from "petal";
+import { GTSGameState, gtsGameStateManager } from "../../../lib/fun/gts";
+import { completeGts } from "../../../lib/graphql/mutation/COMPLETE_GTS";
+import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
+import { Run, SlashCommand } from "../../../struct/command";
+import { Embed, ErrorEmbed } from "../../../struct/embed";
 
-const run = async function (
-  interaction: CommandInteraction,
-  user: PartialUser
-) {
+const run: Run = async function ({ interaction, user, options }) {
   const hasState = gtsGameStateManager.getState(user.id);
 
   if (hasState) {
@@ -19,18 +17,32 @@ const run = async function (
     "**Loading...** <:song:930932998138900540>"
   );
 
+  const gender = options.getOption<"male" | "female">("gender");
+
   await interaction.createMessage({ embeds: [loadingEmbed] });
 
-  const firstGuessReward = await gts.getFirstGuessReward();
-  const timeLimit = await gts.getTimeLimit();
-  const maxGuesses = await gts.getMaxGuesses();
+  const song = await getRandomSong(
+    gender?.toUpperCase() as "MALE" | "FEMALE" | undefined
+  );
+
+  if (!song) {
+    return await interaction.editOriginalMessage({
+      embeds: [
+        new ErrorEmbed(
+          "<:song:930932998138900540> there are no available songs, try again later 😔"
+        ),
+      ],
+    });
+  }
+
+  const { maxReward, timeLimit, maxGuesses } = song;
 
   try {
-    const song = await gts.getSong();
-
     const embed = new Embed()
       .setDescription(
-        `<:song:930932998138900540> **Guess the song by using /guess!**\n\nModifiers: **None**\nMaximum reward: <:petals:930918815225741383> **${firstGuessReward}**\nTime limit: **${timeLimit} seconds**\nMaximum guesses: **${maxGuesses}**`
+        `<:song:930932998138900540> **Guess the song by using /guess!**\n\nModifiers: **None**\nMaximum reward: <:petals:930918815225741383> **${maxReward}**\nTime limit: **${
+          timeLimit / 1000
+        } seconds**\nMaximum guesses: **${maxGuesses}**`
       )
       .setFooter("Example command: /guess singing in the rain")
       .setImage("https://cdn.playpetal.com/banners/default.png");
@@ -39,17 +51,17 @@ const run = async function (
       {
         embeds: [embed],
       },
-      { file: song.buffer, name: "song.mp4" }
+      { file: Buffer.from(song.video, "base64"), name: "song.mp4" }
     );
 
     let state: GTSGameState = {
       startedAt: Date.now(),
-      firstGuessReward,
+      maxReward,
       timeLimit,
       maxGuesses,
       playerId: user.id,
       gameMessageId: message.id,
-      song: song.song,
+      song: song,
       guesses: 0,
       correct: false,
     };
@@ -67,7 +79,7 @@ const run = async function (
       if (
         newState.correct ||
         newState.guesses >= newState.maxGuesses ||
-        newState.startedAt <= Date.now() - newState.timeLimit * 1000
+        newState.startedAt <= Date.now() - newState.timeLimit
       ) {
         clearInterval(interval);
         return await handleGTSEnd(interaction, newState);
@@ -89,7 +101,11 @@ async function handleGTSEnd(
   gtsGameStateManager.unsetState(state.playerId);
   let embed = new Embed();
 
-  const reward = state.firstGuessReward;
+  const time = Date.now() - state.startedAt;
+  const reward = Math.floor(
+    ((state.maxGuesses - (state.guesses - 1)) / state.maxGuesses) *
+      state.maxReward
+  );
 
   if (state.correct) {
     embed
@@ -97,7 +113,9 @@ async function handleGTSEnd(
       .setDescription(
         `<:song:930932998138900540> **You got it in ${state.guesses} guess${
           state.guesses !== 1 ? "es" : ""
-        }!**\nYou've been rewarded <:petals:930918815225741383> **${reward}**, enjoy!`
+        } (${(time / 1000).toFixed(
+          2
+        )}s)!**\nYou've been rewarded <:petals:930918815225741383> **${reward}**, enjoy!`
       )
       .setImage("https://cdn.playpetal.com/banners/default.png");
   } else {
@@ -112,23 +130,36 @@ async function handleGTSEnd(
   }
 
   try {
+    await completeGts(
+      interaction.member!.id,
+      state.guesses,
+      time,
+      reward,
+      state.song.id,
+      state.correct,
+      state.startedAt
+    );
+  } catch (e: any) {
+    console.log(e.networkError.result.errors);
+  }
+
+  try {
     await interaction.editOriginalMessage({ embeds: [embed] }, []);
   } catch (e) {
-    // do nothing cuz the original message was probably deleted
+    // do nothing, the original message was probably deleted
   }
   return;
 }
 
-const command = new SlashCommand("song", "GTS prototype", run, [
-  {
+export default new SlashCommand("song")
+  .desc("gts")
+  .run(run)
+  .option({
+    type: "string",
     name: "gender",
     description: "limits your song to only boys or girls",
-    type: Constants.ApplicationCommandOptionTypes.STRING,
     choices: [
-      { name: "boys", value: "boys" },
-      { name: "girls", value: "girls" },
+      { name: "boys", value: "male" },
+      { name: "girls", value: "female" },
     ],
-  },
-]);
-
-export default command;
+  } as SlashCommandOption<"string">);

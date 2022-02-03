@@ -7,6 +7,8 @@ import { bot } from "..";
 import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
 import { ErrorEmbed } from "../struct/embed";
 import { Event } from "../struct/event";
+import { CommandInteraction as CInt, InteractionOption } from "petal";
+import { InteractionOptions } from "../struct/options";
 
 const run = async function (interaction: unknown) {
   if (
@@ -16,9 +18,25 @@ const run = async function (interaction: unknown) {
   )
     return;
 
+  if (
+    !(interaction instanceof AutocompleteInteraction) &&
+    !interaction.guildID
+  ) {
+    await interaction.createMessage({
+      flags: 64,
+      embeds: [
+        new ErrorEmbed(
+          "sorry, but you can only use petal in servers for now. :("
+        ),
+      ],
+    });
+
+    return;
+  }
+
   if (interaction instanceof ComponentInteraction) {
     const component = bot.components.find(
-      (c) => c.customId === interaction.data.custom_id
+      (c) => c.customId === interaction.data.custom_id.split("?")[0]
     );
     if (!component) return;
 
@@ -46,10 +64,16 @@ const run = async function (interaction: unknown) {
     if (!(interaction instanceof CommandInteraction)) return;
     if (command.name === "register") {
       // TODO: fix this hack
-      await command.run(interaction, {
-        id: 0,
-        username: "",
-        title: { title: { title: "" } },
+      await command.execute({
+        interaction,
+        user: {
+          id: 0,
+          username: "",
+          title: { title: { title: "" } },
+        },
+        options: new InteractionOptions(
+          interaction.data.options as InteractionOption<boolean>[]
+        ),
       });
       return;
     }
@@ -63,10 +87,16 @@ const run = async function (interaction: unknown) {
   }
 
   if (interaction instanceof CommandInteraction) {
-    await command.run(interaction, user);
+    const options = new InteractionOptions(
+      interaction.data.options as InteractionOption<boolean>[]
+    );
+    await command.execute({ interaction, user, options });
   } else {
-    if (command.runAutocomplete)
-      await command.runAutocomplete(interaction, user);
+    const options = new InteractionOptions(
+      interaction.data.options as InteractionOption<boolean>[]
+    );
+    if (command.getAutocomplete())
+      await command.executeAutocomplete({ interaction, user, options });
   }
 };
 

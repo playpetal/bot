@@ -1,5 +1,4 @@
 import { Client } from "eris";
-import { gts } from "../lib/fun/gts";
 import { loadComponents } from "../lib/loaders/loadComponents";
 import { loadEvents } from "../lib/loaders/loadEvents";
 import { loadSlashCommands } from "../lib/loaders/loadSlashCommands";
@@ -14,13 +13,5 @@ export class Bot extends Client {
     await loadEvents();
     this.components = await loadComponents();
     this.commands = await loadSlashCommands();
-
-    setInterval(async () => {
-      try {
-        if ((await gts.getStackLength()) < 100) await gts.requestSong();
-      } catch (e) {
-        // log later
-      }
-    }, 5000);
   }
 }

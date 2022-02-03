@@ -1,14 +1,10 @@
-import {
-  CommandInteraction,
-  Constants,
-  InteractionDataOptionsWithValue,
-} from "eris";
+import { SlashCommandOption } from "petal";
 import { createAccount } from "../../lib/graphql/mutation/CREATE_ACCOUNT";
 import { getUserPartial } from "../../lib/graphql/query/GET_USER_PARTIAL";
-import { SlashCommand } from "../../struct/command";
+import { Run, SlashCommand } from "../../struct/command";
 import { Embed, ErrorEmbed } from "../../struct/embed";
 
-const run = async function (interaction: CommandInteraction) {
+const run: Run = async function ({ interaction, options }) {
   const id = interaction.member!.user.id;
   const user = await getUserPartial(id);
 
@@ -18,18 +14,13 @@ const run = async function (interaction: CommandInteraction) {
       flags: 64,
     });
 
-  const options = interaction.data.options as
-    | InteractionDataOptionsWithValue[]
-    | undefined;
-  const usernameOption = options?.find((o) => o.name === "username");
+  const username = options.getOption<string>("username");
 
-  if (!usernameOption)
+  if (!username)
     return await interaction.createMessage({
       embeds: [new ErrorEmbed("please enter a username.")],
       flags: 64,
     });
-
-  const username = usernameOption.value as string;
 
   if (username.length > 20 || username.length < 2) {
     return await interaction.createMessage({
@@ -59,18 +50,12 @@ const run = async function (interaction: CommandInteraction) {
   await interaction.createMessage({ embeds: [embed] });
 };
 
-const command = new SlashCommand(
-  "register",
-  "sign up with this command to start playing petal!",
-  run,
-  [
-    {
-      name: "username",
-      description: "your desired username",
-      type: Constants.ApplicationCommandOptionTypes.STRING,
-      required: true,
-    },
-  ]
-);
-
-export default command;
+export default new SlashCommand("register")
+  .desc("sign up with this command to start playing petal!")
+  .run(run)
+  .option({
+    name: "username",
+    description: "your desired username",
+    type: "string",
+    required: true,
+  } as SlashCommandOption<"string">);

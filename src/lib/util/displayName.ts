@@ -1,10 +1,6 @@
-export function displayName({
-  username,
-  title,
-}: {
-  username: string;
-  title: { title: { title: string } } | null;
-}): string {
+import { PartialUser } from "petal";
+
+export function displayName({ username, title }: PartialUser): string {
   if (!title) return `**${username}**`;
   return title.title.title.replace("%u", `**${username}**`);
 }

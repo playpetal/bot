@@ -1,14 +1,9 @@
-import { CommandInteraction, Constants } from "eris";
-import { PartialUser } from "petal";
-import { SlashCommand } from "../../../struct/command";
+import { Run, SlashCommand } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { findBestMatch } from "string-similarity";
-import { gtsGameStateManager } from "../../../lib/fun/gts/state";
+import { gtsGameStateManager } from "../../../lib/fun/gts";
 
-const run = async function (
-  interaction: CommandInteraction,
-  user: PartialUser
-) {
+const run: Run = async function ({ interaction, user, options }) {
   const state = gtsGameStateManager.getState(user.id);
 
   if (!state) {
@@ -18,11 +13,11 @@ const run = async function (
   state.guesses += 1;
 
   // @ts-ignore - im lazy
-  const answer = interaction.data.options[0].value.toLowerCase();
+  const answer = options.getOption<string>("guess")!;
 
   const match = findBestMatch(answer, [
     state.song.title.toLowerCase(),
-    `${state.song.group.name.toLowerCase()} ${state.song.title.toLowerCase()}`,
+    `${state.song.group.toLowerCase()} ${state.song.title.toLowerCase()}`,
   ]);
   const correct = match.bestMatch.rating >= 0.9;
 
@@ -50,13 +45,9 @@ const run = async function (
   }
 };
 
-const command = new SlashCommand("guess", "GTS prototype", run, [
-  {
-    type: Constants.ApplicationCommandOptionTypes.STRING,
-    name: "guess",
-    description: "GTS prototype",
-    required: true,
-  },
-]);
-
-export default command;
+export default new SlashCommand("guess").desc("gts").run(run).option({
+  type: "string",
+  name: "guess",
+  description: "use this to make your guess in the 'guess the song' minigame!",
+  required: true,
+});

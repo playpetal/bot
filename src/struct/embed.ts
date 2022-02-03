@@ -72,6 +72,16 @@ export class Embed {
     this.footer = { text: str, icon_url: icon };
     return this;
   }
+
+  public addField({ name, value, inline }: Field) {
+    this.fields.push({ name, value, inline });
+    return this;
+  }
+
+  public addFields(fields: Field[]) {
+    this.fields.push(...fields);
+    return;
+  }
 }
 
 export class ErrorEmbed {
@@ -82,3 +92,5 @@ export class ErrorEmbed {
     this.description = description;
   }
 }
+
+type Field = { name: string; value: string; inline?: boolean };

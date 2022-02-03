@@ -22,7 +22,7 @@ const run = async function (msg: Message) {
       character: attachment.url,
       frame: "#FFAACC",
       name: "Prefab",
-      id: Date.now() + instance.characterId * Math.round(Math.random() * 1000),
+      id: Date.now(),
     },
   ])) as { data: { card: string } };
 
@@ -43,7 +43,9 @@ const run = async function (msg: Message) {
           components: [
             {
               type: 2,
-              custom_id: "confirm_prefab_creation",
+              custom_id: `confirm_prefab_${
+                instance.isEdit ? "edit" : "creation"
+              }`,
               label: "Confirm",
               style: 3,
             },

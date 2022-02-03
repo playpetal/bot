@@ -1,10 +1,12 @@
 import { gql } from "@apollo/client/core";
+import { PartialUser } from "petal";
 import { graphql, GraphQLResponse, Maybe } from "..";
 
 const GET_USER_PARTIAL = gql`
   query GetUserPartial($id: Int, $username: String, $discordId: String) {
     user(id: $id, username: $username, discordId: $discordId) {
       id
+      discordId
       username
       title {
         title {
@@ -24,11 +26,7 @@ export async function getUserPartial(
     query: GET_USER_PARTIAL,
     variables: { discordId, id, username },
   })) as GraphQLResponse<{
-    user: Maybe<{
-      id: number;
-      username: string;
-      title: { title: { title: string } };
-    }>;
+    user: Maybe<PartialUser>;
   }>;
 
   return query.data.user;

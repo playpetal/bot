@@ -5,18 +5,14 @@ import {
   InteractionDataOptionsWithValue,
 } from "eris";
 import { writeFile } from "fs/promises";
-import { PartialUser } from "petal";
+import { PartialUser, SlashCommandOption } from "petal";
 import { Maybe } from "../../../lib/graphql";
 import { rollCards } from "../../../lib/graphql/mutation/ROLL_CARD";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
-import { prefabCreationManager } from "../../../lib/mod/createCard";
-import { SlashCommand } from "../../../struct/command";
+import { Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
-const run = async function (
-  interaction: CommandInteraction,
-  user: PartialUser
-) {
+const run: Run = async function ({ interaction, user }) {
   const options = interaction.data.options as
     | InteractionDataOptionsWithValue[]
     | undefined;
@@ -189,25 +185,22 @@ async function getCollage(
   }
 }
 
-const command = new SlashCommand("roll", "rolls for a random card", run, [
-  {
-    type: Constants.ApplicationCommandOptionTypes.INTEGER,
+export default new SlashCommand("roll")
+  .desc("rolls for a random card")
+  .run(run)
+  .option({
+    type: "integer",
     name: "amount",
     description: "how many cards you want to roll",
-    // @ts-ignore - eris doesn't like this for some reason but it's valid according to discord docs.
-    max_value: 10,
-    // @ts-ignore - see above
     min_value: 1,
-  },
-  {
-    type: Constants.ApplicationCommandOptionTypes.STRING,
+    max_value: 10,
+  } as SlashCommandOption<"integer">)
+  .option({
+    type: "string",
     name: "gender",
     description: "only roll cards of this gender (costs more)",
     choices: [
       { name: "male", value: "MALE" },
       { name: "female", value: "FEMALE" },
     ],
-  },
-]);
-
-export default command;
+  });

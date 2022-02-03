@@ -1,15 +1,24 @@
 import { gql } from "@apollo/client/core";
+import { Account } from "petal";
 import { graphql, GraphQLResponse, Maybe } from "..";
 
 const GET_USER = gql`
   query GetUser($id: Int, $username: String, $discordId: String) {
     user(id: $id, username: $username, discordId: $discordId) {
       id
+      discordId
       username
       createdAt
       bio
       currency
-      cardCount
+      stats {
+        cardCount
+        gtsTotalGames
+        gtsGuessCount
+        gtsTotalTime
+        gtsTotalRewards
+        rollCount
+      }
       title {
         title {
           title
@@ -37,16 +46,7 @@ export async function getUser({
     query: GET_USER,
     variables: { discordId, id, username },
   })) as GraphQLResponse<{
-    user: Maybe<{
-      id: number;
-      username: string;
-      currency: number;
-      cardCount: number;
-      title: { title: { title: string } } | null;
-      createdAt: number;
-      bio: string;
-      groups: { group: { name: string } }[];
-    }>;
+    user: Maybe<Account>;
   }>;
 
   return query.data.user;

@@ -24,13 +24,13 @@ class PrefabCreationManager {
 }
 
 export type Prefab = {
-  characterId: number;
+  characterId?: number;
   subgroupId?: number;
   groupId?: number;
   maxCards?: number;
   rarity?: number;
   imageUrl?: string;
-  isEdit?: boolean;
+  isEdit?: { prefabId: number };
 };
 
 export const prefabCreationManager = new PrefabCreationManager();

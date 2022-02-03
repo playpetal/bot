@@ -1,125 +1,30 @@
-import axios from "axios";
-import { bot } from "../../..";
-import { getRandomSong } from "../../graphql/query/GET_RANDOM_SONG";
-import { redis } from "../../redis";
+export type GTSGameState = {
+  startedAt: number;
+  maxReward: number;
+  timeLimit: number;
+  maxGuesses: number;
 
-export type Song = { id: number; title: string; group: { name: string } };
-
-type GTSSong = {
-  song: Song;
-  buffer: Buffer;
+  playerId: number;
+  gameMessageId: string;
+  song: { id: number; title: string; group: string };
+  guesses: number;
+  correct: boolean;
 };
 
-type RedisSong = {
-  song: Song;
-  encodedBuffer: string;
-};
+class GTSGameStateManager {
+  private games: Map<number, GTSGameState> = new Map();
 
-class GTSManager {
-  public async getStackLength() {
-    return await redis.llen("songs");
+  public setState(playerId: number, state: GTSGameState) {
+    return this.games.set(playerId, state);
   }
 
-  public async getSong(): Promise<GTSSong> {
-    const song = await redis.rpop("songs");
-
-    if (song) {
-      const jsonSong = JSON.parse(song) as RedisSong;
-
-      return {
-        song: jsonSong.song,
-        buffer: Buffer.from(jsonSong.encodedBuffer, "base64"),
-      };
-    }
-
-    return await this.requestSong(false);
+  public unsetState(playerId: number) {
+    return this.games.delete(playerId);
   }
 
-  public async requestSong(addToStack: boolean = true): Promise<GTSSong> {
-    const song = await getRandomSong();
-
-    if (!song) throw Error("No songs");
-
-    try {
-      const {
-        data: { url },
-      } = (await axios.get(`${process.env.YURE_URL}/song?id=${song.id}`)) as {
-        data: { url: string };
-      };
-
-      const { data } = (await axios.get(url, {
-        responseType: "arraybuffer",
-      })) as { data: Buffer };
-
-      const instance = { song, buffer: data };
-
-      if (addToStack) {
-        const encoded: RedisSong = {
-          song: instance.song,
-          encodedBuffer: data.toString("base64"),
-        };
-
-        await redis.rpush("songs", JSON.stringify(encoded));
-      }
-      return instance;
-    } catch (e) {
-      if ((e as Error).stack?.includes("ECONNREFUSED")) {
-        // TODO: don't hardcode this you fucking moron
-        const user = await bot.getRESTUser("915329934019407872");
-        (await user.getDMChannel()).createMessage(
-          "Hey dipshit, GTS service is offline!"
-        );
-      }
-
-      throw new Error("Failed to connect to Angreifer!");
-    }
-  }
-
-  public async clearSongQueue(): Promise<number> {
-    return await redis.del("songs");
-  }
-
-  public async setFirstGuessReward(reward: number): Promise<void> {
-    await redis.set("gtsFirstGuessReward", reward);
-    return;
-  }
-
-  public async getFirstGuessReward(): Promise<number> {
-    const reward = await redis.get("gtsFirstGuessReward");
-
-    if (!reward) {
-      console.warn("gtsFirstGuessReward is unconfigured, using fallback");
-      return 0;
-    } else return parseInt(reward, 10);
-  }
-
-  public async setTimeLimit(seconds: number): Promise<void> {
-    await redis.set("gtsTimeLimit", seconds);
-    return;
-  }
-
-  public async getTimeLimit(): Promise<number> {
-    const time = await redis.get("gtsTimeLimit");
-
-    if (!time) {
-      console.warn("gtsTimeLimit is unconfigured, using fallback");
-      return 15;
-    } else return parseInt(time, 10);
-  }
-
-  public async setMaxGuesses(maxGuesses: number): Promise<void> {
-    await redis.set("gtsMaxGuesses", maxGuesses);
-    return;
-  }
-
-  public async getMaxGuesses(): Promise<number> {
-    const guesses = await redis.get("gtsMaxGuesses");
-
-    if (!guesses) {
-      console.warn("gtsMaxGuesses is unconfigured, using fallback");
-      return 3;
-    } else return parseInt(guesses, 10);
+  public getState(playerId: number) {
+    return this.games.get(playerId);
   }
 }
 
-export const gts = new GTSManager();
+export const gtsGameStateManager = new GTSGameStateManager();

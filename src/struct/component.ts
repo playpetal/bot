@@ -1,8 +1,9 @@
 import { ComponentInteraction } from "eris";
+import { PartialUser } from "petal";
 
 type RunComponent = (
   interaction: ComponentInteraction,
-  user: { id: number; username: string; title: { title: { title: string } } }
+  user: PartialUser
 ) => Promise<unknown> | unknown;
 
 export class Component {

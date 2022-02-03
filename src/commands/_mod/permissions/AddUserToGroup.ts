@@ -1,16 +1,11 @@
-import {
-  AutocompleteInteraction,
-  CommandInteraction,
-  Constants,
-  InteractionDataOptionsWithValue,
-} from "eris";
+import { AutocompleteInteraction, InteractionDataOptionsWithValue } from "eris";
 import { assignUserGroup } from "../../../lib/graphql/mutation/ASSIGN_USER_GROUP";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { getUserGroups } from "../../../lib/graphql/query/GET_USER_GROUPS";
-import { SlashCommand } from "../../../struct/command";
+import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
-async function run(interaction: CommandInteraction) {
+const run: Run = async ({ interaction }) => {
   const account = (await getUser({ discordId: interaction.member!.user.id }))!;
 
   if (!account.groups.find((g) => g.group.name === "Developer"))
@@ -63,9 +58,9 @@ async function run(interaction: CommandInteraction) {
   );
 
   await interaction.createMessage({ embeds: [embed] });
-}
+};
 
-async function runAutocomplete(interaction: AutocompleteInteraction) {
+const autocomplete: Autocomplete = async ({ interaction }) => {
   const options = interaction.data.options as {
     value: string;
     type: 3;
@@ -81,28 +76,22 @@ async function runAutocomplete(interaction: AutocompleteInteraction) {
   });
 
   await interaction.acknowledge(choices);
-}
+};
 
-const command = new SlashCommand(
-  "addusertogroup",
-  "adds a user to a usergroup",
-  run,
-  [
-    {
-      name: "user",
-      description: "the user you'd like to add to the group",
-      type: Constants.ApplicationCommandOptionTypes.USER,
-      required: true,
-    },
-    {
-      name: "group",
-      description: "the group you'd like to add the user to",
-      type: Constants.ApplicationCommandOptionTypes.STRING,
-      required: true,
-      autocomplete: true,
-    },
-  ],
-  runAutocomplete
-);
-
-export default command;
+export default new SlashCommand("addusertogroup")
+  .desc("adds a user to a user group")
+  .run(run)
+  .autocomplete(autocomplete)
+  .option({
+    type: "user",
+    name: "user",
+    description: "the user you'd like to add to the group",
+    required: true,
+  })
+  .option({
+    type: "string",
+    name: "group",
+    description: "the group you'd like to add the user to",
+    required: true,
+    autocomplete: true,
+  });

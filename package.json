@@ -17,7 +17,7 @@
     "glob": "^7.2.0",
     "glob-promise": "^4.2.2",
     "graphql": "^16.2.0",
-    "ioredis": "^4.28.3",
+    "hot-shots": "^9.0.0",
     "jsonwebtoken": "^8.5.1",
     "rimraf": "^3.0.2",
     "string-similarity": "^4.0.4"
@@ -36,6 +36,6 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "rimraf dist && yarn tsc",
-    "pm2": "NODE_ENV=production pm2 start dist/index.js --watch"
+    "pm2": "NODE_ENV=production pm2-runtime start dist/index.js --watch"
   }
 }

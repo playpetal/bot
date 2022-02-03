@@ -6,12 +6,11 @@ const GET_RANDOM_SONG = gql`
     getRandomSong(gender: $gender) {
       id
       title
-      group {
-        name
-        aliases {
-          alias
-        }
-      }
+      group
+      video
+      maxReward
+      timeLimit
+      maxGuesses
     }
   }
 `;
@@ -19,15 +18,14 @@ const GET_RANDOM_SONG = gql`
 type Song = {
   id: number;
   title: string;
-  group: {
-    name: string;
-    aliases: {
-      alias: string;
-    };
-  };
+  group: string;
+  video: string;
+  maxReward: number;
+  timeLimit: number;
+  maxGuesses: number;
 };
 
-export async function getRandomSong(gender?: "MALE" | "FEMALE") {
+export async function getRandomSong(gender?: "MALE" | "FEMALE" | "COED") {
   const query = (await graphql.query({
     query: GET_RANDOM_SONG,
     variables: { gender },
