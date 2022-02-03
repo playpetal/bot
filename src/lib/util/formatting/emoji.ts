@@ -6,4 +6,7 @@ export const emoji = {
   bud: "<:bud:937994864866492416>",
   flower: "<:flower:937994864837136414>",
   bloom: "<:petal:917578760449060995>",
+  dice: "<:dice:938013692593860639>",
+  song: "<:song:930932998138900540>",
+  petals: "<:petals:930918815225741383>",
 } as const;
