@@ -1,14 +1,9 @@
 import axios from "axios";
-import {
-  CommandInteraction,
-  Constants,
-  InteractionDataOptionsWithValue,
-} from "eris";
-import { writeFile } from "fs/promises";
-import { PartialUser, SlashCommandOption } from "petal";
-import { Maybe } from "../../../lib/graphql";
+import { InteractionDataOptionsWithValue } from "eris";
+import { Card, SlashCommandOption } from "petal";
 import { rollCards } from "../../../lib/graphql/mutation/ROLL_CARD";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
+import { formatCard } from "../../../lib/util/formatting/format";
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
@@ -70,7 +65,7 @@ const run: Run = async function ({ interaction, user }) {
   });
 
   const cards = await rollCards(
-    interaction.member!.user.id,
+    user.discordId,
     amount,
     gender as "MALE" | "FEMALE" | undefined
   );
@@ -80,16 +75,7 @@ const run: Run = async function ({ interaction, user }) {
   const isOnce = amount === 1;
   const counter = isOnce ? "once" : `${amount} times`;
 
-  const humanFriendly = cards.map((c) => {
-    let str = `${emojis[c.quality]}`;
-
-    // if (c.prefab.group) str += ` **${c.prefab.group.name}**`;
-    if (c.prefab.subgroup) str += ` **${c.prefab.subgroup.name}**`;
-
-    str += ` ${c.prefab.character.name}`;
-
-    return str;
-  });
+  const humanFriendly = cards.map((c) => formatCard(c));
 
   const embed = new Embed().setDescription(
     `<:dice:938013692593860639> you rolled **${counter}** for <:petals:930918815225741383> **${cost}** and got...` +
@@ -98,8 +84,6 @@ const run: Run = async function ({ interaction, user }) {
 
   const collage = await getCollage(cards);
   const timeout = Math.max(0, 3000 - (Date.now() - now));
-
-  await writeFile("./file.png", Buffer.from(collage, "base64"));
 
   setTimeout(async () => {
     await interaction.editOriginalMessage({
@@ -128,26 +112,7 @@ const emojis = {
   BLOOM: "<:bloom:917578760449060995>",
 };
 
-async function getCollage(
-  cards: {
-    id: number;
-    prefab: {
-      id: number;
-      group: Maybe<{
-        name: string;
-      }>;
-      subgroup: Maybe<{
-        name: string;
-      }>;
-      character: {
-        name: string;
-      };
-    };
-    issue: number;
-    quality: "SEED" | "SPROUT";
-    tint: number;
-  }[]
-) {
+async function getCollage(cards: Card[]) {
   const oniCards: {
     frame: string;
     name: string;

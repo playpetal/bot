@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse, Maybe } from "..";
+import { Card } from "petal";
+import { graphql, GraphQLResponse } from "..";
 import { tokenize } from "../../crypto";
 
 const ROLL_CARD = gql`
@@ -18,9 +19,20 @@ const ROLL_CARD = gql`
           name
         }
       }
+      owner {
+        id
+        username
+        discordId
+        title {
+          title {
+            title
+          }
+        }
+      }
       issue
       quality
       tint
+      createdAt
     }
   }
 `;
@@ -35,20 +47,7 @@ export async function rollCards(
     variables: { gender, amount },
     context: { headers: { Authorization: tokenize(discordId) } },
   })) as GraphQLResponse<{
-    rollCards: {
-      id: number;
-      prefab: {
-        id: number;
-        group: Maybe<{ name: string }>;
-        subgroup: Maybe<{ name: string }>;
-        character: {
-          name: string;
-        };
-      };
-      issue: number;
-      quality: "SEED" | "SPROUT";
-      tint: number;
-    }[];
+    rollCards: Card[];
   }>;
 
   return mutation.data.rollCards;

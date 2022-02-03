@@ -127,4 +127,26 @@ declare module "petal" {
 
   export type Gender = "MALE" | "FEMALE" | "NONBINARY";
   export type GroupGender = "MALE" | "FEMALE" | "COED";
+
+  export type Quality = "SEED" | "SPROUT" | "BUD" | "FLOWER" | "BLOOM";
+
+  export type Card = {
+    id: number;
+    prefab: {
+      id: number;
+      character: Character;
+      subgroup: Maybe<Subgroup>;
+      group: Maybe<Group>;
+    };
+    owner: {
+      id: number;
+      discordId: string;
+      username: string;
+      title: Maybe<{ title: { title: string } }>;
+    };
+    issue: number;
+    quality: Quality;
+    tint: number;
+    createdAt: number;
+  };
 }
