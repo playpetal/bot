@@ -56,7 +56,7 @@ const run: Run = async ({ interaction, user, options }) => {
     | undefined;
   const creation = subcommand.options!.find((o) => o.name === "creation")
     ?.value as string | undefined;
-  const gender = subcommand.options!.find((o) => o.name === "gender")!.value as
+  const gender = subcommand.options!.find((o) => o.name === "gender")?.value as
     | "male"
     | "female"
     | "coed"
