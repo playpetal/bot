@@ -13,7 +13,7 @@ const run: Run = async ({ interaction, user, options }) => {
   const cardId = parseInt(strCardId, 36);
   const card = await getCard(cardId);
 
-  if (!card) {
+  if (!card || card.owner === null) {
     return interaction.createMessage({
       embeds: [new ErrorEmbed("please select a card from the dropdown!")],
     });
