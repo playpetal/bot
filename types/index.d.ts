@@ -138,12 +138,12 @@ declare module "petal" {
       subgroup: Maybe<Subgroup>;
       group: Maybe<Group>;
     };
-    owner: {
+    owner: Maybe<{
       id: number;
       discordId: string;
       username: string;
       title: Maybe<{ title: { title: string } }>;
-    };
+    }>;
     issue: number;
     quality: Quality;
     tint: number;
