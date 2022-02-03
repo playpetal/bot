@@ -29,7 +29,7 @@ const run: Run = async ({ interaction, user, options }) => {
         title: { title: { title: title.title } },
       })}` +
         `\n${emoji.user} *owned by ${strong(title.ownedCount)} players*` +
-        `\n${title.description || "this title has no description!"}`
+        `\n\n${title.description || "this title has no description!"}`
     );
 
     await interaction.createMessage({ embeds: [embed] });
