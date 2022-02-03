@@ -1,8 +1,12 @@
 import axios from "axios";
+import { burnCard } from "../../../lib/graphql/mutation/game/BURN_CARD";
 import { getCard } from "../../../lib/graphql/query/GET_CARD";
 import { searchCards } from "../../../lib/graphql/query/SEARCH_CARDS";
+import { getCardImage } from "../../../lib/img";
 import { displayName } from "../../../lib/util/displayName";
+import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
+import { strong } from "../../../lib/util/formatting/strong";
 import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
@@ -36,6 +40,30 @@ const run: Run = async ({ interaction, user, options }) => {
         file: image,
         name: `${card.id.toString(36)}.png`,
       },
+    ]);
+  } else if (subcommand.name === "burn") {
+    if (card.owner.id !== user.id)
+      return interaction.createMessage({
+        embeds: [new ErrorEmbed("that card doesn't belong to you!")],
+      });
+
+    const reward =
+      (["SEED", "SPROUT", "BUD", "FLOWER", "BLOOM"].indexOf(card.quality) + 1) *
+      5;
+
+    await burnCard(card.id, user.discordId);
+
+    const image = await getCardImage(card);
+
+    const embed = new Embed()
+      .setDescription(
+        `**the card crackles as it turns to dust...**` +
+          `\nin its ashes you find ${emoji.petals} ${strong(reward)}!`
+      )
+      .setThumbnail(`attachment://${card.id.toString(36)}.png`);
+
+    return interaction.createFollowup({ embeds: [embed] }, [
+      { file: image, name: `${card.id.toString(36)}.png` },
     ]);
   }
 };
