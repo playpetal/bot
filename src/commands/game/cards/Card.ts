@@ -20,23 +20,7 @@ const run: Run = async ({ interaction, user, options }) => {
   }
 
   if (subcommand.name === "view") {
-    const {
-      data: { hash },
-    } = (await axios.get(`${process.env.ONI_URL!}/hash`, {
-      headers: { Authorization: process.env.ONI_SHARED_SECRET! },
-      data: { id: card.prefab.id },
-    })) as { data: { hash: string } };
-
-    const { data } = (await axios.post(`${process.env.ONI_URL!}/card`, [
-      {
-        frame: `#${card.tint.toString(16)}`,
-        name: card.prefab.character.name,
-        id: card.id,
-        character: `https://cdn.playpetal.com/p/${hash}.png`,
-      },
-    ])) as {
-      data: { card: string };
-    };
+    const image = await getCardImage(card);
 
     const embed = new Embed()
       .setDescription(
@@ -49,7 +33,7 @@ const run: Run = async ({ interaction, user, options }) => {
 
     return interaction.createFollowup({ embeds: [embed] }, [
       {
-        file: Buffer.from(data.card, "base64"),
+        file: image,
         name: `${card.id.toString(36)}.png`,
       },
     ]);
