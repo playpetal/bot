@@ -2,6 +2,7 @@ import { CommandInteraction } from "eris";
 import { SlashCommandOption } from "petal";
 import { GTSGameState, gtsGameStateManager } from "../../../lib/fun/gts";
 import { completeGts } from "../../../lib/graphql/mutation/COMPLETE_GTS";
+import { getGTSStats } from "../../../lib/graphql/query/GET_GTS_STATS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
@@ -35,7 +36,21 @@ const run: Run = async function ({ interaction, user, options }) {
     });
   }
 
-  const { maxReward, timeLimit, maxGuesses } = song;
+  const { stats } = (await getGTSStats(user.id))!;
+  const isNewHour =
+    new Date().getHours() !==
+    (stats?.gtsLastGame ? new Date(stats.gtsLastGame).getHours() : -1);
+
+  const isExtra =
+    stats.gtsCurrentGames > 2 &&
+    (stats.gtsLastGame || Date.now()) > Date.now() - 3600000;
+
+  let { maxReward, timeLimit, maxGuesses } = song;
+
+  if (isExtra) {
+    maxReward = 0;
+    maxGuesses = 10;
+  }
 
   try {
     const embed = new Embed()
@@ -44,7 +59,13 @@ const run: Run = async function ({ interaction, user, options }) {
           timeLimit / 1000
         } seconds**\nMaximum guesses: **${maxGuesses}**`
       )
-      .setFooter("Example command: /guess singing in the rain")
+      .setFooter(
+        isExtra
+          ? `Rewards won't be given since you've already won 3 times this hour.`
+          : `You can win ${
+              isNewHour ? 3 : 3 - stats.gtsCurrentGames
+            } more games this hour!`
+      )
       .setImage("https://cdn.playpetal.com/banners/default.png");
 
     const message = await interaction.editOriginalMessage(
@@ -113,9 +134,10 @@ async function handleGTSEnd(
       .setDescription(
         `<:song:930932998138900540> **You got it in ${state.guesses} guess${
           state.guesses !== 1 ? "es" : ""
-        } (${(time / 1000).toFixed(
-          2
-        )}s)!**\nYou've been rewarded <:petals:930918815225741383> **${reward}**, enjoy!`
+        } (${(time / 1000).toFixed(2)}s)!**` +
+          (state.maxReward === 0
+            ? `\nYou did not receive any petals for this game.`
+            : `\nYou've been rewarded <:petals:930918815225741383> **${reward}**, enjoy!`)
       )
       .setImage("https://cdn.playpetal.com/banners/default.png");
   } else {
