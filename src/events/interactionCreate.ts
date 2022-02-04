@@ -5,9 +5,9 @@ import {
 } from "eris";
 import { bot } from "..";
 import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
-import { ErrorEmbed } from "../struct/embed";
+import { Embed, ErrorEmbed } from "../struct/embed";
 import { Event } from "../struct/event";
-import { CommandInteraction as CInt, InteractionOption } from "petal";
+import { InteractionOption, Maybe, PartialUser } from "petal";
 import { InteractionOptions } from "../struct/options";
 
 const run = async function (interaction: unknown) {
@@ -58,7 +58,27 @@ const run = async function (interaction: unknown) {
 
   if (!interaction.member) return;
 
-  const user = await getUserPartial(interaction.member.id);
+  let user: Maybe<PartialUser>;
+
+  try {
+    user = await getUserPartial(interaction.member.id);
+  } catch (e) {
+    if (!(interaction instanceof AutocompleteInteraction)) {
+      return interaction.createMessage({
+        embeds: [
+          new ErrorEmbed(
+            "failed to connect to the api... try again in a few minutes? 😕"
+          ),
+        ],
+      });
+    }
+    return interaction.acknowledge([
+      {
+        name: "could not connect to the api to fetch options :(",
+        value: "ERROR",
+      },
+    ]);
+  }
 
   if (!user) {
     if (!(interaction instanceof CommandInteraction)) return;
