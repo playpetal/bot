@@ -9,9 +9,7 @@ const GET_USER_PARTIAL = gql`
       discordId
       username
       title {
-        title {
-          title
-        }
+        title
       }
     }
   }

@@ -24,9 +24,7 @@ const ROLL_CARD = gql`
         username
         discordId
         title {
-          title {
-            title
-          }
+          title
         }
       }
       issue

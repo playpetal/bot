@@ -22,9 +22,7 @@ const query = gql`
         id
         username
         title {
-          title {
-            title
-          }
+          title
         }
       }
       issue

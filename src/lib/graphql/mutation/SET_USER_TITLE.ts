@@ -10,9 +10,7 @@ const mutation = gql`
       discordId
       username
       title {
-        title {
-          title
-        }
+        title
       }
     }
   }

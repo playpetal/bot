@@ -62,14 +62,14 @@ declare module "petal" {
     id: number;
     discordId: string;
     username: string;
-    title: Maybe<{ title: { title: string } }>;
+    title: Maybe<{ title: string }>;
   };
 
   export type Account = {
     id: number;
     discordId: string;
     username: string;
-    title: Maybe<{ title: { title: string } }>;
+    title: Maybe<{ title: string }>;
     bio: Maybe<string>;
     currency: number;
     createdAt: number;
@@ -142,7 +142,7 @@ declare module "petal" {
       id: number;
       discordId: string;
       username: string;
-      title: Maybe<{ title: { title: string } }>;
+      title: Maybe<{ title: string }>;
     }>;
     issue: number;
     quality: Quality;

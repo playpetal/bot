@@ -26,7 +26,7 @@ const run: Run = async ({ interaction, user, options }) => {
     const embed = new Embed().setDescription(
       `${emoji.title} ${displayName({
         ...user,
-        title: { title: { title: title.title } },
+        title: { title: title.title },
       })}` +
         `\n${emoji.user} *owned by ${strong(title.ownedCount)} players*` +
         `\n\n${title.description || "this title has no description!"}`
@@ -40,7 +40,7 @@ const run: Run = async ({ interaction, user, options }) => {
       (t) =>
         `${emoji.title} ${displayName({
           ...user,
-          title: t,
+          title: t.title,
         })}`
     );
 

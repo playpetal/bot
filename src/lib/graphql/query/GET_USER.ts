@@ -20,9 +20,7 @@ const GET_USER = gql`
         rollCount
       }
       title {
-        title {
-          title
-        }
+        title
       }
       groups {
         group {
