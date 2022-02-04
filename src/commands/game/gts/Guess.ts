@@ -2,13 +2,15 @@ import { Run, SlashCommand } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { findBestMatch } from "string-similarity";
 import { gtsGameStateManager } from "../../../lib/fun/gts";
+import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
   const state = gtsGameStateManager.getState(user.id);
 
-  if (!state) {
-    throw new Error("not in game");
-  }
+  if (!state)
+    throw new BotError(
+      "**you're not playing!**\nuse **/song** to start a game."
+    );
 
   state.guesses += 1;
 

@@ -9,6 +9,7 @@ import { Embed, ErrorEmbed } from "../struct/embed";
 import { Event } from "../struct/event";
 import { InteractionOption, Maybe, PartialUser } from "petal";
 import { InteractionOptions } from "../struct/options";
+import { BotError } from "../struct/error";
 
 const run = async function (interaction: unknown) {
   if (
@@ -110,7 +111,25 @@ const run = async function (interaction: unknown) {
     const options = new InteractionOptions(
       interaction.data.options as InteractionOption<boolean>[]
     );
-    await command.execute({ interaction, user, options });
+
+    try {
+      await command.execute({ interaction, user, options });
+    } catch (e) {
+      if (e instanceof BotError) {
+        return interaction.createMessage({
+          embeds: [new ErrorEmbed(e.message)],
+        });
+      } else {
+        console.log(e);
+        return interaction.createMessage({
+          embeds: [
+            new ErrorEmbed(
+              "**an unexpected error occurred.**\nplease try again in a few moments."
+            ),
+          ],
+        });
+      }
+    }
   } else {
     const options = new InteractionOptions(
       interaction.data.options as InteractionOption<boolean>[]
