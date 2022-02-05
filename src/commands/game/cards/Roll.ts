@@ -1,65 +1,38 @@
 import axios from "axios";
-import { InteractionDataOptionsWithValue } from "eris";
 import { Card, SlashCommandOption } from "petal";
 import { rollCards } from "../../../lib/graphql/mutation/ROLL_CARD";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
+import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
+import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
+import { BotError } from "../../../struct/error";
 
-const run: Run = async function ({ interaction, user }) {
-  const options = interaction.data.options as
-    | InteractionDataOptionsWithValue[]
-    | undefined;
+const run: Run = async function ({ interaction, user, options }) {
+  const amount = options.getOption("amount") as number;
 
-  let amount = options?.find((o) => o.name === "amount")?.value as
-    | number
-    | undefined;
+  if (!amount || isNaN(amount) || amount < 1 || amount > 10)
+    throw new BotError(
+      "**woah there!**\nyou can only roll up to 10 cards at once."
+    );
 
-  if (amount === undefined) amount = 1;
+  const gender = options.getOption("gender") as string | undefined;
 
-  if (isNaN(amount) || amount < 1 || amount > 10) {
-    return await interaction.createMessage({
-      embeds: [new ErrorEmbed("`amount` must be a number between 1 and 10!")],
-      flags: 64,
-    });
-  }
-
-  const gender = options?.find((o) => o.name === "gender")?.value as
-    | string
-    | undefined;
-
-  let cost = 10;
-
-  if (gender) {
-    if (!["MALE", "FEMALE"].includes(gender))
-      return await interaction.createMessage({
-        embeds: [
-          new ErrorEmbed("`gender` must be either **male** or **female**!"),
-        ],
-      });
-
-    cost = 15;
-  }
-
-  cost *= amount;
-
+  const cost = (gender ? 15 : 10) * amount;
   const { currency } = (await getUser({ id: user.id }))!;
+
   if (currency < cost) {
-    return await interaction.createMessage({
-      embeds: [
-        new ErrorEmbed(
-          `you need <:petals:930918815225741383> **${cost}** to do that, but you only have <:petals:930918815225741383> **${currency}** :(`
-        ),
-      ],
-    });
+    throw new BotError(
+      `**woah there!**` +
+        `\nyou need ${emoji.petals} ${strong(cost)} to do that.`
+    );
   }
 
-  await interaction.createFollowup({
-    content: "",
+  await interaction.createMessage({
     embeds: [
       new Embed().setDescription(
-        `<:dice:938013692593860639> **rolling your dice...** good luck!`
+        `${emoji.dice} **rolling your dice...** good luck!`
       ),
     ],
   });
@@ -78,8 +51,9 @@ const run: Run = async function ({ interaction, user }) {
   const humanFriendly = cards.map((c) => formatCard(c));
 
   const embed = new Embed().setDescription(
-    `<:dice:938013692593860639> you rolled **${counter}** for <:petals:930918815225741383> **${cost}** and got...` +
-      `\n\n${humanFriendly.join("\n")}`
+    `${emoji.dice} you rolled **${counter}** for ${emoji.petals} ${strong(
+      cost
+    )} and got...` + `\n\n${humanFriendly.join("\n")}`
   );
 
   const collage = await getCollage(cards);
@@ -102,14 +76,6 @@ const run: Run = async function ({ interaction, user }) {
       ]
     );
   }, timeout);
-};
-
-const emojis = {
-  SEED: "<:seed:937994849553113088>",
-  SPROUT: "<:sprout:937994864606457856>",
-  BUD: "<:bud:937994864866492416>",
-  FLOWER: "<:flower:937994864837136414>",
-  BLOOM: "<:bloom:917578760449060995>",
 };
 
 async function getCollage(cards: Card[]) {
