@@ -15,13 +15,19 @@ const run: Run = async function ({ interaction, user, options }) {
 
   state.guesses += 1;
 
-  const answer = options.getOption<string>("guess")!.toLowerCase();
+  const answer = options.getOption<string>("guess")!;
 
-  const match = findBestMatch(answer, [
-    state.song.title.toLowerCase(),
-    `${state.song.group.toLowerCase()} ${state.song.title.toLowerCase()}`,
-  ]);
-  const correct = match.bestMatch.rating >= 0.85;
+  const title = state.song.title.toLowerCase().replace(/[^a-zA-Z0-9]/gm, "");
+  const groupTitle = `${state.song.group || ""}${state.song.title}`
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]/gm, "");
+
+  const match = findBestMatch(
+    answer.toLowerCase().replace(/[^a-zA-Z0-9]/gm, ""),
+    [title, groupTitle]
+  );
+
+  const correct = match.bestMatch.rating >= 0.75;
 
   const embed = new Embed();
 
