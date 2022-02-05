@@ -37,7 +37,13 @@ const run: Run = async function ({ interaction, user, options }) {
     new Date().getHours() !==
     (stats?.gtsLastGame ? new Date(stats.gtsLastGame).getHours() : -1);
 
-  const isExtra = stats.gtsCurrentGames > 2 && isNewHour;
+  let isExtra = false;
+
+  if (stats.gtsCurrentGames > 2) {
+    isExtra = true;
+  } else if (!isNewHour) {
+    isExtra = true;
+  }
 
   let { maxReward, timeLimit, maxGuesses } = song;
 
