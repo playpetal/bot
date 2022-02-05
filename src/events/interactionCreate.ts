@@ -100,40 +100,46 @@ const run = async function (interaction: unknown) {
     ]);
   }
 
-  if (!user) {
-    if (!(interaction instanceof CommandInteraction)) return;
-    if (command.name === "register") {
-      // TODO: fix this hack
-      await command.execute({
-        interaction,
-        user: {
-          id: 0,
-          username: "",
-          title: { title: { title: "" } },
-        },
-        options: new InteractionOptions(
-          interaction.data.options as InteractionOption<boolean>[]
-        ),
-      });
-      return;
+  try {
+    if (!user) {
+      if (!(interaction instanceof CommandInteraction)) return;
+      if (command.name === "register") {
+        // TODO: fix this hack
+        await command.execute({
+          interaction,
+          user: {
+            id: 0,
+            username: "",
+            title: { title: { title: "" } },
+          },
+          options: new InteractionOptions(
+            interaction.data.options as InteractionOption<boolean>[]
+          ),
+        });
+        return;
+      }
+
+      throw new BotError(
+        "please sign up by using **/register `username`** to play petal!"
+      );
     }
 
-    const embed = new ErrorEmbed(
-      "please sign up by using **/register `username`** to play petal!"
-    );
-    return await interaction.createMessage({
-      embeds: [embed],
-    });
-  }
+    if (interaction instanceof CommandInteraction) {
+      const options = new InteractionOptions(
+        interaction.data.options as InteractionOption<boolean>[]
+      );
 
-  if (interaction instanceof CommandInteraction) {
-    const options = new InteractionOptions(
-      interaction.data.options as InteractionOption<boolean>[]
-    );
-
-    try {
       await command.execute({ interaction, user, options });
-    } catch (e) {
+    } else {
+      const options = new InteractionOptions(
+        interaction.data.options as InteractionOption<boolean>[]
+      );
+
+      if (command.getAutocomplete())
+        await command.executeAutocomplete({ interaction, user, options });
+    }
+  } catch (e) {
+    if (interaction instanceof CommandInteraction) {
       if (e instanceof BotError) {
         return interaction.createMessage({
           embeds: [new ErrorEmbed(e.message)],
@@ -148,13 +154,10 @@ const run = async function (interaction: unknown) {
           ],
         });
       }
-    }
-  } else {
-    const options = new InteractionOptions(
-      interaction.data.options as InteractionOption<boolean>[]
-    );
-    if (command.getAutocomplete())
-      await command.executeAutocomplete({ interaction, user, options });
+    } else
+      return interaction.acknowledge([
+        { name: "an error occurred :(", value: "-1" },
+      ]);
   }
 };
 
