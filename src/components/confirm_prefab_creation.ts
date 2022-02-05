@@ -3,50 +3,28 @@ import { ComponentInteraction } from "eris";
 import { createPrefab } from "../lib/graphql/mutation/CREATE_PREFAB";
 import { prefabCreationManager } from "../lib/mod/createCard";
 import { Component } from "../struct/component";
-import { Embed, ErrorEmbed } from "../struct/embed";
+import { Embed } from "../struct/embed";
+import { BotError } from "../struct/error";
 
 async function run(interaction: ComponentInteraction) {
   const instance = prefabCreationManager.getInstance(interaction.member!.user);
 
-  if (!instance) {
-    return await interaction.createFollowup({
-      embeds: [new ErrorEmbed("This prefab creation instance expired.")],
-      flags: 64,
-    });
-  }
+  if (!instance) throw new BotError("this instance has expired 😔");
 
-  let id: number;
-  let url: string;
+  const { id } = await createPrefab(interaction.member!.id, instance);
 
-  try {
-    const prefab = await createPrefab(interaction.member!.id, instance);
+  const upload = await axios.post(`${process.env.ONI_URL}/upload`, {
+    url: instance.imageUrl,
+    id: id.toString(),
+  });
 
-    id = prefab.id;
-  } catch (e) {
-    console.log(e);
-    return await interaction.createFollowup({
-      embeds: [new ErrorEmbed("An error occurred creating the prefab.")],
-    });
-  }
-
-  try {
-    const upload = await axios.post(`${process.env.ONI_URL}/upload`, {
-      url: instance.imageUrl,
-      id: id.toString(),
-    });
-
-    url = upload.data.url;
-  } catch (e) {
-    return await interaction.createFollowup({
-      embeds: [new ErrorEmbed("An error occurred uploading the prefab image.")],
-    });
-  }
+  const url = upload.data.url;
 
   prefabCreationManager.deleteInstance(interaction.member!.user);
-  return await interaction.createFollowup({
+  return interaction.createFollowup({
     embeds: [
       new Embed().setDescription(
-        "**Success!**" + `\nYou've created [**Prefab #${id}**](${url})!`
+        "**success!**" + `\nyou've created [**prefab #${id}**](${url})!`
       ),
     ],
   });

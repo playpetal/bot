@@ -3,55 +3,32 @@ import { ComponentInteraction } from "eris";
 import { updatePrefab } from "../lib/graphql/mutation/categorization/prefab/UPDATE_PREFAB";
 import { prefabCreationManager } from "../lib/mod/createCard";
 import { Component } from "../struct/component";
-import { Embed, ErrorEmbed } from "../struct/embed";
+import { Embed } from "../struct/embed";
+import { BotError } from "../struct/error";
 
 async function run(interaction: ComponentInteraction) {
   const instance = prefabCreationManager.getInstance(interaction.member!.user);
 
-  if (!instance) {
-    return await interaction.createFollowup({
-      embeds: [new ErrorEmbed("This prefab creation instance expired.")],
-      flags: 64,
-    });
-  }
+  if (!instance) throw new BotError("this instance has expired 😔");
 
-  let id: number;
+  const { id } = await updatePrefab({
+    id: instance.isEdit!.prefabId,
+    senderId: interaction.member!.id,
+    characterId: instance.characterId,
+    subgroupId: instance.subgroupId,
+    groupId: instance.groupId,
+    rarity: instance.rarity,
+    maxCards: instance.maxCards,
+  });
+
   let url: string | undefined;
-
-  try {
-    const prefab = await updatePrefab({
-      id: instance.isEdit!.prefabId,
-      senderId: interaction.member!.id,
-      characterId: instance.characterId,
-      subgroupId: instance.subgroupId,
-      groupId: instance.groupId,
-      rarity: instance.rarity,
-      maxCards: instance.maxCards,
-    });
-
-    id = prefab.id;
-  } catch (e: any) {
-    console.log(e);
-    return await interaction.createFollowup({
-      embeds: [new ErrorEmbed("an error occurred while editing the prefab.")],
-    });
-  }
-
   if (instance.imageUrl) {
-    try {
-      const upload = await axios.post(`${process.env.ONI_URL}/upload`, {
-        url: instance.imageUrl,
-        id: id.toString(),
-      });
+    const upload = await axios.post(`${process.env.ONI_URL}/upload`, {
+      url: instance.imageUrl,
+      id: id.toString(),
+    });
 
-      url = upload.data.url;
-    } catch (e) {
-      return await interaction.createFollowup({
-        embeds: [
-          new ErrorEmbed("An error occurred uploading the prefab image."),
-        ],
-      });
-    }
+    url = upload.data.url;
   }
 
   prefabCreationManager.deleteInstance(interaction.member!.user);

@@ -48,7 +48,26 @@ const run = async function (interaction: unknown) {
 
     if (!user) return;
 
-    return await component.run(interaction, user);
+    try {
+      return await component.run(interaction, user);
+    } catch (e) {
+      if (e instanceof BotError) {
+        return interaction.createMessage({
+          embeds: [new ErrorEmbed(e.message)],
+          flags: 64,
+        });
+      } else {
+        console.log(e);
+        return interaction.createMessage({
+          embeds: [
+            new ErrorEmbed(
+              "**an unexpected error occurred.**\nplease try again in a few moments."
+            ),
+          ],
+          flags: 64,
+        });
+      }
+    }
   }
 
   const command = bot.commands.find((c) => c.name === interaction.data.name);

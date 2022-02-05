@@ -1,5 +1,4 @@
 import { ComponentInteraction } from "eris";
-import { getUser } from "../lib/graphql/query/GET_USER";
 import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
 import { inventory } from "../lib/graphql/query/INVENTORY";
 import { inventoryPage } from "../lib/graphql/query/INVENTORY_PAGE";
