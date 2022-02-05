@@ -39,9 +39,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
   let isExtra = false;
 
-  if (stats.gtsCurrentGames > 2) {
-    isExtra = true;
-  } else if (!isNewHour) {
+  if (stats.gtsCurrentGames >= 3 && !isNewHour) {
     isExtra = true;
   }
 
