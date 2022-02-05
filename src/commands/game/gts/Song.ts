@@ -6,13 +6,15 @@ import { getGTSStats } from "../../../lib/graphql/query/GET_GTS_STATS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
+import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
   const hasState = gtsGameStateManager.getState(user.id);
 
-  if (hasState) {
-    throw new Error("already");
-  }
+  if (hasState)
+    throw new BotError(
+      "**you're already playing a game!**\nfinish your current minigame first 😒"
+    );
 
   const loadingEmbed = new Embed().setDescription(
     "**Loading...** <:song:930932998138900540>"
