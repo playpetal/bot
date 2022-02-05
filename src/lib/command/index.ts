@@ -1,5 +1,4 @@
 import { ApplicationCommand } from "eris";
-import { parse } from "path/posix";
 import { DiscordSlashCommandOption, SlashCommandOption } from "petal";
 import { bot } from "../..";
 import { SlashCommand } from "../../struct/command";
