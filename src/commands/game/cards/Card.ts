@@ -1,4 +1,3 @@
-import axios from "axios";
 import { burnCard } from "../../../lib/graphql/mutation/game/BURN_CARD";
 import { getCard } from "../../../lib/graphql/query/GET_CARD";
 import { searchCards } from "../../../lib/graphql/query/SEARCH_CARDS";
@@ -8,7 +7,8 @@ import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
-import { Embed, ErrorEmbed } from "../../../struct/embed";
+import { Embed } from "../../../struct/embed";
+import { BotError } from "../../../struct/error";
 
 const run: Run = async ({ interaction, user, options }) => {
   const subcommand = options.options[0];
@@ -17,11 +17,8 @@ const run: Run = async ({ interaction, user, options }) => {
   const cardId = parseInt(strCardId, 36);
   const card = await getCard(cardId);
 
-  if (!card || card.owner === null) {
-    return interaction.createMessage({
-      embeds: [new ErrorEmbed("please select a card from the dropdown!")],
-    });
-  }
+  if (!card || card.owner === null)
+    throw new BotError("please select a card from the dropdown!");
 
   if (subcommand.name === "view") {
     const image = await getCardImage(card);
@@ -43,9 +40,7 @@ const run: Run = async ({ interaction, user, options }) => {
     ]);
   } else if (subcommand.name === "burn") {
     if (card.owner.id !== user.id)
-      return interaction.createMessage({
-        embeds: [new ErrorEmbed("that card doesn't belong to you!")],
-      });
+      throw new BotError("**hands off!**\nthat card doesn't belong to you.");
 
     const reward =
       (["SEED", "SPROUT", "BUD", "FLOWER", "BLOOM"].indexOf(card.quality) + 1) *
