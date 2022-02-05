@@ -4,8 +4,10 @@ import { GTSGameState, gtsGameStateManager } from "../../../lib/fun/gts";
 import { completeGts } from "../../../lib/graphql/mutation/COMPLETE_GTS";
 import { getGTSStats } from "../../../lib/graphql/query/GET_GTS_STATS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
+import { emoji } from "../../../lib/util/formatting/emoji";
+import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
-import { Embed, ErrorEmbed } from "../../../struct/embed";
+import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
@@ -16,36 +18,26 @@ const run: Run = async function ({ interaction, user, options }) {
       "**you're already playing a game!**\nfinish your current minigame first 😒"
     );
 
-  const loadingEmbed = new Embed().setDescription(
-    "**Loading...** <:song:930932998138900540>"
-  );
+  const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
+  await interaction.createMessage({ embeds: [loading] });
 
   const gender = options.getOption<"male" | "female">("gender");
-
-  await interaction.createMessage({ embeds: [loadingEmbed] });
 
   const song = await getRandomSong(
     gender?.toUpperCase() as "MALE" | "FEMALE" | undefined
   );
 
-  if (!song) {
-    return await interaction.editOriginalMessage({
-      embeds: [
-        new ErrorEmbed(
-          "<:song:930932998138900540> there are no available songs, try again later 😔"
-        ),
-      ],
-    });
-  }
+  if (!song)
+    throw new BotError(
+      `${emoji.song} there are no available songs 😔 try again later!`
+    );
 
   const { stats } = (await getGTSStats(user.id))!;
   const isNewHour =
     new Date().getHours() !==
     (stats?.gtsLastGame ? new Date(stats.gtsLastGame).getHours() : -1);
 
-  const isExtra =
-    stats.gtsCurrentGames > 2 &&
-    (stats.gtsLastGame || Date.now()) > Date.now() - 3600000;
+  const isExtra = stats.gtsCurrentGames > 2 && isNewHour;
 
   let { maxReward, timeLimit, maxGuesses } = song;
 
@@ -57,13 +49,15 @@ const run: Run = async function ({ interaction, user, options }) {
   try {
     const embed = new Embed()
       .setDescription(
-        `<:song:930932998138900540> **Guess the song by using /guess!**\n\nModifiers: **None**\nMaximum reward: <:petals:930918815225741383> **${maxReward}**\nTime limit: **${
-          timeLimit / 1000
-        } seconds**\nMaximum guesses: **${maxGuesses}**`
+        `${emoji.song} **Guess the song by using /guess!**` +
+          `\n\nModifiers: **None**` +
+          `\nMaximum reward: ${emoji.petals} ${strong(maxReward)}` +
+          `\nTime limit: ${strong(timeLimit / 1000)} seconds` +
+          `\nMaximum guesses: ${strong(maxGuesses)}`
       )
       .setFooter(
         isExtra
-          ? `Rewards won't be given since you've already won 3 times this hour.`
+          ? `Rewards won't be given since you've already won 3 games this hour.`
           : `You can win ${
               isNewHour ? 3 : 3 - stats.gtsCurrentGames
             } more games this hour!`
@@ -71,9 +65,7 @@ const run: Run = async function ({ interaction, user, options }) {
       .setImage("https://cdn.playpetal.com/banners/default.png");
 
     const message = await interaction.editOriginalMessage(
-      {
-        embeds: [embed],
-      },
+      { embeds: [embed] },
       { file: Buffer.from(song.video, "base64"), name: "song.mp4" }
     );
 
@@ -109,12 +101,9 @@ const run: Run = async function ({ interaction, user, options }) {
       }
     }, 500);
   } catch (e) {
-    console.log(e);
-    await interaction.editOriginalMessage({ content: "Error!" });
-    return;
+    console.error(e);
+    throw e;
   }
-
-  return;
 };
 
 async function handleGTSEnd(
@@ -134,12 +123,14 @@ async function handleGTSEnd(
     embed
       .setColor("#3BA55D")
       .setDescription(
-        `<:song:930932998138900540> **You got it in ${state.guesses} guess${
+        `${emoji.song} **You got it in ${state.guesses} guess${
           state.guesses !== 1 ? "es" : ""
         } (${(time / 1000).toFixed(2)}s)!**` +
           (state.maxReward === 0
             ? `\nYou did not receive any petals for this game.`
-            : `\nYou've been rewarded <:petals:930918815225741383> **${reward}**, enjoy!`)
+            : `\nYou've been rewarded ${emoji.petals} ${strong(
+                reward
+              )}, enjoy!`)
       )
       .setImage("https://cdn.playpetal.com/banners/default.png");
   } else {
