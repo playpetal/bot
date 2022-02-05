@@ -1,29 +1,27 @@
-import Eris, {
-  CommandInteraction,
-  InteractionDataOptionsWithValue,
-} from "eris";
+import { Account } from "petal";
 import { getProfileEmbed } from "../../lib/embed/Profile";
 import { getUser } from "../../lib/graphql/query/GET_USER";
 import { Run, SlashCommand } from "../../struct/command";
+import { BotError } from "../../struct/error";
 
-const run: Run = async function ({ interaction }) {
-  const options = interaction.data.options as
-    | InteractionDataOptionsWithValue[]
-    | undefined;
+const run: Run = async function ({ interaction, user, options }) {
+  const userId =
+    (options.getOption("user") as string | undefined) || user.discordId;
 
-  const targetId =
-    (options?.find((o) => o.name === "user")?.value as string | undefined) ||
-    interaction.member!.user.id;
-
-  const user = await getUser({ discordId: targetId });
-
-  if (!user) {
-    await interaction.createMessage({ content: "no profile" });
-    return;
+  let target: Account | null;
+  if (userId === user.discordId) {
+    target = await getUser({ id: user.id });
+  } else {
+    target = await getUser({ discordId: userId });
   }
 
+  if (!target)
+    throw new BotError(
+      "**uh oh!**\nthat user hasn't registered yet, or doesn't exist!"
+    );
+
   await interaction.createMessage({
-    embeds: [getProfileEmbed(user)],
+    embeds: [getProfileEmbed(target)],
     components: [
       {
         type: 1,
@@ -31,14 +29,14 @@ const run: Run = async function ({ interaction }) {
           {
             type: 2,
             label: "view profile",
-            custom_id: `view_profile?${user.id}`,
+            custom_id: `view_profile?${target.id}`,
             style: 2,
             disabled: true,
           },
           {
             type: 2,
             label: "view stats",
-            custom_id: `view_stats?${user.id}`,
+            custom_id: `view_stats?${target.id}`,
             style: 2,
           },
         ],

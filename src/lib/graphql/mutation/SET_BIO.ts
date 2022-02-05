@@ -10,7 +10,7 @@ const SET_BIO = gql`
   }
 `;
 
-export async function setBio(discordId: string, bio: string | undefined) {
+export async function setBio(discordId: string, bio: string) {
   const mutation = (await graphql.mutate({
     mutation: SET_BIO,
     variables: { bio: bio || null },
