@@ -10,7 +10,9 @@ import { Embed, ErrorEmbed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
-  const amount = options.getOption("amount") as number;
+  let amount = options.getOption("amount") as number | undefined;
+
+  if (!amount) amount = 1;
 
   if (!amount || isNaN(amount) || amount < 1 || amount > 10)
     throw new BotError(
