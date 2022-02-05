@@ -17,7 +17,7 @@ export function getProfileEmbed(account: Account) {
       `${emoji.user} ${displayName(account)}` +
         `\nregistered <t:${Math.floor(createdAt / 1000)}:R>` +
         (account.bio ? `\n\n${bio}` : ``) +
-        `\n\n${emoji.petals} ${strong(currency)}**` +
+        `\n\n${emoji.petals} ${strong(currency)}` +
         `\n${emoji.bloom} ${strong(cardCount)} cards` +
         `\n\n[[view on website]](https://playpetal.com/profile/${account.id})`
     )
