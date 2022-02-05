@@ -1,6 +1,8 @@
+import axios from "axios";
 import { SlashCommandOption } from "petal";
 import { bot } from "../..";
 import { getSong } from "../../lib/fun/ping/getSong";
+import { getUserPartial } from "../../lib/graphql/query/GET_USER_PARTIAL";
 import { displayName } from "../../lib/util/displayName";
 import { SlashCommand, Run } from "../../struct/command";
 import { Embed } from "../../struct/embed";
@@ -12,14 +14,53 @@ const run: Run = async function ({ interaction, user, options }) {
 
   if (isDevMode) {
     const latency = bot.shards.get(0)?.latency!;
-
     const processTime = Date.now() - interaction.createdAt;
 
-    embed.setDescription(
-      `**latency**\nshard: **${
-        isFinite(latency) ? `${latency}ms` : `no data`
-      }**\ninteraction: **~${processTime}ms**`
-    );
+    let now = Date.now();
+    let oniLatency: number | undefined;
+    try {
+      const res = await axios.get(`${process.env.ONI_URL!}/health`);
+      if (res.status === 200) oniLatency = Date.now() - now;
+    } catch (e) {}
+
+    now = Date.now();
+    let yureLatency: number | undefined;
+    try {
+      const res = await axios.get(`${process.env.YURE_URL!}/health`);
+      if (res.status === 200) yureLatency = Date.now() - now;
+    } catch (e) {}
+
+    now = Date.now();
+    let yumeLatency: number | undefined;
+    try {
+      await getUserPartial(undefined, user.id);
+      yumeLatency = Date.now() - now;
+    } catch (e) {}
+
+    embed
+      .addField({
+        name: "discord",
+        value:
+          `[shard latency](https://discord.com/developers/docs/topics/gateway#sharding): **${
+            isFinite(latency) ? `${latency}ms` : "no data..."
+          }**` +
+          `\n[interaction response](https://discord.com/developers/docs/interactions/receiving-and-responding): **~${processTime}ms**`,
+        inline: true,
+      })
+      .addField({
+        name: "services",
+        value:
+          `yume response: **${
+            yumeLatency ? `${yumeLatency}ms` : "error"
+          }**\n||yume is petal's api service||` +
+          `\noni response: **${
+            oniLatency ? `${oniLatency}ms` : "error"
+          }**\n||oni is petal's image generation service||` +
+          `\nyure response: **${
+            yureLatency ? `${yureLatency}ms` : "ERROR"
+          }**\n||yure is petal's video generation service||`,
+        inline: true,
+      });
 
     return await interaction.createMessage({ embeds: [embed] });
   }
