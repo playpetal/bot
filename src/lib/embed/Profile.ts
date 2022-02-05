@@ -1,15 +1,24 @@
 import { Account } from "petal";
 import { Embed } from "../../struct/embed";
 import { displayName } from "../util/displayName";
+import { emoji } from "../util/formatting/emoji";
+import { strong } from "../util/formatting/strong";
 
 export function getProfileEmbed(account: Account) {
+  const {
+    createdAt,
+    bio,
+    currency,
+    stats: { cardCount },
+  } = account;
+
   const embed = new Embed()
     .setDescription(
-      `<:user:930918872473796648> ${displayName(account)}` +
-        `\nregistered <t:${Math.floor(account.createdAt / 1000)}:R>` +
-        (account.bio ? `\n\n${account.bio}` : ``) +
-        `\n\n<:petals:930918815225741383> **${account.currency.toLocaleString()}**` +
-        `\n<:petal:917578760449060995> **${account.stats.cardCount.toLocaleString()}** cards` +
+      `${emoji.user} ${displayName(account)}` +
+        `\nregistered <t:${Math.floor(createdAt / 1000)}:R>` +
+        (account.bio ? `\n\n${bio}` : ``) +
+        `\n\n${emoji.petals} ${strong(currency)}**` +
+        `\n${emoji.bloom} ${strong(cardCount)} cards` +
         `\n\n[[view on website]](https://playpetal.com/profile/${account.id})`
     )
     .setThumbnail("https://cdn.playpetal.com/avatars/default.png")
