@@ -15,7 +15,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
   state.guesses += 1;
 
-  const answer = options.getOption<string>("guess")!;
+  const answer = options.getOption<string>("guess")!.toLowerCase();
 
   const match = findBestMatch(answer, [
     state.song.title.toLowerCase(),
