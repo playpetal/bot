@@ -3,6 +3,7 @@ import { Embed } from "../../../struct/embed";
 import { findBestMatch } from "string-similarity";
 import { gtsGameStateManager } from "../../../lib/fun/gts";
 import { BotError } from "../../../struct/error";
+import { emoji } from "../../../lib/util/formatting/emoji";
 
 const run: Run = async function ({ interaction, user, options }) {
   const state = gtsGameStateManager.getState(user.id);
@@ -14,14 +15,13 @@ const run: Run = async function ({ interaction, user, options }) {
 
   state.guesses += 1;
 
-  // @ts-ignore - im lazy
   const answer = options.getOption<string>("guess")!;
 
   const match = findBestMatch(answer, [
     state.song.title.toLowerCase(),
     `${state.song.group.toLowerCase()} ${state.song.title.toLowerCase()}`,
   ]);
-  const correct = match.bestMatch.rating >= 0.9;
+  const correct = match.bestMatch.rating >= 0.85;
 
   const embed = new Embed();
 
@@ -31,7 +31,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
     embed
       .setColor("#3BA55D")
-      .setDescription(`<:song:930932998138900540> **${answer}** was correct!`);
+      .setDescription(`${emoji.song} **${answer}** was correct!`);
     await interaction.createMessage({ embeds: [embed], flags: 64 });
   } else {
     gtsGameStateManager.setState(user.id, state);
@@ -39,7 +39,7 @@ const run: Run = async function ({ interaction, user, options }) {
     embed
       .setColor("#F04747")
       .setDescription(
-        `<:song:930932998138900540> **${answer}** was incorrect! You have **${
+        `${emoji.song} **${answer}** was incorrect! You have **${
           state.maxGuesses - state.guesses
         }** guesses remaining!`
       );
