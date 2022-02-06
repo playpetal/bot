@@ -36,6 +36,6 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "rimraf dist && yarn tsc",
-    "pm2": "NODE_ENV=production pm2-runtime start ecosystem.config.js"
+    "pm2": "NODE_ENV=production pm2 start ecosystem.config.js"
   }
 }
