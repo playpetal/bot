@@ -2,3 +2,4 @@
 .graphqlrc
 dist/
 node_modules/
+newrelic.js
