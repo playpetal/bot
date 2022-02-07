@@ -5,6 +5,7 @@ import { BotError } from "../../../struct/error";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { redis } from "../../../lib/redis";
 import { GTS } from "petal";
+import { bot } from "../../..";
 
 const run: Run = async function ({ interaction, user, options }) {
   const gameStr = await redis.get(`gts:game:${user.id}`);
@@ -15,6 +16,29 @@ const run: Run = async function ({ interaction, user, options }) {
     );
 
   const game = JSON.parse(gameStr) as GTS;
+
+  if (game.startedAt < Date.now() - game.timeLimit) {
+    await redis.del(`gts:game:${user.id}`);
+
+    try {
+      const message = await bot.getMessage(
+        interaction.channel.id,
+        game.gameMessageId
+      );
+
+      const embed = new Embed()
+        .setColor("#F04747")
+        .setDescription("**Better luck next time!**\nYou ran out of time!");
+
+      await message.edit({ embeds: [embed] });
+    } catch {
+      // ignore
+    }
+
+    throw new BotError(
+      "**you're not playing!**\nuse **/song** to start a game."
+    );
+  }
 
   game.guesses += 1;
 
