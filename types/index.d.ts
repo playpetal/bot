@@ -149,4 +149,26 @@ declare module "petal" {
     tint: number;
     createdAt: number;
   };
+
+  export type Song = {
+    id: number;
+    title: string;
+    group: string;
+    video: string;
+    maxReward: number;
+    timeLimit: number;
+    maxGuesses: number;
+  };
+
+  export type GTS = {
+    startedAt: number;
+    maxReward: number;
+    timeLimit: number;
+    maxGuesses: number;
+    playerId: number;
+    gameMessageId: string;
+    song: Song;
+    guesses: number;
+    correct: boolean;
+  };
 }
