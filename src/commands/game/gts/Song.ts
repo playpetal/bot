@@ -1,9 +1,9 @@
 import { CommandInteraction } from "eris";
-import { SlashCommandOption } from "petal";
-import { GTSGameState, gtsGameStateManager } from "../../../lib/fun/gts";
+import { GTS, SlashCommandOption } from "petal";
 import { completeGts } from "../../../lib/graphql/mutation/COMPLETE_GTS";
 import { getGTSStats } from "../../../lib/graphql/query/GET_GTS_STATS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
+import { redis } from "../../../lib/redis";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
@@ -11,9 +11,9 @@ import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
-  const hasState = gtsGameStateManager.getState(user.id);
+  const gtsString = await redis.get(`gts:game:${user.id}`);
 
-  if (hasState)
+  if (gtsString)
     throw new BotError(
       "**you're already playing a game!**\nfinish your current minigame first 😒"
     );
@@ -73,7 +73,7 @@ const run: Run = async function ({ interaction, user, options }) {
       { file: Buffer.from(song.video, "base64"), name: "song.mp4" }
     );
 
-    let state: GTSGameState = {
+    const state = JSON.stringify({
       startedAt: Date.now(),
       maxReward,
       timeLimit,
@@ -83,25 +83,28 @@ const run: Run = async function ({ interaction, user, options }) {
       song: song,
       guesses: 0,
       correct: false,
-    };
+    });
 
-    gtsGameStateManager.setState(user.id, state);
+    await redis.set(`gts:game:${user.id}`, state);
 
     const interval = setInterval(async () => {
-      const newState = gtsGameStateManager.getState(user.id);
+      const gameStr = await redis.get(`gts:game:${user.id}`);
 
-      if (!newState) {
+      if (!gameStr) {
         clearInterval(interval);
         return;
       }
 
+      const game = JSON.parse(gameStr) as GTS;
+      const { correct, guesses, maxGuesses, startedAt } = game;
+
       if (
-        newState.correct ||
-        newState.guesses >= newState.maxGuesses ||
-        newState.startedAt <= Date.now() - newState.timeLimit
+        correct ||
+        guesses >= maxGuesses ||
+        startedAt <= Date.now() - timeLimit
       ) {
         clearInterval(interval);
-        return await handleGTSEnd(interaction, newState);
+        return await handleGTSEnd(interaction, game);
       }
     }, 500);
   } catch (e) {
@@ -112,25 +115,24 @@ const run: Run = async function ({ interaction, user, options }) {
 
 async function handleGTSEnd(
   interaction: CommandInteraction,
-  state: GTSGameState
+  { playerId, startedAt, maxGuesses, guesses, maxReward, correct, song }: GTS
 ) {
-  gtsGameStateManager.unsetState(state.playerId);
+  await redis.del(`gts:game:${playerId}`);
   let embed = new Embed();
 
-  const time = Date.now() - state.startedAt;
+  const time = Date.now() - startedAt;
   const reward = Math.floor(
-    ((state.maxGuesses - (state.guesses - 1)) / state.maxGuesses) *
-      state.maxReward
+    ((maxGuesses - (guesses - 1)) / maxGuesses) * maxReward
   );
 
-  if (state.correct) {
+  if (correct) {
     embed
       .setColor("#3BA55D")
       .setDescription(
-        `${emoji.song} **You got it in ${state.guesses} guess${
-          state.guesses !== 1 ? "es" : ""
+        `${emoji.song} **You got it in ${guesses} guess${
+          guesses !== 1 ? "es" : ""
         } (${(time / 1000).toFixed(2)}s)!**` +
-          (state.maxReward === 0
+          (maxReward === 0
             ? `\nYou did not receive any petals for this game.`
             : `\nYou've been rewarded ${emoji.petals} ${strong(
                 reward
@@ -141,7 +143,7 @@ async function handleGTSEnd(
     embed.setColor("#F04747");
     let desc = "**Better luck next time!**";
 
-    if (state.guesses >= state.maxGuesses) {
+    if (guesses >= maxGuesses) {
       embed.setDescription(desc + "\nYou ran out of guesses!");
     } else {
       embed.setDescription(desc + "\nYou ran out of time!");
@@ -151,12 +153,12 @@ async function handleGTSEnd(
   try {
     await completeGts(
       interaction.member!.id,
-      state.guesses,
+      guesses,
       time,
       reward,
-      state.song.id,
-      state.correct,
-      state.startedAt
+      song.id,
+      correct,
+      startedAt
     );
   } catch (e: any) {
     console.log(e.networkError.result.errors);
