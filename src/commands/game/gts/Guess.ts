@@ -6,6 +6,7 @@ import { emoji } from "../../../lib/util/formatting/emoji";
 import { redis } from "../../../lib/redis";
 import { GTS } from "petal";
 import { bot } from "../../..";
+import { logger } from "../../../lib/logger";
 
 const run: Run = async function ({ interaction, user, options }) {
   const gameStr = await redis.get(`gts:game:${user.id}`);
@@ -53,6 +54,8 @@ const run: Run = async function ({ interaction, user, options }) {
     answer.toLowerCase().replace(/[^a-zA-Z0-9]/gm, ""),
     [title, groupTitle]
   );
+
+  logger.info(JSON.stringify(match));
 
   const correct = match.bestMatch.rating >= 0.75;
 
