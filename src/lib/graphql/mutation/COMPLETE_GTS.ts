@@ -7,17 +7,15 @@ const COMPLETE_GTS = gql`
     $guesses: Int!
     $time: Int!
     $reward: Int!
-    $songId: Int!
     $correct: Boolean!
-    $startedAt: DateTime!
+    $isNewHour: Boolean!
   ) {
     completeGts(
       guesses: $guesses
       correct: $correct
       reward: $reward
-      songId: $songId
-      startedAt: $startedAt
       time: $time
+      isNewHour: $isNewHour
     )
   }
 `;
@@ -27,13 +25,12 @@ export async function completeGts(
   guesses: number,
   time: number,
   reward: number,
-  songId: number,
   correct: boolean,
-  startedAt: number
+  isNewHour: boolean
 ) {
   const mutation = (await graphql.mutate({
     mutation: COMPLETE_GTS,
-    variables: { guesses, time, reward, songId, correct, startedAt },
+    variables: { guesses, time, reward, correct, isNewHour },
     context: { headers: { Authorization: tokenize(senderDiscordId) } },
   })) as GraphQLResponse<{
     completeGts: number;

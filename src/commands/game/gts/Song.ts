@@ -2,7 +2,6 @@ import { CommandInteraction } from "eris";
 import { GTS, SlashCommandOption } from "petal";
 import { bot } from "../../..";
 import { completeGts } from "../../../lib/graphql/mutation/COMPLETE_GTS";
-import { getGTSStats } from "../../../lib/graphql/query/GET_GTS_STATS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
 import { logger } from "../../../lib/logger";
 import { redis } from "../../../lib/redis";
@@ -45,6 +44,7 @@ const run: Run = async function ({ interaction, user, options }) {
   const gender = options.getOption<"male" | "female">("gender");
 
   const song = await getRandomSong(
+    user.discordId,
     gender?.toUpperCase() as "MALE" | "FEMALE" | undefined
   );
 
@@ -53,23 +53,7 @@ const run: Run = async function ({ interaction, user, options }) {
       `${emoji.song} there are no available songs 😔 try again later!`
     );
 
-  const { stats } = (await getGTSStats(user.id))!;
-  const isNewHour =
-    new Date().getHours() !==
-    (stats?.gtsLastGame ? new Date(stats.gtsLastGame).getHours() : -1);
-
-  let isExtra = false;
-
-  if (stats.gtsCurrentGames >= 3 && !isNewHour) {
-    isExtra = true;
-  }
-
-  let { maxReward, timeLimit, maxGuesses } = song;
-
-  if (isExtra) {
-    maxReward = 0;
-    maxGuesses = 10;
-  }
+  let { maxReward, timeLimit, maxGuesses, remainingGames, isNewHour } = song;
 
   try {
     const embed = new Embed()
@@ -81,11 +65,11 @@ const run: Run = async function ({ interaction, user, options }) {
           `\nMaximum guesses: ${strong(maxGuesses)}`
       )
       .setFooter(
-        isExtra
+        maxReward === 0
           ? `Rewards won't be given since you've already won 3 games this hour.`
-          : `You can win ${
-              isNewHour ? 3 : 3 - stats.gtsCurrentGames
-            } more games this hour!`
+          : `You can win ${remainingGames} more game${
+              remainingGames !== 1 ? "s" : ""
+            } this hour!`
       )
       .setImage("https://cdn.playpetal.com/banners/default.png");
 
@@ -120,6 +104,8 @@ const run: Run = async function ({ interaction, user, options }) {
       song: { ...song, video: undefined },
       guesses: 0,
       correct: false,
+      remainingGames,
+      isNewHour,
     } as GTS);
 
     await redis.set(`gts:game:${user.id}`, state);
@@ -160,7 +146,15 @@ const run: Run = async function ({ interaction, user, options }) {
 
 async function handleGTSEnd(
   interaction: CommandInteraction,
-  { playerId, startedAt, maxGuesses, guesses, maxReward, correct, song }: GTS
+  {
+    playerId,
+    startedAt,
+    maxGuesses,
+    guesses,
+    maxReward,
+    correct,
+    isNewHour,
+  }: GTS
 ) {
   await redis.del(`gts:game:${playerId}`);
   let embed = new Embed();
@@ -201,9 +195,8 @@ async function handleGTSEnd(
       guesses,
       time,
       reward,
-      song.id,
       correct,
-      startedAt
+      isNewHour
     );
   } catch (e: any) {
     logger.error(e);

@@ -158,6 +158,8 @@ declare module "petal" {
     maxReward: number;
     timeLimit: number;
     maxGuesses: number;
+    remainingGames: number;
+    isNewHour: boolean;
   };
 
   export type GTS = {
@@ -171,5 +173,7 @@ declare module "petal" {
     song: Song;
     guesses: number;
     correct: boolean;
+    remainingGames: number;
+    isNewHour: boolean;
   };
 }
