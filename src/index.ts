@@ -1,5 +1,4 @@
 require("dotenv").config();
-require("newrelic");
 import { Bot } from "./struct/client";
 
 if (!process.env.ENVIRONMENT) process.env.ENVIRONMENT = "DEVELOPMENT";
