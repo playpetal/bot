@@ -159,7 +159,7 @@ declare module "petal" {
   export type Song = {
     id: number;
     title: string;
-    group: string;
+    group?: string;
     video?: string;
     maxReward: number;
     timeLimit: number;
