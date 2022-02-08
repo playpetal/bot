@@ -194,7 +194,7 @@ async function handleGTSEnd(
       interaction.member!.id,
       guesses,
       time,
-      reward,
+      correct ? reward : 0,
       correct,
       isNewHour
     );
