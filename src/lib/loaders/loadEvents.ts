@@ -2,6 +2,7 @@ import glob from "glob-promise";
 import path from "path";
 import { bot } from "../..";
 import { Event } from "../../struct/event";
+import { logger } from "../logger";
 
 export async function loadEvents(): Promise<void> {
   const dir = path.join(__dirname, "../../events");
@@ -15,7 +16,7 @@ export async function loadEvents(): Promise<void> {
         bot.on(clientEvent, event.run);
       }
     } catch (e) {
-      console.log(`Failed to load event at ${match}:\n${e}`);
+      logger.error(`Failed to load event at ${match}:\n${e}`);
     }
   }
 }

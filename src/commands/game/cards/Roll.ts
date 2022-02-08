@@ -118,7 +118,7 @@ async function getCollage(cards: Card[]) {
 
     return card;
   } catch (e) {
-    console.log(e);
+    logger.error(e);
     return "";
   }
 }
