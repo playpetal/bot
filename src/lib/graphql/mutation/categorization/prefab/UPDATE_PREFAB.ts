@@ -6,6 +6,7 @@ import { tokenize } from "../../../../crypto";
 const query = gql`
   mutation UpdatePrefab(
     $prefabId: Int!
+    $releaseId: Int
     $characterId: Int
     $subgroupId: Int
     $groupId: Int
@@ -19,6 +20,7 @@ const query = gql`
       groupId: $groupId
       rarity: $rarity
       maxCards: $maxCards
+      releaseId: $releaseId
     ) {
       id
       character {
@@ -32,6 +34,10 @@ const query = gql`
       }
       rarity
       maxCards
+      release {
+        id
+        droppable
+      }
     }
   }
 `;
@@ -44,6 +50,7 @@ export async function updatePrefab({
   groupId,
   rarity,
   maxCards,
+  releaseId,
 }: {
   id: number;
   senderId: string;
@@ -52,6 +59,7 @@ export async function updatePrefab({
   groupId?: number | null;
   rarity?: number;
   maxCards?: number;
+  releaseId?: number;
 }): Promise<Prefab> {
   const { data } = (await graphql.query({
     query: query,
@@ -62,6 +70,7 @@ export async function updatePrefab({
       groupId,
       rarity,
       maxCards,
+      releaseId,
     },
     context: { headers: { Authorization: tokenize(senderId) } },
   })) as GraphQLResponse<{

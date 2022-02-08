@@ -20,6 +20,10 @@ const query = gql`
       }
       maxCards
       rarity
+      release {
+        id
+        droppable
+      }
     }
   }
 `;

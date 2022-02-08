@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client/core";
+import { Release } from "petal";
 import { graphql, GraphQLResponse } from "..";
 import { tokenize } from "../../crypto";
 import { Prefab } from "../../mod/createCard";
@@ -6,6 +7,7 @@ import { Prefab } from "../../mod/createCard";
 const CREATE_PREFAB = gql`
   mutation CreatePrefab(
     $characterId: Int!
+    $releaseId: Int
     $subgroupId: Int
     $groupId: Int
     $maxCards: Int
@@ -13,6 +15,7 @@ const CREATE_PREFAB = gql`
   ) {
     createPrefab(
       characterId: $characterId
+      releaseId: $releaseId
       subgroupId: $subgroupId
       groupId: $groupId
       maxCards: $maxCards
@@ -30,17 +33,28 @@ const CREATE_PREFAB = gql`
       }
       maxCards
       rarity
+      release {
+        id
+        droppable
+      }
     }
   }
 `;
 
 export async function createPrefab(
   discordId: string,
-  { characterId, subgroupId, groupId, maxCards, rarity }: Prefab
+  { characterId, subgroupId, groupId, maxCards, rarity, releaseId }: Prefab
 ) {
   const mutation = (await graphql.mutate({
     mutation: CREATE_PREFAB,
-    variables: { characterId, subgroupId, groupId, maxCards, rarity },
+    variables: {
+      characterId,
+      subgroupId,
+      groupId,
+      maxCards,
+      rarity,
+      releaseId,
+    },
     context: { headers: { Authorization: tokenize(discordId) } },
   })) as GraphQLResponse<{
     createPrefab: {
@@ -50,6 +64,7 @@ export async function createPrefab(
       group: { name: string } | null;
       maxCards: number;
       rarity: number;
+      release: Release;
     };
   }>;
 

@@ -8,6 +8,7 @@ import {
   Subgroup,
 } from "petal";
 import { getPrefab } from "../../../lib/graphql/query/categorization/prefab/GET_PREFAB";
+import { getLastRelease } from "../../../lib/graphql/query/categorization/release/GET_LAST_RELEASE";
 import { getCharacter } from "../../../lib/graphql/query/GET_CHARACTER";
 import { getGroup } from "../../../lib/graphql/query/GET_GROUP";
 import { getSubgroup } from "../../../lib/graphql/query/GET_SUBGROUP";
@@ -30,6 +31,7 @@ const run: Run = async ({ interaction, options, user }) => {
   let group: Maybe<Group> | undefined;
   let maxCards: number | undefined;
   let rarity: number | undefined;
+  let releaseId: number | undefined;
 
   if (subcommand.name === "edit") {
     const strPrefabId = fields.find((o) => o.name === "prefab")!
@@ -107,6 +109,14 @@ const run: Run = async ({ interaction, options, user }) => {
     | number
     | undefined;
   rarity = fields.find((f) => f.name === "rarity")?.value as number | undefined;
+  releaseId = fields.find((f) => f.name === "release")?.value as
+    | number
+    | undefined;
+
+  if (!releaseId) {
+    const lastRelease = await getLastRelease();
+    if (lastRelease) releaseId = lastRelease.id;
+  }
 
   prefabCreationManager.createInstance(interaction.member!.user, {
     isEdit,
@@ -115,6 +125,7 @@ const run: Run = async ({ interaction, options, user }) => {
     groupId: group?.id,
     maxCards,
     rarity,
+    releaseId,
   });
 
   const embed = new Embed();
@@ -126,7 +137,9 @@ const run: Run = async ({ interaction, options, user }) => {
           prefab!.character.name
         }${prefab!.subgroup ? ` ${prefab!.subgroup.name}` : ""}**, rarity **${
           prefab!.rarity
-        }**, max cards **${prefab!.maxCards}**` +
+        }**, max cards **${prefab!.maxCards}**, release **${
+          prefab!.release.id
+        }**` +
         `\n\nto the following:` +
         `\n**${
           group
@@ -142,7 +155,7 @@ const run: Run = async ({ interaction, options, user }) => {
             : ""
         }**, rarity **${rarity || prefab!.rarity}**, max cards **${
           maxCards || prefab!.maxCards
-        }**` +
+        }**, release **${releaseId || prefab!.release.id}**` +
         `\n\nif you'd like to change the image, mention petal with an image attached.` +
         `\notherwise, click "confirm" to save these changes.`
     );
@@ -153,7 +166,7 @@ const run: Run = async ({ interaction, options, user }) => {
           subgroup ? ` ${subgroup.name}` : ""
         }**, rarity **${rarity || "default"}**, max cards **${
           maxCards || "default"
-        }**` +
+        }**, release **${releaseId || "New Release  "}**` +
         `\n\nto add an image, mention petal with an image attached.`
     );
   }
@@ -262,6 +275,12 @@ export default new SlashCommand("prefab")
         autocomplete: true,
       } as SlashCommandOption<"string">,
       {
+        type: "integer",
+        name: "release",
+        description:
+          "the release to put the prefab in. if empty, creates new release or adds to last undroppable release.",
+      } as SlashCommandOption<"integer">,
+      {
         type: "string",
         name: "subgroup",
         description: "the subgroup you'd like to set the prefab to",
@@ -303,6 +322,11 @@ export default new SlashCommand("prefab")
         description: "the character you'd like to set the prefab to",
         autocomplete: true,
       } as SlashCommandOption<"string">,
+      {
+        type: "integer",
+        name: "release",
+        description: "the number of the release to put the prefab in",
+      } as SlashCommandOption<"integer">,
       {
         type: "string",
         name: "subgroup",

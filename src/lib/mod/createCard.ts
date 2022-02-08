@@ -30,6 +30,7 @@ export type Prefab = {
   maxCards?: number;
   rarity?: number;
   imageUrl?: string;
+  releaseId?: number;
   isEdit?: { prefabId: number };
 };
 

@@ -19,6 +19,7 @@ async function run(interaction: ComponentInteraction) {
     groupId: instance.groupId,
     rarity: instance.rarity,
     maxCards: instance.maxCards,
+    releaseId: instance.releaseId,
   });
 
   let url: string | undefined;

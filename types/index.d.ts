@@ -95,6 +95,12 @@ declare module "petal" {
     subgroup: Maybe<{ id: number; name: string }>;
     maxCards: number;
     rarity: number;
+    release: Release;
+  };
+
+  export type Release = {
+    id: number;
+    droppable: boolean;
   };
 
   export type Character = {
