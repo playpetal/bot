@@ -1,8 +1,10 @@
 import { CommandInteraction } from "eris";
 import { GTS, SlashCommandOption } from "petal";
+import { bot } from "../../..";
 import { completeGts } from "../../../lib/graphql/mutation/COMPLETE_GTS";
 import { getGTSStats } from "../../../lib/graphql/query/GET_GTS_STATS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
+import { logger } from "../../../lib/logger";
 import { redis } from "../../../lib/redis";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
@@ -13,10 +15,29 @@ import { BotError } from "../../../struct/error";
 const run: Run = async function ({ interaction, user, options }) {
   const gtsString = await redis.get(`gts:game:${user.id}`);
 
-  if (gtsString)
-    throw new BotError(
-      "**you're already playing a game!**\nfinish your current minigame first 😒"
-    );
+  if (gtsString) {
+    const game = JSON.parse(gtsString) as GTS;
+    if (game.startedAt > Date.now() - game.timeLimit)
+      throw new BotError(
+        "**you're already playing a game!**\nfinish your current minigame first 😒"
+      );
+
+    try {
+      await redis.del(`gts:game:${user.id}`);
+      const message = await bot.getMessage(
+        game.gameChannelId,
+        game.gameMessageId
+      );
+      await message.edit({
+        embeds: [
+          new Embed()
+            .setColor("#F04747")
+            .setDescription("**Better luck next time!**\nYou ran out of time!"),
+        ],
+        components: [],
+      });
+    } catch {}
+  }
 
   const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
   await interaction.createMessage({ embeds: [loading] });
@@ -69,8 +90,23 @@ const run: Run = async function ({ interaction, user, options }) {
       .setImage("https://cdn.playpetal.com/banners/default.png");
 
     const message = await interaction.editOriginalMessage(
-      { embeds: [embed] },
-      { file: Buffer.from(song.video, "base64"), name: "song.mp4" }
+      {
+        embeds: [embed],
+        components: [
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                custom_id: `cancel-gts?${user.id}`,
+                label: "Cancel",
+                style: 4,
+              },
+            ],
+          },
+        ],
+      },
+      { file: Buffer.from(song.video!, "base64"), name: "song.mp4" }
     );
 
     const state = JSON.stringify({
@@ -80,12 +116,14 @@ const run: Run = async function ({ interaction, user, options }) {
       maxGuesses,
       playerId: user.id,
       gameMessageId: message.id,
-      song: song,
+      gameChannelId: message.channel.id,
+      song: { ...song, video: undefined },
       guesses: 0,
       correct: false,
-    });
+    } as GTS);
 
     await redis.set(`gts:game:${user.id}`, state);
+    logger.info(state);
 
     const interval = setInterval(async () => {
       const gameStr = await redis.get(`gts:game:${user.id}`);
@@ -96,6 +134,13 @@ const run: Run = async function ({ interaction, user, options }) {
       }
 
       const game = JSON.parse(gameStr) as GTS;
+
+      if (game.gameMessageId !== message.id) {
+        await message.delete();
+        clearInterval(interval);
+        return;
+      }
+
       const { correct, guesses, maxGuesses, startedAt } = game;
 
       if (
@@ -108,7 +153,7 @@ const run: Run = async function ({ interaction, user, options }) {
       }
     }, 500);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     throw e;
   }
 };
@@ -161,11 +206,11 @@ async function handleGTSEnd(
       startedAt
     );
   } catch (e: any) {
-    console.log(e.networkError.result.errors);
+    logger.error(e);
   }
 
   try {
-    await interaction.editOriginalMessage({ embeds: [embed] }, []);
+    await interaction.editOriginalMessage({ embeds: [embed], components: [] });
   } catch (e) {
     // do nothing, the original message was probably deleted
   }
