@@ -1,6 +1,7 @@
 import glob from "glob-promise";
 import path from "path";
 import { Component } from "../../struct/component";
+import { logger } from "../logger";
 
 export async function loadComponents() {
   const dir = path.join(__dirname, "../../components");
@@ -14,7 +15,7 @@ export async function loadComponents() {
 
       components.push(component);
     } catch (e) {
-      console.error(`Component failed to load at ${match}\n${e}`);
+      logger.error(`Component failed to load at ${match}\n${e}`);
     }
   }
 

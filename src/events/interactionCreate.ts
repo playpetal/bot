@@ -10,6 +10,7 @@ import { Event } from "../struct/event";
 import { InteractionOption, Maybe, PartialUser } from "petal";
 import { InteractionOptions } from "../struct/options";
 import { BotError } from "../struct/error";
+import { logger } from "../lib/logger";
 
 const run = async function (interaction: unknown) {
   if (
@@ -57,7 +58,7 @@ const run = async function (interaction: unknown) {
           flags: 64,
         });
       } else {
-        console.log(e);
+        logger.error(e);
         return interaction.createMessage({
           embeds: [
             new ErrorEmbed(
@@ -145,7 +146,7 @@ const run = async function (interaction: unknown) {
           embeds: [new ErrorEmbed(e.message)],
         });
       } else {
-        console.log(e);
+        logger.error(e);
         return interaction.createMessage({
           embeds: [
             new ErrorEmbed(

@@ -1,6 +1,7 @@
 import glob from "glob-promise";
 import path from "path";
 import { SlashCommand } from "../../struct/command";
+import { logger } from "../logger";
 
 export async function loadSlashCommands() {
   const dir = path.join(__dirname, "../../commands");
@@ -16,7 +17,7 @@ export async function loadSlashCommands() {
 
       commands.push(command);
     } catch (e) {
-      console.error(`Command failed to load at ${match}\n${e}`);
+      logger.error(`Command failed to load at ${match}\n${e}`);
     }
   }
 
