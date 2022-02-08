@@ -154,7 +154,7 @@ declare module "petal" {
     id: number;
     title: string;
     group: string;
-    video: string;
+    video?: string;
     maxReward: number;
     timeLimit: number;
     maxGuesses: number;
@@ -167,6 +167,7 @@ declare module "petal" {
     maxGuesses: number;
     playerId: number;
     gameMessageId: string;
+    gameChannelId: string;
     song: Song;
     guesses: number;
     correct: boolean;
