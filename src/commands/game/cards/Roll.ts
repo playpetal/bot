@@ -2,6 +2,7 @@ import axios from "axios";
 import { Card, SlashCommandOption } from "petal";
 import { rollCards } from "../../../lib/graphql/mutation/ROLL_CARD";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
+import { logger } from "../../../lib/logger";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import { strong } from "../../../lib/util/formatting/strong";
@@ -43,6 +44,10 @@ const run: Run = async function ({ interaction, user, options }) {
     user.discordId,
     amount,
     gender as "MALE" | "FEMALE" | undefined
+  );
+
+  logger.info(
+    JSON.stringify({ user, currency, cost, gender, amount: amount, cards })
   );
 
   const now = Date.now();
