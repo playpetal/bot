@@ -58,6 +58,7 @@ const run = async function (interaction: unknown) {
           flags: 64,
         });
       } else {
+        console.log(e);
         logger.error(e);
         return interaction.createMessage({
           embeds: [
@@ -146,6 +147,7 @@ const run = async function (interaction: unknown) {
           embeds: [new ErrorEmbed(e.message)],
         });
       } else {
+        console.log(e);
         logger.error(e);
         return interaction.createMessage({
           embeds: [

@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   Character,
   Group,
@@ -7,6 +8,8 @@ import {
   SlashCommandOption,
   Subgroup,
 } from "petal";
+import { updatePrefab } from "../../../lib/graphql/mutation/categorization/prefab/UPDATE_PREFAB";
+import { createPrefab } from "../../../lib/graphql/mutation/CREATE_PREFAB";
 import { getPrefab } from "../../../lib/graphql/query/categorization/prefab/GET_PREFAB";
 import { getLastRelease } from "../../../lib/graphql/query/categorization/release/GET_LAST_RELEASE";
 import { getCharacter } from "../../../lib/graphql/query/GET_CHARACTER";
@@ -16,7 +19,6 @@ import { searchCharacters } from "../../../lib/graphql/query/SEARCH_CHARACTERS";
 import { searchGroups } from "../../../lib/graphql/query/SEARCH_GROUPS";
 import { searchPrefabs } from "../../../lib/graphql/query/SEARCH_PREFABS";
 import { searchSubgroups } from "../../../lib/graphql/query/SEARCH_SUBGROUPS";
-import { prefabCreationManager } from "../../../lib/mod/createCard";
 import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
@@ -32,6 +34,15 @@ const run: Run = async ({ interaction, options, user }) => {
   let maxCards: number | undefined;
   let rarity: number | undefined;
   let releaseId: number | undefined;
+  let image: string | undefined;
+
+  const attachmentId = subcommand.options!.find((o) => o.name === "image")
+    ?.value as string | undefined;
+
+  if (attachmentId) {
+    // @ts-ignore
+    image = interaction.data.resolved?.attachments[attachmentId].url;
+  }
 
   if (subcommand.name === "edit") {
     const strPrefabId = fields.find((o) => o.name === "prefab")!
@@ -113,26 +124,34 @@ const run: Run = async ({ interaction, options, user }) => {
     | number
     | undefined;
 
-  if (!releaseId) {
+  if (!releaseId && !isEdit) {
     const lastRelease = await getLastRelease();
     if (lastRelease) releaseId = lastRelease.id;
   }
 
-  prefabCreationManager.createInstance(interaction.member!.user, {
-    isEdit,
-    characterId: character?.id,
-    subgroupId: subgroup?.id,
-    groupId: group?.id,
-    maxCards,
-    rarity,
-    releaseId,
-  });
-
   const embed = new Embed();
+  let card: string | undefined;
 
   if (isEdit) {
+    await updatePrefab({
+      senderId: user.discordId,
+      id: prefab!.id,
+      characterId: character?.id,
+      subgroupId: subgroup?.id,
+      maxCards,
+      rarity,
+      releaseId,
+    });
+
+    if (image) {
+      await axios.post(`${process.env.ONI_URL}/upload`, {
+        url: image,
+        id: prefab!.id.toString(),
+      });
+    }
+
     embed.setDescription(
-      "**heads up!** you're about to edit a prefab:" +
+      "**heads up!** you just edited a prefab:" +
         `\n**${prefab!.group ? `${prefab!.group.name} ` : ""}${
           prefab!.character.name
         }${prefab!.subgroup ? ` ${prefab!.subgroup.name}` : ""}**, rarity **${
@@ -155,57 +174,55 @@ const run: Run = async ({ interaction, options, user }) => {
             : ""
         }**, rarity **${rarity || prefab!.rarity}**, max cards **${
           maxCards || prefab!.maxCards
-        }**, release **${releaseId || prefab!.release.id}**` +
-        `\n\nif you'd like to change the image, mention petal with an image attached.` +
-        `\notherwise, click "confirm" to save these changes.`
+        }**, release **${releaseId || prefab!.release.id}**`
     );
+
+    if (image) embed.setImage("attachment://collage.png");
   } else {
-    embed.setDescription(
-      "**heads up!** you're about to create a prefab:" +
-        `\n**${group ? `${group.name} ` : ""}${character!.name}${
-          subgroup ? ` ${subgroup.name}` : ""
-        }**, rarity **${rarity || "default"}**, max cards **${
-          maxCards || "default"
-        }**, release **${releaseId || "New Release  "}**` +
-        `\n\nto add an image, mention petal with an image attached.`
-    );
+    prefab = await createPrefab(user.discordId, {
+      characterId: character!.id,
+      subgroupId: subgroup?.id,
+      groupId: group?.id,
+      maxCards,
+      rarity,
+      releaseId,
+    });
+
+    await axios.post(`${process.env.ONI_URL}/upload`, {
+      url: image!,
+      id: prefab.id.toString(),
+    });
+
+    embed
+      .setDescription(
+        "**heads up!** you just created a prefab:" +
+          `\n**${group ? `${group.name} ` : ""}${character!.name}${
+            subgroup ? ` ${subgroup.name}` : ""
+          }**, rarity **${rarity || "default"}**, max cards **${
+            maxCards || "default"
+          }**, release **${releaseId || "New Release  "}**`
+      )
+      .setImage("attachment://collage.png");
   }
 
-  await interaction.createMessage({
-    embeds: [embed],
-    components: isEdit
-      ? [
-          {
-            type: 1,
-            components: [
-              {
-                type: 2,
-                label: "confirm",
-                custom_id: "confirm_prefab_edit",
-                style: 3,
-              },
-            ],
-          },
-        ]
-      : undefined,
-  });
+  if (image) {
+    const { data } = (await axios.post(`${process.env.ONI_URL}/card`, [
+      {
+        character: image,
+        frame: "#FFAACC",
+        name: "Prefab",
+        id: Date.now(),
+      },
+    ])) as { data: { card: string } };
+    card = data.card;
+  }
 
-  setTimeout(async () => {
-    const instance = prefabCreationManager.getInstance(
-      interaction.member!.user
-    );
-
-    if (instance) {
-      prefabCreationManager.deleteInstance(interaction.member!.user);
-      await interaction.editOriginalMessage({
-        embeds: [
-          embed.setDescription(
-            embed.description + `\n__**this session has timed out.**__`
-          ),
-        ],
-      });
-    }
-  }, 60000);
+  await interaction.createFollowup(
+    {
+      embeds: [embed],
+    },
+    [{ file: Buffer.from(card!, "base64"), name: "collage.png" }]
+  );
 };
 
 const autocomplete: Autocomplete = async ({ interaction, options }) => {
@@ -275,6 +292,12 @@ export default new SlashCommand("prefab")
         autocomplete: true,
       } as SlashCommandOption<"string">,
       {
+        type: "attachment",
+        name: "image",
+        description: "the image of the prefab you'd like to create",
+        required: true,
+      } as SlashCommandOption<"attachment">,
+      {
         type: "integer",
         name: "release",
         description:
@@ -322,6 +345,11 @@ export default new SlashCommand("prefab")
         description: "the character you'd like to set the prefab to",
         autocomplete: true,
       } as SlashCommandOption<"string">,
+      {
+        type: "attachment",
+        name: "image",
+        description: "the image you'd like to set the prefab to",
+      } as SlashCommandOption<"attachment">,
       {
         type: "integer",
         name: "release",

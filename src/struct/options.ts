@@ -43,4 +43,5 @@ export const optionTypes = {
   role: 8,
   mentionable: 9,
   number: 10,
+  attachment: 11,
 } as const;

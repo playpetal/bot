@@ -34,7 +34,9 @@ export async function processCommands(
 
     if (!isEqual) {
       if (serverId) {
+        // @ts-ignore
         await bot.editGuildCommand(serverId, cmd.id, parsed);
+        // @ts-ignore
       } else await bot.editCommand(cmd.id, parsed);
     }
   }
@@ -48,7 +50,9 @@ export async function processCommands(
     const parsed = { ...command, options: parseOptions(command.options) };
 
     if (serverId) {
+      // @ts-ignore
       await bot.createGuildCommand(serverId, parsed);
+      // @ts-ignore
     } else await bot.createCommand(parsed);
   }
 
@@ -84,6 +88,9 @@ export function parseOptions(
       parsed.push(_opt as DiscordSlashCommandOption<9>);
     } else if (type === 10) {
       parsed.push(_opt as DiscordSlashCommandOption<10>);
+    } else if (type === 11) {
+      // @ts-ignore
+      parsed.push(_opt as DiscordSlashCommandOption<11>);
     }
 
     if (opt.options) {
