@@ -5,9 +5,6 @@ jobs:
     docker:
       - image: arvindr226/alpine-ssh
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "74:86:b4:ae:57:61:a3:d3:24:1b:16:f7:b0:e3:6b:65"
       - checkout
       - run: ssh -oStrictHostKeyChecking=no -v $USER@$IP "./deploy.sh"
 
