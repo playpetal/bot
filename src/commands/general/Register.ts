@@ -1,5 +1,6 @@
 import { SlashCommandOption } from "petal";
 import { createAccount } from "../../lib/graphql/mutation/CREATE_ACCOUNT";
+import { getUser } from "../../lib/graphql/query/GET_USER";
 import { getUserPartial } from "../../lib/graphql/query/GET_USER_PARTIAL";
 import { emoji } from "../../lib/util/formatting/emoji";
 import { Run, SlashCommand } from "../../struct/command";
@@ -25,6 +26,13 @@ const run: Run = async function ({ interaction, options }) {
   if (RegExp(/[^A-Za-z0-9 _-]+/gm).exec(username))
     throw new BotError(
       "**woah there!**\nyour username contains invalid characters!\nyou may only use alphanumeric characters, spaces, hyphens, and underscores."
+    );
+
+  const userExists = await getUser({ username });
+
+  if (userExists)
+    throw new BotError(
+      "**woah there!**\nsorry, but that username has already been taken."
     );
 
   const account = await createAccount(id, username);
