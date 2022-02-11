@@ -51,9 +51,9 @@ const run: Run = async ({ interaction, options, user }) => {
     }
 
     const embed = new Embed().setDescription(
-      `**gift complete!**\nyou gave ${gifts.join(" and ")} to **${displayName(
+      `**gift complete!**\nyou gave ${gifts.join(" and ")} to ${displayName(
         target
-      )}**.`
+      )}.`
     );
 
     await interaction.createMessage({ embeds: [embed] });
