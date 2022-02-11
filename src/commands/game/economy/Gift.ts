@@ -47,7 +47,7 @@ const run: Run = async ({ interaction, options, user }) => {
     }
 
     if (cards.length > 0) {
-      gifts.push(`**${cards.length}** card${cards.length === 0 ? "" : "s"}`);
+      gifts.push(`**${cards.length}** card${cards.length === 1 ? "" : "s"}`);
     }
 
     const embed = new Embed().setDescription(
