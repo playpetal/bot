@@ -52,7 +52,7 @@ const run: Run = async ({ interaction, user, options }) => {
 
     const embed = new Embed()
       .setDescription(
-        `**the card crackles as it turns to dust...**` +
+        `${emoji.burn} **the card crackles as it turns to dust...**` +
           `\nin its ashes you find ${emoji.petals} ${strong(reward)}!`
       )
       .setThumbnail(`attachment://${card.id.toString(36)}.png`);
