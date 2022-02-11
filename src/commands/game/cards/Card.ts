@@ -14,7 +14,7 @@ const run: Run = async ({ interaction, user, options }) => {
   const subcommand = options.options[0];
   const strCardId = subcommand.options![0].value as string;
 
-  const cardId = parseInt(strCardId, 36);
+  const cardId = parseInt(strCardId, 16);
   const card = await getCard(cardId);
 
   if (!card || card.owner === null)
@@ -27,7 +27,7 @@ const run: Run = async ({ interaction, user, options }) => {
       .setDescription(
         `${formatCard(card)}` + `\n*owned by ${displayName(card.owner)}*`
       )
-      .setImage(`attachment://${card.id.toString(36)}.png`)
+      .setImage(`attachment://${card.id.toString(16)}.png`)
       .setFooter(
         `Card #${card.issue || 0} • #${card.tint.toString(16).toUpperCase()}`
       );
@@ -35,7 +35,7 @@ const run: Run = async ({ interaction, user, options }) => {
     return interaction.createFollowup({ embeds: [embed] }, [
       {
         file: image,
-        name: `${card.id.toString(36)}.png`,
+        name: `${card.id.toString(16)}.png`,
       },
     ]);
   } else if (subcommand.name === "burn") {
@@ -55,10 +55,10 @@ const run: Run = async ({ interaction, user, options }) => {
         `${emoji.burn} **the card crackles as it turns to dust...**` +
           `\nin its ashes you find ${emoji.petals} ${strong(reward)}!`
       )
-      .setThumbnail(`attachment://${card.id.toString(36)}.png`);
+      .setThumbnail(`attachment://${card.id.toString(16)}.png`);
 
     return interaction.createFollowup({ embeds: [embed] }, [
-      { file: image, name: `${card.id.toString(36)}.png` },
+      { file: image, name: `${card.id.toString(16)}.png` },
     ]);
   }
 };
@@ -73,12 +73,12 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
     const cards = await searchCards(option.value as string, user);
 
     choices = cards.map((c) => ({
-      name: `${c.id.toString(36)} - ${
+      name: `${c.id.toString(16)} - ${
         c.prefab.group ? `${c.prefab.group.name} ` : ""
       }${c.prefab.subgroup ? ` ${c.prefab.subgroup.name} ` : ""}${
         c.prefab.character.name
       }`,
-      value: c.id.toString(36),
+      value: c.id.toString(16),
     }));
   }
 

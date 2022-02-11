@@ -29,7 +29,7 @@ const run: Run = async ({ interaction, options, user }) => {
     const ids = cardIds.split(" ");
 
     for (let strId of ids) {
-      const id = parseInt(strId, 36);
+      const id = parseInt(strId, 16);
       if (isNaN(id))
         throw new BotError(`**hold up!**\n\`${id}\` is not a valid card.`);
 

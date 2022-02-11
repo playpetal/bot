@@ -17,7 +17,7 @@ export function formatCard(
 ): string {
   let str = "";
 
-  if (options.code) str += `\`${card.id.toString(36)}\` `;
+  if (options.code) str += `\`${card.id.toString(16)}\` `;
   if (options.icon)
     str += `${
       emoji[
