@@ -154,6 +154,7 @@ async function handleGTSEnd(
     maxReward,
     correct,
     isNewHour,
+    song,
   }: GTS
 ) {
   await redis.del(`gts:game:${playerId}`);
@@ -183,11 +184,22 @@ async function handleGTSEnd(
     let desc = "**Better luck next time!**";
 
     if (guesses >= maxGuesses) {
-      embed.setDescription(desc + "\nYou ran out of guesses!");
+      desc += "\nYou ran out of guesses!";
     } else {
-      embed.setDescription(desc + "\nYou ran out of time!");
+      desc += "\nYou ran out of time!";
     }
+
+    embed.setDescription(desc);
   }
+
+  embed.setDescription(
+    embed.description +
+      `\n\nYou just heard || ${emoji.song} **${song.title}** by ${
+        song.group || "a Soloist"
+      }||!`
+  );
+
+  console.log(embed.description);
 
   try {
     await completeGts(
