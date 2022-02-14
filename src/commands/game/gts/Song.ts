@@ -5,6 +5,7 @@ import { completeGts } from "../../../lib/graphql/mutation/COMPLETE_GTS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
 import { logger } from "../../../lib/logger";
 import { redis } from "../../../lib/redis";
+import { button, row } from "../../../lib/util/component";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
@@ -76,19 +77,7 @@ const run: Run = async function ({ interaction, user, options }) {
     const message = await interaction.editOriginalMessage(
       {
         embeds: [embed],
-        components: [
-          {
-            type: 1,
-            components: [
-              {
-                type: 2,
-                custom_id: `cancel-gts?${user.id}`,
-                label: "Cancel",
-                style: 4,
-              },
-            ],
-          },
-        ],
+        components: [row(button("cancel", `cancel-gts?${user.id}`, "red"))],
       },
       { file: Buffer.from(song.video!, "base64"), name: "song.mp4" }
     );
