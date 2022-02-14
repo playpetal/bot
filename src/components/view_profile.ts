@@ -1,6 +1,7 @@
 import { ComponentInteraction } from "eris";
 import { getProfileEmbed } from "../lib/embed/Profile";
 import { getUser } from "../lib/graphql/query/GET_USER";
+import { button, row } from "../lib/util/component";
 import { Component } from "../struct/component";
 
 async function run(interaction: ComponentInteraction) {
@@ -15,24 +16,10 @@ async function run(interaction: ComponentInteraction) {
   await interaction.editOriginalMessage({
     embeds: [getProfileEmbed(account)],
     components: [
-      {
-        type: 1,
-        components: [
-          {
-            label: "view profile",
-            style: 2,
-            custom_id: `view_profile?${account.id}`,
-            type: 2,
-            disabled: true,
-          },
-          {
-            label: "view stats",
-            style: 2,
-            custom_id: `view_stats?${account.id}`,
-            type: 2,
-          },
-        ],
-      },
+      row(
+        button("view profile", `view_profile?${account.id}`, "gray", true),
+        button("view stats", `view_stats?${account.id}`, "gray")
+      ),
     ],
   });
 
