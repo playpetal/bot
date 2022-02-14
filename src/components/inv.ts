@@ -2,6 +2,7 @@ import { ComponentInteraction } from "eris";
 import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
 import { inventory } from "../lib/graphql/query/INVENTORY";
 import { inventoryPage } from "../lib/graphql/query/INVENTORY_PAGE";
+import { button, row } from "../lib/util/component";
 import { displayName } from "../lib/util/displayName";
 import { formatCard } from "../lib/util/formatting/format";
 import { Component } from "../struct/component";
@@ -36,32 +37,26 @@ const run = async (interaction: ComponentInteraction) => {
   return interaction.editOriginalMessage({
     embeds: [embed],
     components: [
-      {
-        type: 1,
-        components: [
-          {
-            type: 2,
-            emoji: { id: "862984408076255252" },
-            custom_id: `inv?prev&${userId}&${_cards[0].id}`,
-            style: 1,
-            disabled: current <= 1,
-          },
-          {
-            type: 2,
-            label: `page ${current} of ${max}`,
-            custom_id: "page",
-            style: 2,
-            disabled: true,
-          },
-          {
-            type: 2,
-            emoji: { id: "862984408339578880" },
-            custom_id: `inv?next&${userId}&${_cards[_cards.length - 1].id}`,
-            style: 1,
-            disabled: current >= max,
-          },
-        ],
-      },
+      row(
+        button({
+          customId: `inv?prev&${userId}&${_cards[0].id}`,
+          style: "blue",
+          emoji: "862984408076255252",
+          disabled: current <= 1,
+        }),
+        button({
+          customId: "page",
+          style: "gray",
+          label: `page ${current} of ${max}`,
+          disabled: true,
+        }),
+        button({
+          customId: `inv?next&${userId}&${_cards[_cards.length - 1].id}`,
+          style: "blue",
+          emoji: "862984408339578880",
+          disabled: current >= max,
+        })
+      ),
     ],
   });
 };

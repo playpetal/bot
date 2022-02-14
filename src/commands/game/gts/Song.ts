@@ -77,7 +77,15 @@ const run: Run = async function ({ interaction, user, options }) {
     const message = await interaction.editOriginalMessage(
       {
         embeds: [embed],
-        components: [row(button("cancel", `cancel-gts?${user.id}`, "red"))],
+        components: [
+          row(
+            button({
+              customId: `cancel-gts?${user.id}`,
+              label: "cancel",
+              style: "red",
+            })
+          ),
+        ],
       },
       { file: Buffer.from(song.video!, "base64"), name: "song.mp4" }
     );

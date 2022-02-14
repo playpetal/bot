@@ -25,8 +25,17 @@ const run: Run = async function ({ interaction, user, options }) {
     embeds: [getProfileEmbed(target)],
     components: [
       row(
-        button("view profile", `view_profile?${target.id}`, "gray", true),
-        button("view stats", `view_stats?${target.id}`, "gray")
+        button({
+          customId: `view_profile?${target.id}`,
+          style: "gray",
+          label: "view profile",
+          disabled: true,
+        }),
+        button({
+          customId: `view_stats?${target.id}`,
+          style: "gray",
+          label: "view stats",
+        })
       ),
     ],
   });

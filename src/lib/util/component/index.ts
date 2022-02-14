@@ -10,20 +10,32 @@ type Button = {
   label: string;
   custom_id: string;
   style: 1 | 2 | 3 | 4;
+  emoji?: {
+    id: string;
+  };
+  disabled: boolean;
 };
 
-export function button(
-  label: string,
-  customId: string,
-  style: keyof typeof buttonStyles,
-  disabled: boolean = false
-) {
+export function button({
+  customId,
+  style,
+  label,
+  emoji,
+  disabled = false,
+}: {
+  customId: string;
+  style: keyof typeof buttonStyles;
+  label?: string;
+  emoji?: string;
+  disabled?: boolean;
+}): Button {
   return {
     type: 2 as const,
-    label,
+    label: label as string,
     custom_id: customId,
     style: buttonStyles[style],
     disabled,
+    emoji: emoji ? { id: emoji } : undefined,
   };
 }
 

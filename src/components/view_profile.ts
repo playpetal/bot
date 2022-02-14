@@ -17,8 +17,17 @@ async function run(interaction: ComponentInteraction) {
     embeds: [getProfileEmbed(account)],
     components: [
       row(
-        button("view profile", `view_profile?${account.id}`, "gray", true),
-        button("view stats", `view_stats?${account.id}`, "gray")
+        button({
+          customId: `view_profile?${account.id}`,
+          style: "gray",
+          label: "view profile",
+          disabled: true,
+        }),
+        button({
+          customId: `view_stats?${account.id}`,
+          style: "gray",
+          label: "view stats",
+        })
       ),
     ],
   });
