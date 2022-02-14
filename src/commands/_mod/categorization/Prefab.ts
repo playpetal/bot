@@ -139,6 +139,7 @@ const run: Run = async ({ interaction, options, user }) => {
       id: prefab!.id,
       characterId: character?.id,
       subgroupId: subgroup?.id,
+      groupId: group?.id,
       maxCards,
       rarity,
       releaseId,
