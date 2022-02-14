@@ -24,8 +24,7 @@ const run = async function (interaction: unknown) {
     !(interaction instanceof AutocompleteInteraction) &&
     !interaction.guildID
   ) {
-    await interaction.createMessage({
-      flags: 64,
+    await interaction.editOriginalMessage({
       embeds: [
         new ErrorEmbed(
           "sorry, but you can only use petal in servers for now. :("
@@ -53,20 +52,18 @@ const run = async function (interaction: unknown) {
       return await component.run(interaction, user);
     } catch (e) {
       if (e instanceof BotError) {
-        return interaction.createMessage({
+        return interaction.editOriginalMessage({
           embeds: [new ErrorEmbed(e.message)],
-          flags: 64,
         });
       } else {
         console.log(e);
         logger.error(e);
-        return interaction.createMessage({
+        return interaction.editOriginalMessage({
           embeds: [
             new ErrorEmbed(
               "**an unexpected error occurred.**\nplease try again in a few moments."
             ),
           ],
-          flags: 64,
         });
       }
     }
@@ -76,7 +73,7 @@ const run = async function (interaction: unknown) {
   if (!command) return;
 
   if (interaction instanceof CommandInteraction)
-    await interaction.acknowledge();
+    await interaction.acknowledge(command.isEphemeral ? 64 : undefined);
 
   if (!interaction.member) return;
 
@@ -85,8 +82,9 @@ const run = async function (interaction: unknown) {
   try {
     user = await getUserPartial(interaction.member.id);
   } catch (e) {
+    logger.error(e);
     if (!(interaction instanceof AutocompleteInteraction)) {
-      return interaction.createMessage({
+      return interaction.editOriginalMessage({
         embeds: [
           new ErrorEmbed(
             "failed to connect to the api... try again in a few minutes? 😕"
@@ -143,13 +141,13 @@ const run = async function (interaction: unknown) {
   } catch (e) {
     if (interaction instanceof CommandInteraction) {
       if (e instanceof BotError) {
-        return interaction.createMessage({
+        return interaction.editOriginalMessage({
           embeds: [new ErrorEmbed(e.message)],
         });
       } else {
         console.log(e);
         logger.error(e);
-        return interaction.createMessage({
+        return interaction.editOriginalMessage({
           embeds: [
             new ErrorEmbed(
               "**an unexpected error occurred.**\nplease try again in a few moments."

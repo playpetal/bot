@@ -27,6 +27,7 @@ export class SlashCommand {
   readonly name: string;
   description: string;
   options: SlashCommandOption<keyof typeof optionTypes>[] = [];
+  isEphemeral: boolean = false;
 
   private _run: Run | undefined;
   private _autocomplete: Autocomplete | undefined;
@@ -107,5 +108,10 @@ export class SlashCommand {
 
   public isModOnly() {
     return this._modOnly;
+  }
+
+  public ephemeral() {
+    this.isEphemeral = true;
+    return this;
   }
 }

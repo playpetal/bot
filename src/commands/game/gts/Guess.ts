@@ -85,9 +85,14 @@ const run: Run = async function ({ interaction, user, options }) {
   }
 };
 
-export default new SlashCommand("guess").desc("gts").run(run).option({
-  type: "string",
-  name: "guess",
-  description: "use this to make your guess in the 'guess the song' minigame!",
-  required: true,
-});
+export default new SlashCommand("guess")
+  .desc("gts")
+  .run(run)
+  .option({
+    type: "string",
+    name: "guess",
+    description:
+      "use this to make your guess in the 'guess the song' minigame!",
+    required: true,
+  })
+  .ephemeral();
