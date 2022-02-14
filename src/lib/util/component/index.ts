@@ -15,13 +15,15 @@ type Button = {
 export function button(
   label: string,
   customId: string,
-  style: keyof typeof buttonStyles
+  style: keyof typeof buttonStyles,
+  disabled: boolean = false
 ) {
   return {
     type: 2 as const,
     label,
     custom_id: customId,
     style: buttonStyles[style],
+    disabled,
   };
 }
 
