@@ -1,6 +1,7 @@
 import { Account } from "petal";
 import { getProfileEmbed } from "../../lib/embed/Profile";
 import { getUser } from "../../lib/graphql/query/GET_USER";
+import { button, row } from "../../lib/util/component";
 import { Run, SlashCommand } from "../../struct/command";
 import { BotError } from "../../struct/error";
 
@@ -23,24 +24,10 @@ const run: Run = async function ({ interaction, user, options }) {
   await interaction.createMessage({
     embeds: [getProfileEmbed(target)],
     components: [
-      {
-        type: 1,
-        components: [
-          {
-            type: 2,
-            label: "view profile",
-            custom_id: `view_profile?${target.id}`,
-            style: 2,
-            disabled: true,
-          },
-          {
-            type: 2,
-            label: "view stats",
-            custom_id: `view_stats?${target.id}`,
-            style: 2,
-          },
-        ],
-      },
+      row(
+        button("view profile", `view_profile?${target.id}`, "gray", true),
+        button("view stats", `view_stats?${target.id}`, "gray")
+      ),
     ],
   });
 };
