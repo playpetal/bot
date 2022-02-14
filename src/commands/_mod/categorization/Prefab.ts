@@ -19,6 +19,7 @@ import { searchCharacters } from "../../../lib/graphql/query/SEARCH_CHARACTERS";
 import { searchGroups } from "../../../lib/graphql/query/SEARCH_GROUPS";
 import { searchPrefabs } from "../../../lib/graphql/query/SEARCH_PREFABS";
 import { searchSubgroups } from "../../../lib/graphql/query/SEARCH_SUBGROUPS";
+import { getCardImage } from "../../../lib/img";
 import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
@@ -130,7 +131,7 @@ const run: Run = async ({ interaction, options, user }) => {
   }
 
   const embed = new Embed();
-  let card: string | undefined;
+  let card: Buffer | undefined;
 
   if (isEdit) {
     await updatePrefab({
@@ -214,14 +215,14 @@ const run: Run = async ({ interaction, options, user }) => {
         id: Date.now(),
       },
     ])) as { data: { card: string } };
-    card = data.card;
+    card = Buffer.from(data.card, "base64");
   }
 
   await interaction.createFollowup(
     {
       embeds: [embed],
     },
-    [{ file: Buffer.from(card!, "base64"), name: "collage.png" }]
+    card ? [{ file: card, name: "collage.png" }] : undefined
   );
 };
 
