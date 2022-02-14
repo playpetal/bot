@@ -155,6 +155,7 @@ declare module "petal" {
     quality: Quality;
     tint: number;
     createdAt: number;
+    hasFrame: boolean;
   };
 
   export type Song = {

@@ -29,6 +29,7 @@ const query = gql`
       quality
       tint
       createdAt
+      hasFrame
     }
   }
 `;

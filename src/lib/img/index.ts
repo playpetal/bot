@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Card } from "petal";
+import { logger } from "../logger";
 
 export async function getCardImage(card: Card): Promise<Buffer> {
   const {
@@ -9,16 +10,23 @@ export async function getCardImage(card: Card): Promise<Buffer> {
     data: { id: card.prefab.id },
   })) as { data: { hash: string } };
 
-  const { data } = (await axios.post(`${process.env.ONI_URL!}/card`, [
-    {
-      frame: `#${card.tint.toString(16)}`,
-      name: card.prefab.character.name,
-      id: card.id,
-      character: `https://cdn.playpetal.com/p/${hash}.png`,
-    },
-  ])) as {
-    data: { card: string };
-  };
+  try {
+    const { data } = (await axios.post(`${process.env.ONI_URL!}/card`, [
+      {
+        frame: card.hasFrame
+          ? `https://cdn.playpetal.com/f/${hash}.png`
+          : `#${card.tint.toString(16)}`,
+        name: card.prefab.character.name,
+        id: card.id,
+        character: `https://cdn.playpetal.com/p/${hash}.png`,
+      },
+    ])) as {
+      data: { card: string };
+    };
 
-  return Buffer.from(data.card, "base64");
+    return Buffer.from(data.card, "base64");
+  } catch (e) {
+    logger.error(e);
+    return Buffer.alloc(0);
+  }
 }
