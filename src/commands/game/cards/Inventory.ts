@@ -10,9 +10,9 @@ import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 
 export const run: Run = async ({ interaction, user, options }) => {
-  const character = options.getOption<string>("character");
-  const subgroup = options.getOption<string>("subgroup");
-  const group = options.getOption<string>("group");
+  const character = trimBirthday(options.getOption<string>("character"));
+  const subgroup = trimBirthday(options.getOption<string>("subgroup"));
+  const group = trimBirthday(options.getOption<string>("group"));
 
   const _cards = await inventory(user.id, { character, subgroup, group });
 
@@ -72,6 +72,13 @@ export const run: Run = async ({ interaction, user, options }) => {
   });
 };
 
+function trimBirthday(str?: string): string | undefined {
+  if (!str) return str;
+  return str
+    .replace(/\(\d\d\d\d-\d\d-\d\d\)|\(No Birthday\)|\(No Date\)/gi, "")
+    .trim();
+}
+
 const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
   const focused = options.getFocused()!;
   let choices: { name: string; value: string }[] = [];
@@ -91,7 +98,7 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
     choices = subgroups.map((s) => {
       const creation = s.creation
         ? new Date(s.creation).toISOString().split("T")[0]
-        : "No Birthday";
+        : "No Date";
       return { name: `${s.name} (${creation})`, value: s.name };
     });
   } else if (focused.name === "group") {
@@ -100,7 +107,7 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
     choices = groups.map((g) => {
       const creation = g.creation
         ? new Date(g.creation).toISOString().split("T")[0]
-        : "No Birthday";
+        : "No Date";
       return { name: `${g.name} (${creation})`, value: g.name };
     });
   }
