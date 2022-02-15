@@ -25,7 +25,8 @@ const run: Run = async ({ interaction, user, options }) => {
 
     const embed = new Embed()
       .setDescription(
-        `${formatCard(card)}` + `\n*owned by ${displayName(card.owner)}*`
+        `${formatCard(card, { issue: false })}` +
+          `\n*owned by ${displayName(card.owner)}*`
       )
       .setImage(`attachment://${card.id.toString(16)}.png`)
       .setFooter(
