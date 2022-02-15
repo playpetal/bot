@@ -3,8 +3,22 @@ import { Card } from "petal";
 import { graphql, GraphQLResponse } from "..";
 
 const query = gql`
-  query Inventory($user: Int!, $next: Int, $prev: Int) {
-    inventory(user: $user, next: $next, prev: $prev) {
+  query Inventory(
+    $user: Int!
+    $next: Int
+    $prev: Int
+    $group: String
+    $subgroup: String
+    $character: String
+  ) {
+    inventory(
+      user: $user
+      next: $next
+      prev: $prev
+      group: $group
+      subgroup: $subgroup
+      character: $character
+    ) {
       id
       prefab {
         id
@@ -36,11 +50,23 @@ const query = gql`
 
 export async function inventory(
   userId: number,
-  { next, prev }: { next?: number; prev?: number }
+  {
+    next,
+    prev,
+    character,
+    subgroup,
+    group,
+  }: {
+    next?: number;
+    prev?: number;
+    character?: string;
+    group?: string;
+    subgroup?: string;
+  }
 ) {
   const { data } = (await graphql.query({
     query,
-    variables: { user: userId, next, prev },
+    variables: { user: userId, next, prev, character, subgroup, group },
   })) as GraphQLResponse<{
     inventory: Card[];
   }>;

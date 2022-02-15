@@ -10,19 +10,27 @@ import { Embed } from "../struct/embed";
 
 const run = async (interaction: ComponentInteraction) => {
   const [_customId, data] = interaction.data.custom_id.split("?");
-  const [action, _userId, _cursor] = data.split("&");
+  const [action, _userId, _cursor, character, subgroup, group] =
+    data.split("&");
 
   const userId = parseInt(_userId, 10);
   const cursor = parseInt(_cursor, 10);
   const _cards = await inventory(userId, {
     next: action === "next" ? cursor : undefined,
     prev: action === "prev" ? cursor : undefined,
+    character,
+    subgroup,
+    group,
   });
 
   if (action === "prev") _cards.reverse();
   const strCards = _cards.map((c) => formatCard(c));
 
-  const { current, max, cards } = await inventoryPage(userId, _cards[0].id);
+  const { current, max, cards } = await inventoryPage(userId, _cards[0].id, {
+    character,
+    subgroup,
+    group,
+  });
 
   const user = (await getUserPartial(undefined, userId))!;
 
@@ -39,7 +47,7 @@ const run = async (interaction: ComponentInteraction) => {
     components: [
       row(
         button({
-          customId: `inv?prev&${userId}&${_cards[0].id}`,
+          customId: `inv?prev&${userId}&${_cards[0].id}&${character}&${subgroup}&${group}`,
           style: "blue",
           emoji: "862984408076255252",
           disabled: current <= 1,
@@ -51,7 +59,9 @@ const run = async (interaction: ComponentInteraction) => {
           disabled: true,
         }),
         button({
-          customId: `inv?next&${userId}&${_cards[_cards.length - 1].id}`,
+          customId: `inv?next&${userId}&${
+            _cards[_cards.length - 1].id
+          }&${character}&${subgroup}&${group}`,
           style: "blue",
           emoji: "862984408339578880",
           disabled: current >= max,
