@@ -36,3 +36,19 @@ export async function getHash(number: number): Promise<string> {
 
   return hash;
 }
+
+export async function uploadImage(
+  imageUrl: string,
+  id: number,
+  type: "prefab" | "frame"
+): Promise<string> {
+  const {
+    data: { url },
+  } = (await axios.post(`${process.env.ONI_URL!}/upload`, {
+    id,
+    url: imageUrl,
+    type,
+  })) as { data: { url: string } };
+
+  return url;
+}

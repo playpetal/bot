@@ -19,7 +19,7 @@ import { searchCharacters } from "../../../lib/graphql/query/SEARCH_CHARACTERS";
 import { searchGroups } from "../../../lib/graphql/query/SEARCH_GROUPS";
 import { searchPrefabs } from "../../../lib/graphql/query/SEARCH_PREFABS";
 import { searchSubgroups } from "../../../lib/graphql/query/SEARCH_SUBGROUPS";
-import { getCardImage } from "../../../lib/img";
+import { uploadImage } from "../../../lib/img";
 import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
@@ -145,12 +145,7 @@ const run: Run = async ({ interaction, options, user }) => {
       releaseId,
     });
 
-    if (image) {
-      await axios.post(`${process.env.ONI_URL}/upload`, {
-        url: image,
-        id: prefab!.id.toString(),
-      });
-    }
+    if (image) await uploadImage(image, prefab!.id, "prefab");
 
     embed.setDescription(
       "**heads up!** you just edited a prefab:" +
@@ -190,10 +185,7 @@ const run: Run = async ({ interaction, options, user }) => {
       releaseId,
     });
 
-    await axios.post(`${process.env.ONI_URL}/upload`, {
-      url: image!,
-      id: prefab.id.toString(),
-    });
+    await uploadImage(image!, prefab.id, "prefab");
 
     embed
       .setDescription(
