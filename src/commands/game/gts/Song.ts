@@ -230,4 +230,4 @@ export default new SlashCommand("song")
       { name: "boys", value: "male" },
       { name: "girls", value: "female" },
     ],
-  } as SlashCommandOption<"string">);
+  });

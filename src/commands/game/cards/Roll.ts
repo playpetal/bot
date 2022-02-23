@@ -132,7 +132,7 @@ export default new SlashCommand("roll")
     description: "how many cards you want to roll",
     min_value: 1,
     max_value: 10,
-  } as SlashCommandOption<"integer">)
+  })
   .option({
     type: "string",
     name: "gender",
