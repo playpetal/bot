@@ -45,7 +45,7 @@ const run: Run = async ({ interaction, user, options }) => {
 
     const reward =
       (["SEED", "SPROUT", "BUD", "FLOWER", "BLOOM"].indexOf(card.quality) + 1) *
-      5;
+      3;
 
     await burnCard(card.id, user.discordId);
 
