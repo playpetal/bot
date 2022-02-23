@@ -7,6 +7,7 @@ import { redis } from "../../../lib/redis";
 import { GTS } from "petal";
 import { bot } from "../../..";
 import { logger } from "../../../lib/logger";
+import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
 
 const run: Run = async function ({ interaction, user, options }) {
   const gameStr = await redis.get(`gts:game:${user.id}`);
@@ -18,7 +19,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
   const game = JSON.parse(gameStr) as GTS;
 
-  if (game.startedAt < Date.now() - game.timeLimit) {
+  if (game.startedAt < Date.now() - GTS_MAX_MS) {
     await redis.del(`gts:game:${user.id}`);
 
     try {
@@ -63,6 +64,8 @@ const run: Run = async function ({ interaction, user, options }) {
 
   if (correct) {
     game.correct = true;
+    game.time = interaction.createdAt - game.startedAt;
+
     const state = JSON.stringify(game);
     await redis.set(`gts:game:${user.id}`, state);
 
@@ -78,7 +81,7 @@ const run: Run = async function ({ interaction, user, options }) {
       .setColor("#F04747")
       .setDescription(
         `${emoji.song} **${answer}** was incorrect! You have **${
-          game.maxGuesses - game.guesses
+          GTS_MAX_GUESSES - game.guesses
         }** guesses remaining!`
       );
     await interaction.createMessage({ embeds: [embed], flags: 64 });

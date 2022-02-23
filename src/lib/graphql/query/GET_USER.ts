@@ -13,10 +13,6 @@ const GET_USER = gql`
       currency
       stats {
         cardCount
-        gtsTotalGames
-        gtsGuessCount
-        gtsTotalTime
-        gtsTotalRewards
         rollCount
       }
       title {

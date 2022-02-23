@@ -14,7 +14,7 @@ async function run(interaction: ComponentInteraction) {
   if (!account) return;
 
   await interaction.editOriginalMessage({
-    embeds: [getStatsEmbed(account)],
+    embeds: [await getStatsEmbed(account)],
     components: [
       row(
         button({

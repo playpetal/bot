@@ -1,11 +1,13 @@
 import { CommandInteraction } from "eris";
-import { GTS, SlashCommandOption } from "petal";
+import { GTS } from "petal";
 import { bot } from "../../..";
-import { completeGts } from "../../../lib/graphql/mutation/COMPLETE_GTS";
+import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
+import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
 import { logger } from "../../../lib/logger";
 import { redis } from "../../../lib/redis";
 import { button, row } from "../../../lib/util/component";
+import { getGTSRewardComponents } from "../../../lib/util/component/minigame";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
@@ -16,18 +18,19 @@ const run: Run = async function ({ interaction, user, options }) {
   const gtsString = await redis.get(`gts:game:${user.id}`);
 
   if (gtsString) {
-    const game = JSON.parse(gtsString) as GTS;
-    if (game.startedAt > Date.now() - game.timeLimit)
+    const { startedAt, gameChannelId, gameMessageId } = JSON.parse(
+      gtsString
+    ) as GTS;
+
+    if (startedAt > Date.now() - GTS_MAX_MS) {
       throw new BotError(
         "**you're already playing a game!**\nfinish your current minigame first 😒"
       );
+    }
 
     try {
       await redis.del(`gts:game:${user.id}`);
-      const message = await bot.getMessage(
-        game.gameChannelId,
-        game.gameMessageId
-      );
+      const message = await bot.getMessage(gameChannelId, gameMessageId);
       await message.edit({
         embeds: [
           new Embed()
@@ -54,23 +57,21 @@ const run: Run = async function ({ interaction, user, options }) {
       `${emoji.song} there are no available songs 😔 try again later!`
     );
 
-  let { maxReward, timeLimit, maxGuesses, remainingGames, isNewHour } = song;
+  const canClaim = await canClaimRewards(user.discordId);
 
   try {
     const embed = new Embed()
       .setDescription(
         `${emoji.song} **Guess the song by using /guess!**` +
-          `\n\nModifiers: **None**` +
-          `\nMaximum reward: ${emoji.petals} ${strong(maxReward)}` +
-          `\nTime limit: ${strong(timeLimit / 1000)} seconds` +
-          `\nMaximum guesses: ${strong(maxGuesses)}`
+          `\nTime limit: ${strong(GTS_MAX_MS / 1000)} seconds` +
+          `\nMaximum guesses: ${strong(GTS_MAX_GUESSES)}`
       )
       .setFooter(
-        maxReward === 0
-          ? `Rewards won't be given since you've already won 3 games this hour.`
-          : `You can win ${remainingGames} more game${
-              remainingGames !== 1 ? "s" : ""
+        canClaim
+          ? `You can claim ${canClaim} more reward${
+              canClaim !== 1 ? "s" : ""
             } this hour!`
+          : `Rewards won't be given since you've already won 3 games this hour.`
       )
       .setImage("https://cdn.playpetal.com/banners/default.png");
 
@@ -92,17 +93,12 @@ const run: Run = async function ({ interaction, user, options }) {
 
     const state = JSON.stringify({
       startedAt: Date.now(),
-      maxReward,
-      timeLimit,
-      maxGuesses,
       playerId: user.id,
       gameMessageId: message.id,
       gameChannelId: message.channel.id,
       song: { ...song, video: undefined },
       guesses: 0,
       correct: false,
-      remainingGames,
-      isNewHour,
     } as GTS);
 
     await redis.set(`gts:game:${user.id}`, state);
@@ -124,12 +120,12 @@ const run: Run = async function ({ interaction, user, options }) {
         return;
       }
 
-      const { correct, guesses, maxGuesses, startedAt } = game;
+      const { correct, guesses, startedAt, song } = game;
 
       if (
         correct ||
-        guesses >= maxGuesses ||
-        startedAt <= Date.now() - timeLimit
+        guesses >= GTS_MAX_GUESSES ||
+        startedAt <= Date.now() - GTS_MAX_MS
       ) {
         clearInterval(interval);
         return await handleGTSEnd(interaction, game);
@@ -143,80 +139,55 @@ const run: Run = async function ({ interaction, user, options }) {
 
 async function handleGTSEnd(
   interaction: CommandInteraction,
-  {
-    playerId,
-    startedAt,
-    maxGuesses,
-    guesses,
-    maxReward,
-    correct,
-    isNewHour,
-    song,
-  }: GTS
+  { playerId, guesses, correct, song, time }: GTS
 ) {
-  await redis.del(`gts:game:${playerId}`);
-  let embed = new Embed();
+  if (!correct) {
+    await redis.del(`gts:game:${playerId}`);
 
-  const time = Date.now() - startedAt;
-  const reward = Math.floor(
-    ((maxGuesses - (guesses - 1)) / maxGuesses) * maxReward
-  );
-
-  if (correct) {
-    embed
-      .setColor("#3BA55D")
-      .setDescription(
-        `${emoji.song} **You got it in ${guesses} guess${
-          guesses !== 1 ? "es" : ""
-        } (${(time / 1000).toFixed(2)}s)!**` +
-          (maxReward === 0
-            ? `\nYou did not receive any petals for this game.`
-            : `\nYou've been rewarded ${emoji.petals} ${strong(
-                reward
-              )}, enjoy!`)
-      )
-      .setImage("https://cdn.playpetal.com/banners/default.png");
-  } else {
-    embed.setColor("#F04747");
-    let desc = "**Better luck next time!**";
-
-    if (guesses >= maxGuesses) {
-      desc += "\nYou ran out of guesses!";
-    } else {
-      desc += "\nYou ran out of time!";
-    }
-
-    embed.setDescription(desc);
+    return interaction.editOriginalMessage({
+      embeds: [
+        new Embed().setDescription(
+          "**Better luck next time!**\n" +
+            (guesses >= GTS_MAX_GUESSES
+              ? "You ran out of guesses!"
+              : "You ran out of time!") +
+            `\n\nYou just heard || ${emoji.song} **${song.title}** by ${
+              song.group || "a Soloist"
+            }||!`
+        ),
+      ],
+      components: [],
+    });
   }
 
-  embed.setDescription(
-    embed.description +
-      `\n\nYou just heard || ${emoji.song} **${song.title}** by ${
-        song.group || "a Soloist"
-      }||!`
-  );
+  const embed = new Embed().setColor("#3BA55D");
 
-  console.log(embed.description);
+  const description = `${emoji.song} **You got it in ${guesses} guess${
+    guesses !== 1 ? "es" : ""
+  } (${(time! / 1000).toFixed(2)}s)!**`;
 
-  try {
-    await completeGts(
-      interaction.member!.id,
-      guesses,
-      time,
-      correct ? reward : 0,
-      correct,
-      isNewHour
+  const rewardsRemaining = await canClaimRewards(interaction.member!.id);
+
+  if (rewardsRemaining === 0) {
+    await redis.del(`gts:game:${playerId}`);
+
+    embed.setDescription(
+      description + `\nYou've already claimed all the rewards this hour.`
     );
-  } catch (e: any) {
-    logger.error(e);
+  } else {
+    embed.setDescription(
+      description + `\nChoose your reward from the options below!`
+    );
   }
 
   try {
-    await interaction.editOriginalMessage({ embeds: [embed], components: [] });
+    return interaction.editOriginalMessage({
+      embeds: [embed],
+      components: rewardsRemaining > 0 ? getGTSRewardComponents(playerId) : [],
+    });
   } catch (e) {
     // do nothing, the original message was probably deleted
   }
-  return;
 }
 
 export default new SlashCommand("song")

@@ -76,10 +76,6 @@ declare module "petal" {
     createdAt: number;
     stats: {
       cardCount: number;
-      gtsTotalGames: number;
-      gtsGuessCount: number;
-      gtsTotalTime: number;
-      gtsTotalRewards: number;
       rollCount: number;
     };
     groups: {
@@ -163,25 +159,16 @@ declare module "petal" {
     title: string;
     group?: string;
     video?: string;
-    maxReward: number;
-    timeLimit: number;
-    maxGuesses: number;
-    remainingGames: number;
-    isNewHour: boolean;
   };
 
   export type GTS = {
-    startedAt: number;
-    maxReward: number;
-    timeLimit: number;
-    maxGuesses: number;
     playerId: number;
     gameMessageId: string;
     gameChannelId: string;
     song: Song;
     guesses: number;
     correct: boolean;
-    remainingGames: number;
-    isNewHour: boolean;
+    startedAt: number;
+    time?: number;
   };
 }

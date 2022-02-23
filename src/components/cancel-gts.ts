@@ -1,5 +1,5 @@
 import { ComponentInteraction } from "eris";
-import { PartialUser } from "petal";
+import { GTS, PartialUser } from "petal";
 import { getUser } from "../lib/graphql/query/GET_USER";
 import { redis } from "../lib/redis";
 import { Component } from "../struct/component";
@@ -19,6 +19,10 @@ async function run(interaction: ComponentInteraction, user: PartialUser) {
   const gameStr = await redis.get(`gts:game:${accountId}`);
 
   if (!gameStr) throw new BotError("this game doesn't exist!");
+
+  const game = JSON.parse(gameStr) as GTS;
+  if (game.guesses > 0)
+    throw new BotError("you can't cancel a game you've guessed on!");
 
   await redis.del(`gts:game:${accountId}`);
 

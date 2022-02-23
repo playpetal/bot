@@ -10,11 +10,6 @@ const GET_RANDOM_SONG = gql`
       title
       group
       video
-      maxReward
-      timeLimit
-      maxGuesses
-      remainingGames
-      isNewHour
     }
   }
 `;

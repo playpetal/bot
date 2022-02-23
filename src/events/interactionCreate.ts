@@ -5,12 +5,13 @@ import {
 } from "eris";
 import { bot } from "..";
 import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
-import { Embed, ErrorEmbed } from "../struct/embed";
+import { ErrorEmbed } from "../struct/embed";
 import { Event } from "../struct/event";
 import { InteractionOption, Maybe, PartialUser } from "petal";
 import { InteractionOptions } from "../struct/options";
 import { BotError } from "../struct/error";
 import { logger } from "../lib/logger";
+import { ApolloError } from "@apollo/client/errors";
 
 const run = async function (interaction: unknown) {
   if (
@@ -52,18 +53,20 @@ const run = async function (interaction: unknown) {
       return await component.run(interaction, user);
     } catch (e) {
       if (e instanceof BotError) {
-        return interaction.editOriginalMessage({
+        return interaction.createMessage({
           embeds: [new ErrorEmbed(e.message)],
+          flags: 64,
         });
       } else {
         console.log(e);
         logger.error(e);
-        return interaction.editOriginalMessage({
+        return interaction.createMessage({
           embeds: [
             new ErrorEmbed(
               "**an unexpected error occurred.**\nplease try again in a few moments."
             ),
           ],
+          flags: 64,
         });
       }
     }
@@ -144,17 +147,28 @@ const run = async function (interaction: unknown) {
         return interaction.editOriginalMessage({
           embeds: [new ErrorEmbed(e.message)],
         });
+      } else if (e instanceof ApolloError) {
+        if (e.networkError) {
+          const { networkError } = e;
+
+          if (networkError.hasOwnProperty("response")) {
+            // @ts-ignore
+            logger.error(networkError.result.errors);
+          } else logger.error(e.networkError);
+        } else {
+          logger.error(e);
+        }
       } else {
-        console.log(e);
         logger.error(e);
-        return interaction.editOriginalMessage({
-          embeds: [
-            new ErrorEmbed(
-              "**an unexpected error occurred.**\nplease try again in a few moments."
-            ),
-          ],
-        });
       }
+
+      return interaction.editOriginalMessage({
+        embeds: [
+          new ErrorEmbed(
+            "**an unexpected error occurred.**\nplease try again in a few moments."
+          ),
+        ],
+      });
     } else
       return interaction.acknowledge([
         { name: "an error occurred :(", value: "-1" },
