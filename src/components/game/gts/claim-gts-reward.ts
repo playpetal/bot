@@ -1,5 +1,6 @@
 import { GTS } from "petal";
 import { claimMinigameCardReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_CARD";
+import { claimMinigameLilyReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_LILY";
 import { claimMinigamePetalReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
 import { completeGts } from "../../../lib/graphql/mutation/game/minigame/gts/COMPLETE_GTS";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
@@ -43,6 +44,10 @@ const run: RunComponent = async function ({ interaction, user }) {
     const [card] = await claimMinigameCardReward(account.discordId);
 
     desc += `\nYou received ${formatCard(card)}!`;
+  } else if (reward === "lily") {
+    await claimMinigameLilyReward(account.discordId);
+
+    desc += `\nYou were rewarded ${emoji.bloom} **1**!`;
   } else throw new BotError("there is no reward associated with the game :(");
 
   await redis.del(`gts:game:${accountId}`);
@@ -61,6 +66,6 @@ const run: RunComponent = async function ({ interaction, user }) {
   return;
 };
 
-const command = new Component("claim-gts-reward").run(run);
+const command = new Component("claim-gts-reward").run(run).autoack();
 
 export default command;

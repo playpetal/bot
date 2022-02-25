@@ -33,6 +33,6 @@ const run: RunComponent = async function ({ interaction, user }) {
   return;
 };
 
-const command = new Component("cancel-gts").run(run);
+const command = new Component("cancel-gts").run(run).autoack();
 
 export default command;

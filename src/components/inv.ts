@@ -70,4 +70,4 @@ const run: RunComponent = async function ({ interaction }) {
   });
 };
 
-export default new Component("inv").run(run);
+export default new Component("inv").run(run).autoack();

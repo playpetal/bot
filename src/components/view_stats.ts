@@ -34,6 +34,6 @@ const run: RunComponent = async function ({ interaction }) {
   return;
 };
 
-const command = new Component("view_stats").run(run);
+const command = new Component("view_stats").run(run).autoack();
 
 export default command;
