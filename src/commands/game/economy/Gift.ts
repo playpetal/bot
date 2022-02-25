@@ -12,7 +12,7 @@ const run: Run = async ({ interaction, options, user }) => {
   const targetId = options.getOption<string>("user")!;
   const cardIds = options.getOption<string>("cards");
   const petals = options.getOption<number>("petals");
-  const lilies = options.getOption<number>("petals");
+  const lilies = options.getOption<number>("lilies");
 
   if (!cardIds && !petals && !lilies)
     throw new BotError("**hold up!**\nyou have to gift *something*... :\\");
@@ -98,5 +98,6 @@ export default new SlashCommand("gift")
     type: "integer",
     name: "lilies",
     description: "the amount of lilies you'd like to gift",
+    min_value: 1,
   })
   .run(run);
