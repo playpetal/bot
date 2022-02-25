@@ -33,7 +33,7 @@ const run: Run = async function ({ interaction, user, options }) {
     now = Date.now();
     let yumeLatency: number | undefined;
     try {
-      await getUserPartial(undefined, user.id);
+      await getUserPartial({ id: user.id });
       yumeLatency = Date.now() - now;
     } catch (e) {}
 

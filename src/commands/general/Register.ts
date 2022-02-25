@@ -9,7 +9,7 @@ import { BotError } from "../../struct/error";
 
 const run: Run = async function ({ interaction, options }) {
   const id = interaction.member!.id;
-  const user = await getUserPartial(id);
+  const user = await getUserPartial({ discordId: id });
 
   if (user) throw new BotError("**woah there!**\nyou already have an account.");
 

@@ -1,10 +1,9 @@
-import { ComponentInteraction } from "eris";
 import { getProfileEmbed } from "../lib/embed/Profile";
 import { getUser } from "../lib/graphql/query/GET_USER";
 import { button, row } from "../lib/util/component";
-import { Component } from "../struct/component";
+import { Component, RunComponent } from "../struct/component";
 
-async function run(interaction: ComponentInteraction) {
+const run: RunComponent = async function ({ interaction }) {
   const [_customId, accountIdStr] = interaction.data.custom_id.split("?");
   if (!accountIdStr) return;
 
@@ -33,8 +32,8 @@ async function run(interaction: ComponentInteraction) {
   });
 
   return;
-}
+};
 
-const command = new Component("view_profile", run);
+const command = new Component("view_profile").run(run);
 
 export default command;

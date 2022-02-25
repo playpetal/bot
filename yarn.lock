@@ -490,6 +490,15 @@ end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
+eris@Linker-123/eris-1#modals:
+  version "0.16.2-dev"
+  resolved "https://codeload.github.com/Linker-123/eris-1/tar.gz/10a5de751da98ce1f58dde557bff1a8a25ff3204"
+  dependencies:
+    ws "^8.2.3"
+  optionalDependencies:
+    opusscript "^0.0.8"
+    tweetnacl "^1.0.3"
+
 eris@^0.16.1:
   version "0.16.1"
   resolved "https://registry.yarnpkg.com/eris/-/eris-0.16.1.tgz#44b0a9220944fc73dd74538cd614826bfbfcde61"

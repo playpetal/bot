@@ -1,5 +1,4 @@
-import { ComponentInteraction } from "eris";
-import { GTS, PartialUser } from "petal";
+import { GTS } from "petal";
 import { claimMinigameCardReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_CARD";
 import { claimMinigamePetalReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
 import { completeGts } from "../../../lib/graphql/mutation/game/minigame/gts/COMPLETE_GTS";
@@ -7,12 +6,11 @@ import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { redis } from "../../../lib/redis";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
-import { strong } from "../../../lib/util/formatting/strong";
-import { Component } from "../../../struct/component";
+import { Component, RunComponent } from "../../../struct/component";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
-async function run(interaction: ComponentInteraction, user: PartialUser) {
+const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, data] = interaction.data.custom_id.split("?");
   if (!data) return;
 
@@ -61,8 +59,8 @@ async function run(interaction: ComponentInteraction, user: PartialUser) {
   await interaction.editOriginalMessage({ embeds: [embed], components: [] });
 
   return;
-}
+};
 
-const command = new Component("claim-gts-reward", run);
+const command = new Component("claim-gts-reward").run(run);
 
 export default command;

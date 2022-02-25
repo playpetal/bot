@@ -73,8 +73,8 @@ export class SlashCommand {
     user,
     options,
   }: {
-    interaction: any;
-    user: any;
+    interaction: CommandInteraction;
+    user: PartialUser;
     options: InteractionOptions;
   }) {
     if (!this._run)

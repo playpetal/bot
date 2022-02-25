@@ -1,5 +1,6 @@
 import glob from "glob-promise";
 import path from "path";
+import { bot } from "../..";
 import { SlashCommand } from "../../struct/command";
 import { logger } from "../logger";
 
@@ -25,5 +26,6 @@ export async function loadSlashCommands() {
     }
   }
 
-  return commands;
+  bot.commands = commands;
+  return;
 }

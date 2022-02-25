@@ -1,25 +1,25 @@
 import glob from "glob-promise";
 import path from "path";
 import { bot } from "../..";
-import { Component } from "../../struct/component";
+import { Modal } from "../../struct/modal";
 import { logger } from "../logger";
 
-export async function loadComponents() {
-  const dir = path.join(__dirname, "../../components");
+export async function loadModals() {
+  const dir = path.join(__dirname, "../../modals");
   const matches = await glob(`${dir}/**/*.[jt]s`);
 
-  const components: Component[] = [];
+  const modals: Modal[] = [];
 
   for (let match of matches) {
     try {
-      const component = require(match).default as Component;
+      const modal = require(match).default as Modal;
 
-      components.push(component);
+      modals.push(modal);
     } catch (e) {
       logger.error(`Component failed to load at ${match}\n${e}`);
     }
   }
 
-  bot.components = components;
+  bot.modals = modals;
   return;
 }

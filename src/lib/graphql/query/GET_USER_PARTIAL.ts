@@ -15,11 +15,15 @@ const GET_USER_PARTIAL = gql`
   }
 `;
 
-export async function getUserPartial(
-  discordId?: string,
-  id?: number,
-  username?: string
-) {
+export async function getUserPartial({
+  discordId,
+  id,
+  username,
+}: {
+  discordId?: string;
+  id?: number;
+  username?: string;
+}) {
   const query = (await graphql.query({
     query: GET_USER_PARTIAL,
     variables: { discordId, id, username },

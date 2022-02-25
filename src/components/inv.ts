@@ -1,14 +1,13 @@
-import { ComponentInteraction } from "eris";
 import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
 import { inventory } from "../lib/graphql/query/INVENTORY";
 import { inventoryPage } from "../lib/graphql/query/INVENTORY_PAGE";
 import { button, row } from "../lib/util/component";
 import { displayName } from "../lib/util/displayName";
 import { formatCard } from "../lib/util/formatting/format";
-import { Component } from "../struct/component";
+import { Component, RunComponent } from "../struct/component";
 import { Embed } from "../struct/embed";
 
-const run = async (interaction: ComponentInteraction) => {
+const run: RunComponent = async function ({ interaction }) {
   const [_customId, data] = interaction.data.custom_id.split("?");
   const [action, _userId, _cursor, character, subgroup, group] =
     data.split("&");
@@ -32,7 +31,7 @@ const run = async (interaction: ComponentInteraction) => {
     group,
   });
 
-  const user = (await getUserPartial(undefined, userId))!;
+  const user = (await getUserPartial({ id: userId }))!;
 
   const header = `viewing ${displayName(
     user
@@ -71,4 +70,4 @@ const run = async (interaction: ComponentInteraction) => {
   });
 };
 
-export default new Component("inv", run);
+export default new Component("inv").run(run);

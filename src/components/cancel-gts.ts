@@ -1,12 +1,11 @@
-import { ComponentInteraction } from "eris";
-import { GTS, PartialUser } from "petal";
+import { GTS } from "petal";
 import { getUser } from "../lib/graphql/query/GET_USER";
 import { redis } from "../lib/redis";
-import { Component } from "../struct/component";
+import { Component, RunComponent } from "../struct/component";
 import { Embed } from "../struct/embed";
 import { BotError } from "../struct/error";
 
-async function run(interaction: ComponentInteraction, user: PartialUser) {
+const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, accountIdStr] = interaction.data.custom_id.split("?");
   if (!accountIdStr) return;
 
@@ -32,8 +31,8 @@ async function run(interaction: ComponentInteraction, user: PartialUser) {
   await interaction.editOriginalMessage({ embeds: [embed], components: [] });
 
   return;
-}
+};
 
-const command = new Component("cancel-gts", run);
+const command = new Component("cancel-gts").run(run);
 
 export default command;
