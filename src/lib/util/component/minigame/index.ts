@@ -17,6 +17,13 @@ export async function getGTSRewardComponents(
         label: "5 petals",
         emoji: "930918815225741383",
         style: "gray",
+      }),
+      button({
+        customId: `claim-gts-reward?${userId}&lily`,
+        label: "1 lily",
+        emoji: "917578760449060995",
+        style: "gray",
+        disabled: canClaimPremiumRewards ? false : true,
       })
     ),
   ];
