@@ -10,6 +10,7 @@ const query = gql`
         totalGames
         totalCards
         totalCurrency
+        totalPremiumCurrency
       }
     }
   }
@@ -22,6 +23,7 @@ export async function getGTSStats(id: number): Promise<
     totalGames: number;
     totalCards: number;
     totalCurrency: number;
+    totalPremiumCurrency: number;
   }>
 > {
   const { data } = (await graphql.query({
@@ -35,6 +37,7 @@ export async function getGTSStats(id: number): Promise<
         totalGames: number;
         totalCards: number;
         totalCurrency: number;
+        totalPremiumCurrency: number;
       }>;
     }>;
   }>;

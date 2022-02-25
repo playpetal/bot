@@ -1,6 +1,9 @@
 import { button, row } from "..";
 
-export function getGTSRewardComponents(userId: number) {
+export async function getGTSRewardComponents(
+  userId: number,
+  canClaimPremiumRewards: boolean = true
+) {
   return [
     row(
       button({

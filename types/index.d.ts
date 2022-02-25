@@ -73,6 +73,7 @@ declare module "petal" {
     title: Maybe<{ title: string }>;
     bio: Maybe<string>;
     currency: number;
+    premiumCurrency: number;
     createdAt: number;
     stats: {
       cardCount: number;

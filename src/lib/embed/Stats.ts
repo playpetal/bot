@@ -53,7 +53,6 @@ export async function getStatsEmbed(account: Account) {
     }
 
     const gtsPetals = gts.totalCurrency || 0;
-    const gtsCards = gts.totalCards || 0;
 
     if (gtsPetals > 0) {
       gtsStats += `\n${emoji.song} earned ${emoji.petals} **${strong(
@@ -61,9 +60,19 @@ export async function getStatsEmbed(account: Account) {
       )}**`;
     }
 
+    const gtsCards = gts.totalCards || 0;
+
     if (gtsCards > 0) {
       gtsStats += `\n${emoji.song} earned ${emoji.cards} **${strong(
         gtsCards
+      )}**`;
+    }
+
+    const gtsLilies = gts.totalPremiumCurrency;
+
+    if (gtsLilies > 0) {
+      gtsStats += `\n${emoji.song} earned ${emoji.lily} **${strong(
+        gtsLilies
       )}**`;
     }
   }

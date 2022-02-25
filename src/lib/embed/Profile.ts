@@ -9,6 +9,7 @@ export function getProfileEmbed(account: Account) {
     createdAt,
     bio,
     currency,
+    premiumCurrency,
     stats: { cardCount },
   } = account;
 
@@ -18,7 +19,10 @@ export function getProfileEmbed(account: Account) {
         `\nregistered <t:${Math.floor(createdAt / 1000)}:R>` +
         (account.bio ? `\n\n${bio}` : ``) +
         `\n\n${emoji.petals} ${strong(currency)}` +
-        `\n${emoji.bloom} ${strong(cardCount)} cards` +
+        `\n${emoji.cards} ${strong(cardCount)} cards` +
+        (premiumCurrency !== 0
+          ? `\n${emoji.lily} ${strong(premiumCurrency)}`
+          : "") +
         `\n\n[[view on website]](https://playpetal.com/profile/${account.id})`
     )
     .setThumbnail("https://cdn.playpetal.com/avatars/default.png")

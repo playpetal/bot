@@ -11,6 +11,7 @@ const GET_USER = gql`
       createdAt
       bio
       currency
+      premiumCurrency
       stats {
         cardCount
         rollCount

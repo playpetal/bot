@@ -2,6 +2,7 @@ import { CommandInteraction } from "eris";
 import { GTS } from "petal";
 import { bot } from "../../..";
 import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
+import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
 import { logger } from "../../../lib/logger";
@@ -183,7 +184,13 @@ async function handleGTSEnd(
   try {
     return interaction.editOriginalMessage({
       embeds: [embed],
-      components: rewardsRemaining > 0 ? getGTSRewardComponents(playerId) : [],
+      components:
+        rewardsRemaining > 0
+          ? await getGTSRewardComponents(
+              playerId,
+              (await canClaimPremiumRewards(interaction.member!.id)) > 0
+            )
+          : [],
     });
   } catch (e) {
     // do nothing, the original message was probably deleted
