@@ -1,5 +1,7 @@
 import { burnCard } from "../../../lib/graphql/mutation/game/BURN_CARD";
+import { changeCardColor } from "../../../lib/graphql/mutation/game/card/CHANGE_CARD_COLOR";
 import { getCard } from "../../../lib/graphql/query/GET_CARD";
+import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { searchCards } from "../../../lib/graphql/query/SEARCH_CARDS";
 import { getCardImage } from "../../../lib/img";
 import { displayName } from "../../../lib/util/displayName";
@@ -61,6 +63,43 @@ const run: Run = async ({ interaction, user, options }) => {
     return interaction.createFollowup({ embeds: [embed] }, [
       { file: image, name: `${card.id.toString(16)}.png` },
     ]);
+  } else if (subcommand.name === "dye") {
+    if (card.owner.id !== user.id)
+      throw new BotError("**hands off!**\nthat card doesn't belong to you.");
+
+    const { premiumCurrency, discordId } = (await getUser({ id: user.id }))!;
+
+    if (premiumCurrency < 25) {
+      throw new BotError(
+        `**woah there!**` + `\nyou need ${emoji.lily} ${strong(25)} to do that.`
+      );
+    }
+
+    let hex = subcommand.options![1].value as string;
+    if (!hex.match(/^#?[0-9A-F]{6}$/i))
+      throw new BotError(
+        "**woah there!**\nplease enter a valid hex code! they look like `#FFAACC`."
+      );
+
+    if (hex.startsWith("#")) hex = hex.slice(1);
+    const color = parseInt(hex, 16);
+
+    const _card = await changeCardColor(discordId, card.id, color);
+
+    const image = await getCardImage(_card);
+
+    const embed = new Embed()
+      .setDescription(
+        `${emoji.cards} **you use ${emoji.lily} 25 to brew a dye...**` +
+          `\nyour card has been dyed to \`#${_card.tint
+            .toString(16)
+            .toUpperCase()}\`!`
+      )
+      .setThumbnail(`attachment://${card.id.toString(16)}.png`);
+
+    return interaction.createFollowup({ embeds: [embed] }, [
+      { file: image, name: `${card.id.toString(16)}.png` },
+    ]);
   }
 };
 
@@ -115,6 +154,26 @@ export default new SlashCommand("card")
         description: "the card you'd like to burn",
         required: true,
         autocomplete: true,
+      },
+    ],
+  })
+  .option({
+    type: "subcommand",
+    name: "dye",
+    description: "changes the color of the card! (costs 25 lilies)",
+    options: [
+      {
+        type: "string",
+        name: "card",
+        description: "the card you'd like to color",
+        required: true,
+        autocomplete: true,
+      },
+      {
+        type: "string",
+        name: "color",
+        description: "the hex code of the color",
+        required: true,
       },
     ],
   });
