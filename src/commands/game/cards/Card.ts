@@ -32,7 +32,10 @@ const run: Run = async ({ interaction, user, options }) => {
       )
       .setImage(`attachment://${card.id.toString(16)}.png`)
       .setFooter(
-        `Card #${card.issue || 0} • #${card.tint.toString(16).toUpperCase()}`
+        `Card #${card.issue || 0} • #${card.tint
+          .toString(16)
+          .toUpperCase()
+          .padStart(6, "0")}`
       );
 
     return interaction.createFollowup({ embeds: [embed] }, [
