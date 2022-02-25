@@ -21,7 +21,7 @@ export async function getGTSRewardComponents(
       button({
         customId: `claim-gts-reward?${userId}&lily`,
         label: "1 lily",
-        emoji: "917578760449060995",
+        emoji: "946679737194008606",
         style: "gray",
         disabled: canClaimPremiumRewards ? false : true,
       })

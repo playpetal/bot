@@ -47,7 +47,7 @@ const run: RunComponent = async function ({ interaction, user }) {
   } else if (reward === "lily") {
     await claimMinigameLilyReward(account.discordId);
 
-    desc += `\nYou were rewarded ${emoji.bloom} **1**!`;
+    desc += `\nYou were rewarded ${emoji.lily} **1**!`;
   } else throw new BotError("there is no reward associated with the game :(");
 
   await redis.del(`gts:game:${accountId}`);
