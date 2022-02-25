@@ -1,5 +1,4 @@
 import { ApolloError } from "@apollo/client/core";
-import { SlashCommandOption } from "petal";
 import { gift } from "../../../lib/graphql/mutation/game/economy/GIFT";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { displayName } from "../../../lib/util/displayName";
@@ -13,8 +12,9 @@ const run: Run = async ({ interaction, options, user }) => {
   const targetId = options.getOption<string>("user")!;
   const cardIds = options.getOption<string>("cards");
   const petals = options.getOption<number>("petals");
+  const lilies = options.getOption<number>("petals");
 
-  if (!cardIds && !petals)
+  if (!cardIds && !petals && !lilies)
     throw new BotError("**hold up!**\nyou have to gift *something*... :\\");
 
   const target = await getUser({ discordId: targetId });
@@ -38,12 +38,22 @@ const run: Run = async ({ interaction, options, user }) => {
   }
 
   try {
-    await gift(user.discordId, target.id, petals, cardIds ? cards : undefined);
+    await gift({
+      discordId: user.discordId,
+      recipientId: target.id,
+      cards,
+      petals,
+      lilies,
+    });
 
     const gifts: string[] = [];
 
     if (petals) {
       gifts.push(`${emoji.petals} ${strong(petals)}`);
+    }
+
+    if (lilies) {
+      gifts.push(`${emoji.lily} ${strong(lilies)}`);
     }
 
     if (cards.length > 0) {
@@ -72,16 +82,21 @@ export default new SlashCommand("gift")
     name: "user",
     description: "the user you'd like to gift to",
     required: true,
-  } as SlashCommandOption<"user">)
+  })
+  .option({
+    type: "string",
+    name: "cards",
+    description: "the cards, separated by spaces, you'd like to gift",
+  })
   .option({
     type: "integer",
     name: "petals",
     description: "the amount of petals you'd like to gift",
     min_value: 1,
-  } as SlashCommandOption<"integer">)
+  })
   .option({
-    type: "string",
-    name: "cards",
-    description: "the cards, separated by spaces, you'd like to gift",
-  } as SlashCommandOption<"string">)
+    type: "integer",
+    name: "lilies",
+    description: "the amount of lilies you'd like to gift",
+  })
   .run(run);
