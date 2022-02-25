@@ -10,7 +10,7 @@ export async function getCardImage(card: Card): Promise<Buffer> {
       {
         frame: card.hasFrame
           ? `https://cdn.playpetal.com/f/${await getHash(card.id)}.png`
-          : `#${card.tint.toString(16)}`,
+          : `#${card.tint.toString(16).padStart(6, "0")}`,
         name: card.prefab.character.name,
         id: card.id,
         character: `https://cdn.playpetal.com/p/${hash}.png`,
