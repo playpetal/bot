@@ -14,9 +14,7 @@ export async function loadSlashCommands() {
     try {
       const command = require(match).default as unknown;
 
-      if (!(command instanceof SlashCommand)) {
-        continue;
-      }
+      if (!(command instanceof SlashCommand)) continue;
 
       if (match.includes("commands/_mod")) command.modOnly(true);
 

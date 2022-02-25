@@ -12,7 +12,9 @@ export async function loadModals() {
 
   for (let match of matches) {
     try {
-      const modal = require(match).default as Modal;
+      const modal = require(match).default as unknown;
+
+      if (!(modal instanceof Modal)) continue;
 
       modals.push(modal);
     } catch (e) {

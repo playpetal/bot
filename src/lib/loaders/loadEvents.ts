@@ -10,7 +10,9 @@ export async function loadEvents(): Promise<void> {
 
   for (let match of matches) {
     try {
-      const event = require(match).default as Event;
+      const event = require(match).default as unknown;
+
+      if (!(event instanceof Event)) continue;
 
       for (let clientEvent of event.events) {
         bot.on(clientEvent, event.run);

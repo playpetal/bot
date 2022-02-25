@@ -12,7 +12,9 @@ export async function loadComponents() {
 
   for (let match of matches) {
     try {
-      const component = require(match).default as Component;
+      const component = require(match).default as unknown;
+
+      if (!(component instanceof Component)) continue;
 
       components.push(component);
     } catch (e) {
