@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Card, SlashCommandOption } from "petal";
+import { Card } from "petal";
 import { rollCards } from "../../../lib/graphql/mutation/ROLL_CARD";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { logger } from "../../../lib/logger";
@@ -7,7 +7,7 @@ import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
-import { Embed, ErrorEmbed } from "../../../struct/embed";
+import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {

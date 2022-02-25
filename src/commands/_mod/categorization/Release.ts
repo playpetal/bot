@@ -1,7 +1,6 @@
 import { InteractionOption, SlashCommandOption } from "petal";
 import { createRelease } from "../../../lib/graphql/mutation/categorization/release/CREATE_RELEASE";
 import { updateRelease } from "../../../lib/graphql/mutation/categorization/release/UPDATE_RELEASE";
-import { createSubgroup } from "../../../lib/graphql/mutation/CREATE_SUBGROUP";
 import { getRelease } from "../../../lib/graphql/query/categorization/release/GET_RELEASE";
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
