@@ -141,15 +141,17 @@ async function handleGTSEnd(
 
     return interaction.editOriginalMessage({
       embeds: [
-        new Embed().setDescription(
-          "**Better luck next time!**\n" +
-            (guesses >= GTS_MAX_GUESSES
-              ? "You ran out of guesses!"
-              : "You ran out of time!") +
-            `\n\nYou just heard || ${emoji.song} **${song.title}** by ${
-              song.group || "a Soloist"
-            }||!`
-        ),
+        new Embed()
+          .setDescription(
+            "**Better luck next time!**\n" +
+              (guesses >= GTS_MAX_GUESSES
+                ? "You ran out of guesses!"
+                : "You ran out of time!") +
+              `\n\nYou just heard || ${emoji.song} **${song.title}** by ${
+                song.group || "a Soloist"
+              }||!`
+          )
+          .setColor("#F04747"),
       ],
       components: [],
     });
