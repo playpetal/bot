@@ -167,7 +167,7 @@ declare module "petal" {
   export type UnknownMinigame = {
     playerId: number;
     type: MinigameType;
-    data: any;
+    data: GTSData | WordsData;
   };
 
   export type Minigame<T extends MinigameType | never> = {
