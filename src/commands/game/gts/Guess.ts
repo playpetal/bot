@@ -1,7 +1,6 @@
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { findBestMatch } from "string-similarity";
-import { BotError } from "../../../struct/error";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { bot } from "../../..";
 import { logger } from "../../../lib/logger";
@@ -12,14 +11,12 @@ import {
   setMinigame,
 } from "../../../lib/minigame";
 import { Minigame } from "petal";
+import { MinigameError } from "../../../lib/error/minigame-error";
 
 const run: Run = async function ({ interaction, user, options }) {
   const minigame = await getMinigame(user);
 
-  if (!minigame)
-    throw new BotError(
-      "**you're not playing!**\nuse **/song** to start a game."
-    );
+  if (!minigame) throw MinigameError.NotPlayingGTS;
 
   let data = (minigame as Minigame<"GTS">).data;
 
@@ -34,13 +31,9 @@ const run: Run = async function ({ interaction, user, options }) {
         .setDescription("**Better luck next time!**\nYou ran out of time!");
 
       await originalMessage.edit({ embeds: [embed] });
-    } catch {
-      // ignore
-    }
+    } catch {}
 
-    throw new BotError(
-      "**you're not playing!**\nuse **/song** to start a game."
-    );
+    throw MinigameError.NotPlayingGTS;
   }
 
   data.guesses += 1;

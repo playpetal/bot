@@ -1,6 +1,7 @@
 import { CommandInteraction } from "eris";
 import { GTSData, Minigame } from "petal";
 import { bot } from "../../..";
+import { MinigameError } from "../../../lib/error/minigame-error";
 import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
 import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
@@ -17,25 +18,17 @@ import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
-import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
   const minigame = await getMinigame(user);
 
   if (minigame) {
-    if (minigame.type !== "GTS") {
-      throw new BotError(
-        "**you're already playing something!**\nfinish your current minigame first 😒"
-      );
-    }
+    if (minigame.type !== "GTS") throw MinigameError.AlreadyPlayingMinigame;
 
     const { startedAt, channel, message } = minigame.data as GTSData;
 
-    if (startedAt > Date.now() - GTS_MAX_MS) {
-      throw new BotError(
-        "**you're already playing a game!**\nfinish your current minigame first 😒"
-      );
-    }
+    if (startedAt > Date.now() - GTS_MAX_MS)
+      throw MinigameError.AlreadyPlayingGTS;
 
     try {
       await destroyMinigame(user);
@@ -61,10 +54,7 @@ const run: Run = async function ({ interaction, user, options }) {
     gender?.toUpperCase() as "MALE" | "FEMALE" | undefined
   );
 
-  if (!song)
-    throw new BotError(
-      `${emoji.song} there are no available songs 😔 try again later!`
-    );
+  if (!song) throw MinigameError.NoAvailableSongs;
 
   const canClaim = await canClaimRewards(user.discordId);
 
