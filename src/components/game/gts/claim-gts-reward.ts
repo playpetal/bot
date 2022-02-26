@@ -5,8 +5,7 @@ import { claimMinigamePetalReward } from "../../../lib/graphql/mutation/game/min
 import { completeGts } from "../../../lib/graphql/mutation/game/minigame/gts/COMPLETE_GTS";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { getCardImage } from "../../../lib/img";
-import { getMinigame } from "../../../lib/minigame";
-import { redis } from "../../../lib/redis";
+import { destroyMinigame, getMinigame } from "../../../lib/minigame";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import { Component, RunComponent } from "../../../struct/component";
@@ -59,7 +58,7 @@ const run: RunComponent = async function ({ interaction, user }) {
     desc += `\nYou were rewarded ${emoji.lily} **1**!`;
   } else throw new BotError("there is no reward associated with the game :(");
 
-  await redis.del(`gts:game:${accountId}`);
+  await destroyMinigame(accountId);
 
   await completeGts(
     account.discordId,
