@@ -18,13 +18,16 @@ const run: Run = async function ({ interaction, user, options }) {
 
   if (!minigame) throw MinigameError.NotPlayingGTS;
 
-  let data = (minigame as Minigame<"GTS">).data;
+  const data = (minigame as Minigame<"GTS">).data;
 
   if (data.startedAt < Date.now() - GTS_MAX_MS) {
     await destroyMinigame(user);
 
     try {
-      const originalMessage = await bot.getMessage(data.channel, data.message);
+      const originalMessage = await bot.getMessage(
+        minigame.channel,
+        minigame.message
+      );
 
       const embed = new Embed()
         .setColor("#F04747")
@@ -60,14 +63,14 @@ const run: Run = async function ({ interaction, user, options }) {
     data.correct = true;
     data.elapsed = interaction.createdAt - data.startedAt;
 
-    await setMinigame<"GTS">(user, data);
+    await setMinigame<"GTS">(user, data, minigame.channel, minigame.message);
 
     embed
       .setColor("#3BA55D")
       .setDescription(`${emoji.song} **${answer}** was correct!`);
     await interaction.createMessage({ embeds: [embed], flags: 64 });
   } else {
-    await setMinigame<"GTS">(user, data);
+    await setMinigame<"GTS">(user, data, minigame.channel, minigame.message);
 
     embed
       .setColor("#F04747")

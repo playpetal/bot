@@ -13,7 +13,7 @@ import {
   setMinigame,
 } from "../../../lib/minigame";
 import { button, row } from "../../../lib/util/component";
-import { getGTSRewardComponents } from "../../../lib/util/component/minigame";
+import { getMinigameRewardComponents } from "../../../lib/util/component/minigame";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
@@ -25,7 +25,11 @@ const run: Run = async function ({ interaction, user, options }) {
   if (minigame) {
     if (minigame.type !== "GTS") throw MinigameError.AlreadyPlayingMinigame;
 
-    const { startedAt, channel, message } = minigame.data as GTSData;
+    const {
+      data: { startedAt },
+      channel,
+      message,
+    } = minigame as Minigame<"GTS">;
 
     if (startedAt > Date.now() - GTS_MAX_MS)
       throw MinigameError.AlreadyPlayingGTS;
@@ -90,14 +94,17 @@ const run: Run = async function ({ interaction, user, options }) {
       { file: Buffer.from(song.video!, "base64"), name: "song.mp4" }
     );
 
-    const state = await setMinigame<"GTS">(user, {
-      startedAt: Date.now(),
-      message: message.id,
-      channel: message.channel.id,
-      song: { ...song, video: undefined },
-      guesses: 0,
-      correct: false,
-    });
+    const state = await setMinigame<"GTS">(
+      user,
+      {
+        startedAt: Date.now(),
+        song: { ...song, video: undefined },
+        guesses: 0,
+        correct: false,
+      },
+      message.channel.id,
+      message.id
+    );
 
     logger.info(state);
 
@@ -109,7 +116,7 @@ const run: Run = async function ({ interaction, user, options }) {
         return;
       }
 
-      if (game.data.message !== message.id) {
+      if (game.message !== message.id) {
         await message.delete();
         clearInterval(interval);
         return;
@@ -182,7 +189,7 @@ async function handleGTSEnd(
       embeds: [embed],
       components:
         rewardsRemaining > 0
-          ? await getGTSRewardComponents(
+          ? await getMinigameRewardComponents(
               playerId,
               (await canClaimPremiumRewards(interaction.member!.id)) > 0
             )

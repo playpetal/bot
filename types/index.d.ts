@@ -167,19 +167,21 @@ declare module "petal" {
   export type UnknownMinigame = {
     playerId: number;
     type: MinigameType;
+    message: string;
+    channel: string;
     data: GTSData | WordsData;
   };
 
   export type Minigame<T extends MinigameType | never> = {
     playerId: number;
     type: T;
+    message: string;
+    channel: string;
     data: T extends "GTS" ? GTSData : WordsData;
   };
 
   export type GTSData = {
     song: Song;
-    message: string;
-    channel: string;
     guesses: number;
     correct: boolean;
     elapsed?: number;
@@ -189,5 +191,7 @@ declare module "petal" {
   export type WordsData = {
     answer: string;
     guesses: string[];
+    elapsed?: number;
+    startedAt: number;
   };
 }

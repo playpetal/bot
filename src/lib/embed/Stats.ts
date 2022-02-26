@@ -1,5 +1,6 @@
 import { Account } from "petal";
 import { Embed } from "../../struct/embed";
+import { getWordsStats } from "../graphql/query/game/minigame/words/GET_WORDS_STATS";
 import { getGTSStats } from "../graphql/query/GET_GTS_STATS";
 import { displayName } from "../util/displayName";
 import { emoji } from "../util/formatting/emoji";
@@ -19,10 +20,11 @@ export async function getStatsEmbed(account: Account) {
   const { rollCount } = account.stats;
 
   if (rollCount > 0) {
-    accountStats = `${emoji.dice} rolled ${strong(rollCount)} times`;
+    accountStats = `${emoji.dice} ${strong(rollCount)} rolls`;
   }
 
   let gtsStats = "";
+  let wordsStats = "";
 
   const gts = await getGTSStats(account.id);
 
@@ -30,13 +32,13 @@ export async function getStatsEmbed(account: Account) {
     const totalGames = gts.totalGames;
 
     if (totalGames > 0) {
-      gtsStats += `${emoji.song} ${strong(totalGames)} games played`;
+      gtsStats += `${emoji.song} ${strong(totalGames)} games`;
     }
 
     const totalGuesses = gts.totalGuesses;
 
     if (totalGuesses > 0) {
-      gtsStats += `\n${emoji.song} ${strong(totalGuesses)} total guesses`;
+      gtsStats += `\n${emoji.song} ${strong(totalGuesses)} guesses`;
     }
 
     const totalTime = gts.totalTime;
@@ -52,27 +54,76 @@ export async function getStatsEmbed(account: Account) {
       gtsStats += `\n${emoji.song} **${avgGuessTime}s** avg. guess time`;
     }
 
-    const gtsPetals = gts.totalCurrency || 0;
+    const petals = gts.totalCurrency || 0;
 
-    if (gtsPetals > 0) {
+    if (petals > 0) {
       gtsStats += `\n${emoji.song} earned ${emoji.petals} **${strong(
-        gtsPetals
+        petals
       )}**`;
     }
 
-    const gtsCards = gts.totalCards || 0;
+    const cards = gts.totalCards || 0;
 
-    if (gtsCards > 0) {
-      gtsStats += `\n${emoji.song} earned ${emoji.cards} **${strong(
-        gtsCards
+    if (cards > 0) {
+      gtsStats += `\n${emoji.song} earned ${emoji.cards} **${strong(cards)}**`;
+    }
+
+    const lilies = gts.totalPremiumCurrency;
+
+    if (lilies > 0) {
+      gtsStats += `\n${emoji.song} earned ${emoji.lily} **${strong(lilies)}**`;
+    }
+  }
+
+  const words = await getWordsStats(account.id);
+
+  if (words) {
+    const totalGames = words.totalGames;
+
+    if (totalGames > 0) {
+      wordsStats += `${emoji.bloom} ${strong(totalGames)} games`;
+    }
+
+    const totalWords = words.totalWords;
+
+    if (totalWords > 0) {
+      wordsStats += `\n${emoji.bloom} ${strong(totalWords)} words`;
+    }
+
+    const totalTime = words.totalTime;
+
+    if (totalTime > 0) {
+      const totalGuessTime = (totalTime / 1000).toFixed(2);
+      const _avgGuessTime = totalTime / totalGames / 1000;
+      const avgGuessTime = isNaN(_avgGuessTime)
+        ? `0.00`
+        : _avgGuessTime.toFixed(2);
+
+      wordsStats += `\n${emoji.bloom} **${totalGuessTime}s** spent guessing`;
+      wordsStats += `\n${emoji.bloom} **${avgGuessTime}s** avg. guess time`;
+    }
+
+    const petals = words.totalCurrency || 0;
+
+    if (petals > 0) {
+      wordsStats += `\n${emoji.bloom} earned ${emoji.petals} **${strong(
+        petals
       )}**`;
     }
 
-    const gtsLilies = gts.totalPremiumCurrency;
+    const cards = words.totalCards || 0;
 
-    if (gtsLilies > 0) {
-      gtsStats += `\n${emoji.song} earned ${emoji.lily} **${strong(
-        gtsLilies
+    if (cards > 0) {
+      wordsStats += `\n${emoji.bloom} earned ${emoji.cards} **${strong(
+        cards
+      )}**`;
+    }
+
+    const lilies = words.totalPremiumCurrency;
+
+    if (lilies > 0) {
+      wordsStats += `\n${emoji.bloom} earned ${emoji.lily} **${strong(
+        lilies
       )}**`;
     }
   }
@@ -90,6 +141,9 @@ export async function getStatsEmbed(account: Account) {
       value: gtsStats,
       inline: true,
     });
+
+  if (wordsStats)
+    embed.addField({ name: "petle", value: wordsStats, inline: true });
 
   return embed;
 }
