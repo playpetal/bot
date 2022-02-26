@@ -9,23 +9,28 @@ import {
 import { redis } from "../redis";
 
 export async function setMinigame<T extends MinigameType>(
-  user: PartialUser,
+  user: PartialUser | number,
   data: T extends "GTS" ? GTSData : WordsData
 ): Promise<Minigame<T>> {
   const minigameObject: UnknownMinigame = {
     type: isGTS(data) ? "GTS" : "WORDS",
-    playerId: user.id,
+    playerId: typeof user === "number" ? user : user.id,
     data,
   };
 
-  await redis.set(`minigame:${user.id}`, JSON.stringify(minigameObject));
+  await redis.set(
+    `minigame:${typeof user === "number" ? user : user.id}`,
+    JSON.stringify(minigameObject)
+  );
   return minigameObject as Minigame<T>;
 }
 
 export async function getMinigame<T extends MinigameType>(
-  user: PartialUser
+  user: PartialUser | number
 ): Promise<Minigame<T> | null> {
-  const minigame = await redis.get(`minigame:${user.id}`);
+  const minigame = await redis.get(
+    `minigame:${typeof user === "number" ? user : user.id}`
+  );
 
   if (!minigame) return null;
   return JSON.parse(minigame) as Minigame<never>;
