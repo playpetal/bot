@@ -31,8 +31,12 @@ export async function getMinigame<T extends MinigameType>(
   return JSON.parse(minigame) as Minigame<never>;
 }
 
-export async function destroyMinigame(user: PartialUser): Promise<void> {
-  await redis.del(`minigame:${user.id}`);
+export async function destroyMinigame(
+  user: PartialUser | number
+): Promise<void> {
+  if (typeof user === "number") {
+    await redis.del(`minigame:${user}`);
+  } else await redis.del(`minigame:${user.id}`);
   return;
 }
 

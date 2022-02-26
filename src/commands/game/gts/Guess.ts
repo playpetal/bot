@@ -3,7 +3,6 @@ import { Embed } from "../../../struct/embed";
 import { findBestMatch } from "string-similarity";
 import { BotError } from "../../../struct/error";
 import { emoji } from "../../../lib/util/formatting/emoji";
-import { redis } from "../../../lib/redis";
 import { bot } from "../../..";
 import { logger } from "../../../lib/logger";
 import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";

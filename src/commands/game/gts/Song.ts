@@ -11,7 +11,6 @@ import {
   getMinigame,
   setMinigame,
 } from "../../../lib/minigame";
-import { redis } from "../../../lib/redis";
 import { button, row } from "../../../lib/util/component";
 import { getGTSRewardComponents } from "../../../lib/util/component/minigame";
 import { emoji } from "../../../lib/util/formatting/emoji";
@@ -148,7 +147,7 @@ async function handleGTSEnd(
   { playerId, data: { guesses, correct, song, elapsed } }: Minigame<"GTS">
 ) {
   if (!correct) {
-    await redis.del(`gts:game:${playerId}`);
+    await destroyMinigame(playerId);
 
     return interaction.editOriginalMessage({
       embeds: [
@@ -175,7 +174,7 @@ async function handleGTSEnd(
   const rewardsRemaining = await canClaimRewards(interaction.member!.id);
 
   if (rewardsRemaining === 0) {
-    await redis.del(`gts:game:${playerId}`);
+    await destroyMinigame(playerId);
 
     embed.setDescription(
       description + `\nYou've already claimed all the rewards this hour.`
