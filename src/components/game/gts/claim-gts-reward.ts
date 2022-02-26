@@ -56,7 +56,7 @@ const run: RunComponent = async function ({ interaction, user }) {
     account.discordId,
     game.guesses,
     game.time!,
-    reward.toUpperCase() as "CARD" | "PETAL"
+    reward.toUpperCase() as "CARD" | "PETAL" | "LILY"
   );
 
   const embed = new Embed().setColor("#3BA55D").setDescription(desc);

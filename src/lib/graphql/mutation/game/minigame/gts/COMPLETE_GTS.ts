@@ -12,7 +12,7 @@ export async function completeGts(
   senderDiscordId: string,
   guesses: number,
   time: number,
-  reward: "CARD" | "PETAL"
+  reward: "CARD" | "PETAL" | "LILY"
 ) {
   const mutation = (await graphql.mutate({
     mutation: COMPLETE_GTS,
