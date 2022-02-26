@@ -1,6 +1,5 @@
-import { GTS } from "petal";
 import { getUser } from "../lib/graphql/query/GET_USER";
-import { redis } from "../lib/redis";
+import { destroyMinigame, getMinigame } from "../lib/minigame";
 import { Component, RunComponent } from "../struct/component";
 import { Embed } from "../struct/embed";
 import { BotError } from "../struct/error";
@@ -15,15 +14,14 @@ const run: RunComponent = async function ({ interaction, user }) {
   if (!account || user.id !== account.id)
     throw new BotError("that's not your game!");
 
-  const gameStr = await redis.get(`gts:game:${accountId}`);
+  const game = await getMinigame<"GTS">(user);
 
-  if (!gameStr) throw new BotError("this game doesn't exist!");
+  if (!game) throw new BotError("this game doesn't exist!");
 
-  const game = JSON.parse(gameStr) as GTS;
-  if (game.guesses > 0)
+  if (game.data.guesses > 0)
     throw new BotError("you can't cancel a game you've guessed on!");
 
-  await redis.del(`gts:game:${accountId}`);
+  await destroyMinigame(user);
 
   const embed = new Embed()
     .setColor("#F04747")
