@@ -1,11 +1,16 @@
 import { CommandInteraction } from "eris";
-import { GTS } from "petal";
+import { GTSData, Minigame } from "petal";
 import { bot } from "../../..";
 import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
 import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";
 import { logger } from "../../../lib/logger";
+import {
+  destroyMinigame,
+  getMinigame,
+  setMinigame,
+} from "../../../lib/minigame";
 import { redis } from "../../../lib/redis";
 import { button, row } from "../../../lib/util/component";
 import { getGTSRewardComponents } from "../../../lib/util/component/minigame";
@@ -16,12 +21,16 @@ import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
-  const gtsString = await redis.get(`gts:game:${user.id}`);
+  const minigame = await getMinigame(user);
 
-  if (gtsString) {
-    const { startedAt, gameChannelId, gameMessageId } = JSON.parse(
-      gtsString
-    ) as GTS;
+  if (minigame) {
+    if (minigame.type !== "GTS") {
+      throw new BotError(
+        "**you're already playing something!**\nfinish your current minigame first 😒"
+      );
+    }
+
+    const { startedAt, channel, message } = minigame.data as GTSData;
 
     if (startedAt > Date.now() - GTS_MAX_MS) {
       throw new BotError(
@@ -30,9 +39,9 @@ const run: Run = async function ({ interaction, user, options }) {
     }
 
     try {
-      await redis.del(`gts:game:${user.id}`);
-      const message = await bot.getMessage(gameChannelId, gameMessageId);
-      await message.edit({
+      await destroyMinigame(user);
+      const gameMessage = await bot.getMessage(channel, message);
+      await gameMessage.edit({
         embeds: [
           new Embed()
             .setColor("#F04747")
@@ -92,36 +101,32 @@ const run: Run = async function ({ interaction, user, options }) {
       { file: Buffer.from(song.video!, "base64"), name: "song.mp4" }
     );
 
-    const state = JSON.stringify({
+    const state = await setMinigame<"GTS">(user, {
       startedAt: Date.now(),
-      playerId: user.id,
-      gameMessageId: message.id,
-      gameChannelId: message.channel.id,
+      message: message.id,
+      channel: message.channel.id,
       song: { ...song, video: undefined },
       guesses: 0,
       correct: false,
-    } as GTS);
+    });
 
-    await redis.set(`gts:game:${user.id}`, state);
     logger.info(state);
 
     const interval = setInterval(async () => {
-      const gameStr = await redis.get(`gts:game:${user.id}`);
+      const game = await getMinigame<"GTS">(user);
 
-      if (!gameStr) {
+      if (!game) {
         clearInterval(interval);
         return;
       }
 
-      const game = JSON.parse(gameStr) as GTS;
-
-      if (game.gameMessageId !== message.id) {
+      if (game.data.message !== message.id) {
         await message.delete();
         clearInterval(interval);
         return;
       }
 
-      const { correct, guesses, startedAt, song } = game;
+      const { correct, guesses, startedAt } = game.data;
 
       if (
         correct ||
@@ -140,7 +145,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
 async function handleGTSEnd(
   interaction: CommandInteraction,
-  { playerId, guesses, correct, song, time }: GTS
+  { playerId, data: { guesses, correct, song, elapsed } }: Minigame<"GTS">
 ) {
   if (!correct) {
     await redis.del(`gts:game:${playerId}`);
@@ -165,7 +170,7 @@ async function handleGTSEnd(
 
   const description = `${emoji.song} **You got it in ${guesses} guess${
     guesses !== 1 ? "es" : ""
-  } (${(time! / 1000).toFixed(2)}s)!**`;
+  } (${(elapsed! / 1000).toFixed(2)}s)!**`;
 
   const rewardsRemaining = await canClaimRewards(interaction.member!.id);
 

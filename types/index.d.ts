@@ -162,14 +162,32 @@ declare module "petal" {
     video?: string;
   };
 
-  export type GTS = {
+  type MinigameType = "GTS" | "WORDS";
+
+  export type UnknownMinigame = {
     playerId: number;
-    gameMessageId: string;
-    gameChannelId: string;
+    type: MinigameType;
+    data: any;
+  };
+
+  export type Minigame<T extends MinigameType | never> = {
+    playerId: number;
+    type: T;
+    data: T extends "GTS" ? GTSData : WordsData;
+  };
+
+  export type GTSData = {
     song: Song;
+    message: string;
+    channel: string;
     guesses: number;
     correct: boolean;
+    elapsed?: number;
     startedAt: number;
-    time?: number;
+  };
+
+  export type WordsData = {
+    answer: string;
+    guesses: string[];
   };
 }

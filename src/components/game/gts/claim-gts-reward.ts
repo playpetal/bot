@@ -1,9 +1,11 @@
-import { GTS } from "petal";
+import { Minigame } from "petal";
 import { claimMinigameCardReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_CARD";
 import { claimMinigameLilyReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_LILY";
 import { claimMinigamePetalReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
 import { completeGts } from "../../../lib/graphql/mutation/game/minigame/gts/COMPLETE_GTS";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
+import { getCardImage } from "../../../lib/img";
+import { getMinigame } from "../../../lib/minigame";
 import { redis } from "../../../lib/redis";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
@@ -18,23 +20,28 @@ const run: RunComponent = async function ({ interaction, user }) {
   const [_accountId, reward] = data.split("&");
   const accountId = parseInt(_accountId, 10);
 
-  const gameStr = await redis.get(`gts:game:${accountId}`);
+  const minigame = await getMinigame(user);
 
-  if (!gameStr) throw new BotError("this game doesn't exist!");
+  if (!minigame) throw new BotError("this game doesn't exist!");
+  if (minigame.type !== "GTS")
+    throw new BotError("that isn't the minigame you're currently playing!");
 
   const account = await getUser({ id: accountId });
 
   if (!account || user.id !== account.id)
     throw new BotError("that's not your game!");
 
-  const game = JSON.parse(gameStr) as GTS;
+  const gameData = (minigame as Minigame<"GTS">).data;
 
-  if (!game.correct)
+  if (!gameData.correct)
     throw new BotError("you can't claim rewards for a game you didn't win!");
 
-  let desc: string = `${emoji.song} **You got it in ${game.guesses} guess${
-    game.guesses !== 1 ? "es" : ""
-  } (${(game.time! / 1000).toFixed(2)}s)!**`;
+  const embed = new Embed().setColor("#3BA55D");
+  let image: Buffer | undefined;
+
+  let desc: string = `${emoji.song} **You got it in ${gameData.guesses} guess${
+    gameData.guesses !== 1 ? "es" : ""
+  } (${(gameData.elapsed! / 1000).toFixed(2)}s)!**`;
 
   if (reward === "petal") {
     await claimMinigamePetalReward(account.discordId);
@@ -44,6 +51,8 @@ const run: RunComponent = async function ({ interaction, user }) {
     const [card] = await claimMinigameCardReward(account.discordId);
 
     desc += `\nYou received ${formatCard(card)}!`;
+    image = await getCardImage(card);
+    embed.setThumbnail(`attachment://card.png`);
   } else if (reward === "lily") {
     await claimMinigameLilyReward(account.discordId);
 
@@ -54,14 +63,17 @@ const run: RunComponent = async function ({ interaction, user }) {
 
   await completeGts(
     account.discordId,
-    game.guesses,
-    game.time!,
+    gameData.guesses,
+    gameData.elapsed!,
     reward.toUpperCase() as "CARD" | "PETAL" | "LILY"
   );
 
-  const embed = new Embed().setColor("#3BA55D").setDescription(desc);
+  embed.setDescription(desc);
 
-  await interaction.editOriginalMessage({ embeds: [embed], components: [] });
+  await interaction.editOriginalMessage(
+    { embeds: [embed], components: [] },
+    image ? [{ file: image, name: `card.png` }] : undefined
+  );
 
   return;
 };

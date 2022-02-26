@@ -4,35 +4,37 @@ import { findBestMatch } from "string-similarity";
 import { BotError } from "../../../struct/error";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { redis } from "../../../lib/redis";
-import { GTS } from "petal";
 import { bot } from "../../..";
 import { logger } from "../../../lib/logger";
 import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
+import {
+  destroyMinigame,
+  getMinigame,
+  setMinigame,
+} from "../../../lib/minigame";
+import { Minigame } from "petal";
 
 const run: Run = async function ({ interaction, user, options }) {
-  const gameStr = await redis.get(`gts:game:${user.id}`);
+  const minigame = await getMinigame(user);
 
-  if (!gameStr)
+  if (!minigame)
     throw new BotError(
       "**you're not playing!**\nuse **/song** to start a game."
     );
 
-  const game = JSON.parse(gameStr) as GTS;
+  let data = (minigame as Minigame<"GTS">).data;
 
-  if (game.startedAt < Date.now() - GTS_MAX_MS) {
-    await redis.del(`gts:game:${user.id}`);
+  if (data.startedAt < Date.now() - GTS_MAX_MS) {
+    await destroyMinigame(user);
 
     try {
-      const message = await bot.getMessage(
-        interaction.channel.id,
-        game.gameMessageId
-      );
+      const originalMessage = await bot.getMessage(data.channel, data.message);
 
       const embed = new Embed()
         .setColor("#F04747")
         .setDescription("**Better luck next time!**\nYou ran out of time!");
 
-      await message.edit({ embeds: [embed] });
+      await originalMessage.edit({ embeds: [embed] });
     } catch {
       // ignore
     }
@@ -42,12 +44,12 @@ const run: Run = async function ({ interaction, user, options }) {
     );
   }
 
-  game.guesses += 1;
+  data.guesses += 1;
 
   const answer = options.getOption<string>("guess")!;
 
-  const title = game.song.title.toLowerCase().replace(/[^a-zA-Z0-9]/gm, "");
-  const groupTitle = `${game.song.group || ""}${game.song.title}`
+  const title = data.song.title.toLowerCase().replace(/[^a-zA-Z0-9]/gm, "");
+  const groupTitle = `${data.song.group || ""}${data.song.title}`
     .toLowerCase()
     .replace(/[^a-zA-Z0-9]/gm, "");
 
@@ -63,25 +65,23 @@ const run: Run = async function ({ interaction, user, options }) {
   const embed = new Embed();
 
   if (correct) {
-    game.correct = true;
-    game.time = interaction.createdAt - game.startedAt;
+    data.correct = true;
+    data.elapsed = interaction.createdAt - data.startedAt;
 
-    const state = JSON.stringify(game);
-    await redis.set(`gts:game:${user.id}`, state);
+    await setMinigame<"GTS">(user, data);
 
     embed
       .setColor("#3BA55D")
       .setDescription(`${emoji.song} **${answer}** was correct!`);
     await interaction.createMessage({ embeds: [embed], flags: 64 });
   } else {
-    const state = JSON.stringify(game);
-    await redis.set(`gts:game:${user.id}`, state);
+    await setMinigame<"GTS">(user, data);
 
     embed
       .setColor("#F04747")
       .setDescription(
         `${emoji.song} **${answer}** was incorrect! You have **${
-          GTS_MAX_GUESSES - game.guesses
+          GTS_MAX_GUESSES - data.guesses
         }** guesses remaining!`
       );
     await interaction.createMessage({ embeds: [embed], flags: 64 });
