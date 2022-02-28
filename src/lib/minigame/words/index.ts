@@ -30,28 +30,31 @@ function generateWordEmojis(_guess: string, _answer: string): string {
   const answer = _answer.toLowerCase();
 
   let str = "";
-  let markedLetters: string[] = [];
+
+  const matches: { letter: string; position: number }[] = [];
+  const incorrectPositions: { letter: string; position: number }[] = [];
 
   for (let [index, letter] of [...guess].entries()) {
     if (answer[index] === letter) {
-      markedLetters.push(letter);
+      matches.push({ letter, position: index });
+    }
+  }
+
+  for (let [index, letter] of [...guess].entries()) {
+    if (answer[index] === letter) {
       str += emoji.CORRECT[letter as keyof typeof emoji.CORRECT];
     } else if (answer.includes(letter)) {
       const expr = new RegExp(letter, "gi");
       const count = answer.match(expr)!.length;
 
-      const correctAlready = [...answer].find((l, i) => {
-        l === letter && l === guess[i];
-      });
-      const guessedAlready = markedLetters.filter((l) => l === letter).length;
+      const matched = [...matches, ...incorrectPositions].filter(
+        (m) => m.letter === letter
+      );
 
-      if (
-        guessedAlready >= count ||
-        (correctAlready && guessedAlready < count)
-      ) {
+      if (matched.length >= count) {
         str += emoji.INCORRECT[letter as keyof typeof emoji.INCORRECT];
       } else {
-        markedLetters.push(letter);
+        incorrectPositions.push({ letter, position: index });
         str += emoji.INCORRECT_POS[letter as keyof typeof emoji.INCORRECT_POS];
       }
     } else {
