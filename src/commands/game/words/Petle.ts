@@ -153,5 +153,6 @@ export default new SlashCommand("petle")
         required: true,
       },
     ],
+    ephemeral: true,
   })
   .run(run);

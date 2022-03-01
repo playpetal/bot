@@ -9,7 +9,12 @@ import { bot } from "..";
 import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
 import { ErrorEmbed } from "../struct/embed";
 import { Event } from "../struct/event";
-import { InteractionOption, Maybe, PartialUser } from "petal";
+import {
+  InteractionOption,
+  Maybe,
+  PartialUser,
+  SlashCommandOption,
+} from "petal";
 import { InteractionOptions } from "../struct/options";
 import { BotError } from "../struct/error";
 import { logger } from "../lib/logger";
@@ -52,6 +57,24 @@ const run = async function (interaction: UnknownInteraction) {
       const command = bot.findCommand(interaction.data.name);
       if (!command) return;
 
+      let acknowledged = false;
+      const isSubcommand =
+        interaction.data.options && interaction.data.options[0].type === 1;
+
+      if (isSubcommand) {
+        const subcommand = command.options.find(
+          (o) =>
+            o.type === "subcommand" &&
+            o.name === interaction.data.options![0].name
+        ) as SlashCommandOption<"subcommand">;
+
+        if (subcommand && subcommand.ephemeral) {
+          await interaction.acknowledge(64);
+          acknowledged = true;
+        }
+      }
+
+      if (!acknowledged)
       await interaction.acknowledge(command.isEphemeral ? 64 : undefined);
 
       if (!user && command.name === "register") {

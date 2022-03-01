@@ -99,5 +99,6 @@ export default new SlashCommand("guess")
     description:
       "use this to make your guess in the 'guess the song' minigame!",
     required: true,
+    ephemeral: true,
   })
   .ephemeral();
