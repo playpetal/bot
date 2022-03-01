@@ -19,8 +19,6 @@ const run: RunComponent = async function ({ interaction, user }) {
   if (!account || user.id !== account.id)
     throw new BotError("that's not your game to bump!");
 
-  await interaction.deleteOriginalMessage();
-
   const minigame = await getMinigame<"WORDS">(user);
 
   if (!minigame) throw MinigameError.NotPlayingWords;
@@ -35,7 +33,7 @@ const run: RunComponent = async function ({ interaction, user }) {
   const rewardsRemaining = await canClaimRewards(interaction.member!.id);
   const embed = getWordsEmbed(data, user, rewardsRemaining);
 
-  const message = await bot.createMessage(interaction.channel.id, {
+  const message = await interaction.editOriginalMessage({
     embeds: [embed],
     components:
       correct && rewardsRemaining > 0
