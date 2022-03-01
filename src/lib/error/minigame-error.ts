@@ -1,4 +1,6 @@
+import { PartialUser } from "petal";
 import { BotError } from "../../struct/error";
+import { button, row } from "../util/component";
 
 export const MinigameError = {
   AlreadyPlayingMinigame: new BotError(
@@ -7,9 +9,29 @@ export const MinigameError = {
   AlreadyPlayingGTS: new BotError(
     "**you're already guessing a song!**\nyou can use **`/guess`** to guess."
   ),
-  AlreadyPlayingWords: new BotError(
-    "**you're already guessing a word!**\nyou can use **`/petle guess`** to guess."
-  ),
+  AlreadyPlayingWords: ({
+    message,
+    channel,
+    guild,
+    user,
+  }: {
+    message: string;
+    channel: string;
+    guild: string;
+    user: PartialUser;
+  }) =>
+    new BotError(
+      `**you're currently playing petle!**\nclick [here](https://discord.com/channels/${guild}/${channel}/${message}) to return to your game.`,
+      [
+        row(
+          button({
+            customId: `bump-words?${user.id}`,
+            style: "gray",
+            label: "bump game",
+          })
+        ),
+      ]
+    ),
   MaxWordsGuessed: new BotError(
     "**you've guessed six words already!**\nyou can't guess any more."
   ),
