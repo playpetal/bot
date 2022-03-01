@@ -75,7 +75,7 @@ const run = async function (interaction: UnknownInteraction) {
       }
 
       if (!acknowledged)
-      await interaction.acknowledge(command.isEphemeral ? 64 : undefined);
+        await interaction.acknowledge(command.isEphemeral ? 64 : undefined);
 
       if (!user && command.name === "register") {
         return command.execute({
