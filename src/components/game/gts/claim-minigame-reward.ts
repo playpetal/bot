@@ -66,9 +66,9 @@ const run: RunComponent = async function ({ interaction, user }) {
   } else if (minigame.type === "WORDS") {
     const { guesses, elapsed } = data as WordsData;
 
-    desc = `${generateWords(data as WordsData)}\n\n${
-      emoji.bloom
-    } **you got it in ${guesses.length} guess${
+    desc = `${emoji.bloom} **petle ${guesses.length}/6**\n\n${generateWords(
+      data as WordsData
+    )}\n\n${emoji.bloom} **you got it in ${guesses.length} guess${
       guesses.length !== 1 ? "es" : ""
     } (${(elapsed! / 1000).toFixed(2)}s)!**`;
 
