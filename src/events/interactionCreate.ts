@@ -106,6 +106,7 @@ const run = async function (interaction: UnknownInteraction) {
       if (e instanceof BotError) {
         return interaction.createMessage({
           embeds: [new ErrorEmbed(e.message)],
+          components: e.components,
           flags: 64,
         });
       } else {
@@ -162,6 +163,7 @@ const run = async function (interaction: UnknownInteraction) {
       if (e instanceof BotError) {
         return interaction.createMessage({
           embeds: [new ErrorEmbed(e.message)],
+          components: e.components,
           flags: 64,
         });
       } else {
