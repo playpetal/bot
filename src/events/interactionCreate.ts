@@ -110,7 +110,7 @@ const run = async function (interaction: UnknownInteraction) {
           flags: 64,
         });
       } else {
-        logger.error(e);
+        logger.error((e as Error).message);
       }
 
       return interaction.createMessage({
@@ -167,7 +167,7 @@ const run = async function (interaction: UnknownInteraction) {
           flags: 64,
         });
       } else {
-        logger.error(e);
+        logger.error((e as Error).message);
         return interaction.createMessage({
           embeds: [
             new ErrorEmbed(
