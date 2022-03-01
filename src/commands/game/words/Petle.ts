@@ -78,7 +78,7 @@ const run: Run = async ({ interaction, user, options }) => {
       await setMinigame(user, data, minigame);
     }
 
-    await bot.editMessage(minigame.channel, minigame.message, {
+    await interaction.editMessage(minigame.message, {
       embeds: [getWordsEmbed(data, user, rewardsRemaining)],
       components:
         correct && rewardsRemaining > 0
