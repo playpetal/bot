@@ -8,9 +8,11 @@ import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
 import {
   destroyMinigame,
   getMinigame,
+  isGTS,
+  isWords,
   setMinigame,
 } from "../../../lib/minigame";
-import { Minigame } from "petal";
+import { UnknownMinigame } from "petal";
 import { MinigameError } from "../../../lib/error/minigame-error";
 
 const run: Run = async function ({ interaction, user, options }) {
@@ -18,7 +20,12 @@ const run: Run = async function ({ interaction, user, options }) {
 
   if (!minigame) throw MinigameError.NotPlayingGTS;
 
-  const data = (minigame as Minigame<"GTS">).data;
+  const data = (minigame as UnknownMinigame).data;
+
+  if (isWords(data))
+    throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
+
+  if (!isGTS(data)) throw MinigameError.NotPlayingGTS;
 
   if (data.startedAt < Date.now() - GTS_MAX_MS) {
     await destroyMinigame(user);
