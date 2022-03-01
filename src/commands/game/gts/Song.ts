@@ -1,5 +1,5 @@
 import { CommandInteraction } from "eris";
-import { GTSData, Minigame } from "petal";
+import { Minigame } from "petal";
 import { bot } from "../../..";
 import { MinigameError } from "../../../lib/error/minigame-error";
 import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
@@ -103,8 +103,11 @@ const run: Run = async function ({ interaction, user, options }) {
         guesses: 0,
         correct: false,
       },
-      message.channel.id,
-      message.id
+      {
+        message: message.id,
+        channel: message.channel.id,
+        guild: message.guildID!,
+      }
     );
 
     logger.info(state);

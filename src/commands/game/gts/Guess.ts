@@ -70,14 +70,14 @@ const run: Run = async function ({ interaction, user, options }) {
     data.correct = true;
     data.elapsed = interaction.createdAt - data.startedAt;
 
-    await setMinigame<"GTS">(user, data, minigame.channel, minigame.message);
+    await setMinigame<"GTS">(user, data, minigame);
 
     embed
       .setColor("#3BA55D")
       .setDescription(`${emoji.song} **${answer}** was correct!`);
     await interaction.createMessage({ embeds: [embed], flags: 64 });
   } else {
-    await setMinigame<"GTS">(user, data, minigame.channel, minigame.message);
+    await setMinigame<"GTS">(user, data, minigame);
 
     embed
       .setColor("#F04747")

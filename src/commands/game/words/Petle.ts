@@ -1,4 +1,5 @@
 import { WordsData } from "petal";
+import { bot } from "../../..";
 import { MinigameError } from "../../../lib/error/minigame-error";
 import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
@@ -10,11 +11,9 @@ import {
   isWords,
   setMinigame,
 } from "../../../lib/minigame";
-import { generateWords } from "../../../lib/minigame/words";
+import { getWordsEmbed } from "../../../lib/minigame/words";
 import { getMinigameRewardComponents } from "../../../lib/util/component/minigame";
-import { emoji } from "../../../lib/util/formatting/emoji";
 import { Run, SlashCommand } from "../../../struct/command";
-import { Embed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
   const subcommand = options.options[0];
@@ -24,10 +23,9 @@ const run: Run = async ({ interaction, user, options }) => {
   if (minigame && !isWords(minigame.data))
     throw MinigameError.AlreadyPlayingMinigame;
 
-  const header = `${emoji.bloom} **welcome to petle!**\n**petle** is a k-pop version of the word game [Wordle](https://www.nytimes.com/games/wordle/index.html).\nyou can guess a word by using **\`/petle guess\`**! good luck!`;
-
   if (subcommand.name === "play") {
-    if (minigame) throw MinigameError.AlreadyPlayingWords;
+    if (minigame)
+      throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
 
     const word = await getWord(user.discordId);
 
@@ -37,14 +35,15 @@ const run: Run = async ({ interaction, user, options }) => {
       startedAt: Date.now(),
     };
 
-    const embed = new Embed();
-    const words = generateWords(data);
+    const message = await interaction.editOriginalMessage({
+      embeds: [getWordsEmbed(data, user, 0)],
+    });
 
-    embed.setDescription(`${header}\n\n${words}`);
-
-    const message = await interaction.editOriginalMessage({ embeds: [embed] });
-
-    await setMinigame<"WORDS">(user, data, message.channel.id, message.id);
+    await setMinigame<"WORDS">(user, data, {
+      message: message.id,
+      channel: message.channel.id,
+      guild: interaction.guildID!,
+    });
     return;
   }
 
@@ -62,76 +61,32 @@ const run: Run = async ({ interaction, user, options }) => {
 
     if (data.guesses.includes(guess)) throw MinigameError.WordAlreadyGuessed;
 
-    await interaction.deleteOriginalMessage();
+    await interaction.createMessage(`you guessed **${guess}**!`);
 
     data.guesses.push(guess);
 
     const correct = data.guesses.find((g) => g === data.answer.toLowerCase());
     const isFinished = correct || data.guesses.length >= 6;
 
+    const rewardsRemaining = await canClaimRewards(interaction.member!.id);
+
     if (isFinished) data.elapsed = Date.now() - data.startedAt;
 
-    await setMinigame(user, data, minigame.channel, minigame.message);
-
-    const embed = new Embed();
-    const words = generateWords(data);
-
-    if (isFinished) {
-      const correct = data.guesses.find((g) => g === data.answer.toLowerCase());
-
-      if (correct) {
-        const rewardsRemaining = await canClaimRewards(interaction.member!.id);
-
-        let desc = `${emoji.bloom} **you got it in ${
-          data.guesses.length
-        } guess${data.guesses.length !== 1 ? "es" : ""} (${(
-          data.elapsed! / 1000
-        ).toFixed(2)}s)!**`;
-
-        if (rewardsRemaining === 0) {
-          await destroyMinigame(user);
-
-          embed.setDescription(
-            `${emoji.bloom} **petle ${data.guesses.length}/6**\n\n${words}\n\n${desc}\nyou can't claim any more rewards this hour.`
-          );
-        } else {
-          embed.setDescription(
-            `${emoji.bloom} **petle ${data.guesses.length}/6**\n\n${words}\n\n${desc}\nchoose your reward from the options below!`
-          );
-        }
-
-        await interaction.editMessage(minigame.message, {
-          embeds: [embed],
-          components:
-            rewardsRemaining > 0
-              ? await getMinigameRewardComponents(
-                  user.id,
-                  (await canClaimPremiumRewards(interaction.member!.id)) > 0
-                )
-              : [],
-        });
-
-        return;
-      } else {
-        await destroyMinigame(user);
-
-        embed.setDescription(
-          `${emoji.bloom} **petle X/6**\n\n${words}\n\n**better luck next time!**\nthe word was **\`${data.answer}\`**!`
-        );
-
-        await interaction.editMessage(minigame.message, {
-          embeds: [embed],
-        });
-
-        return;
-      }
+    if ((isFinished && !correct) || (isFinished && rewardsRemaining === 0)) {
+      await destroyMinigame(user);
+    } else {
+      await setMinigame(user, data, minigame);
     }
 
-    embed.setDescription(
-      `${emoji.bloom} **petle ${data.guesses.length}/6**\n\n${words}`
-    );
-    await interaction.editMessage(minigame.message, {
-      embeds: [embed],
+    await bot.editMessage(minigame.channel, minigame.message, {
+      embeds: [getWordsEmbed(data, user, rewardsRemaining)],
+      components:
+        correct && rewardsRemaining > 0
+          ? await getMinigameRewardComponents(
+              user.id,
+              (await canClaimPremiumRewards(interaction.member!.id)) > 0
+            )
+          : [],
     });
 
     return;

@@ -11,14 +11,18 @@ import { redis } from "../redis";
 export async function setMinigame<T extends MinigameType>(
   user: PartialUser | number,
   data: T extends "GTS" ? GTSData : WordsData,
-  channelId: string,
-  messageId: string
+  {
+    message,
+    channel,
+    guild,
+  }: { message: string; channel: string; guild: string }
 ): Promise<Minigame<T>> {
   const minigameObject: UnknownMinigame = {
     type: isGTS(data) ? "GTS" : "WORDS",
     playerId: typeof user === "number" ? user : user.id,
-    channel: channelId,
-    message: messageId,
+    channel,
+    message,
+    guild,
     data,
   };
 

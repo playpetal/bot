@@ -1,4 +1,49 @@
-import { WordsData } from "petal";
+import { PartialUser, WordsData } from "petal";
+import { Embed } from "../../../struct/embed";
+import { displayName } from "../../util/displayName";
+import { emoji as emojis } from "../../util/formatting/emoji";
+
+export function getWordsEmbed(
+  data: WordsData,
+  user: PartialUser,
+  rewards: number
+): Embed {
+  const embed = new Embed();
+  let prefix: string;
+  let suffix: string | undefined;
+
+  const correct = data.guesses.find((g) => g === data.answer.toLowerCase());
+
+  if (data.guesses.length === 0) {
+    prefix = `${emojis.bloom} **welcome to petle!**\n**petle** is a k-pop version of the word game [Wordle](https://www.nytimes.com/games/wordle/index.html).\nyou can guess a word by using **\`/petle guess\`**! good luck!\n\n`;
+  } else if (data.guesses.length === 6) {
+    prefix = `${emojis.bloom} **petle X/6**\n\n`;
+  } else {
+    prefix = `${emojis.bloom} **petle ${data.guesses.length}/6**\n\n`;
+  }
+
+  if (correct) {
+    suffix = `\n\n${emojis.bloom} **you got it in ${data.guesses.length} guess${
+      data.guesses.length !== 1 ? "es" : ""
+    } (${(data.elapsed! / 1000).toFixed(2)}s)!**`;
+
+    if (rewards < 1) {
+      suffix += `\nyou can't claim any more rewards this hour.`;
+    } else {
+      suffix += `\nchoose your reward from the options below!`;
+    }
+  } else if (data.guesses.length === 6) {
+    suffix = `\n\n**better luck next time!**\nthe word was **\`${data.answer}\`**!`;
+  }
+
+  const words = generateWords(data);
+
+  embed.setDescription(
+    `${prefix}__${displayName(user)}__\n${words}${suffix || ""}`
+  );
+
+  return embed;
+}
 
 export function generateWords(data: WordsData): string {
   const answer = data.answer.toLowerCase();
