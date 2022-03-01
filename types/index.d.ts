@@ -1,6 +1,22 @@
 declare module "petal" {
   export type Maybe<T> = T | null;
 
+  type Components = {
+    type: 1;
+    components: Button[];
+  }[];
+
+  type Button = {
+    type: 2;
+    label: string;
+    custom_id: string;
+    style: 1 | 2 | 3 | 4;
+    emoji?: {
+      id: string;
+    };
+    disabled: boolean;
+  };
+
   export interface SlashCommandOptionType {
     subcommand: 1;
     subcommandGroup: 2;
@@ -29,6 +45,7 @@ declare module "petal" {
     description: string;
     required?: boolean;
     autocomplete?: boolean;
+    ephemeral?: T extends "subcommand" ? boolean : never;
     choices?: { name: string; value: string | number }[];
     min_value?: T extends "number"
       ? number | undefined
@@ -169,6 +186,7 @@ declare module "petal" {
     type: MinigameType;
     message: string;
     channel: string;
+    guild: string;
     data: GTSData | WordsData;
   };
 
@@ -177,6 +195,7 @@ declare module "petal" {
     type: T;
     message: string;
     channel: string;
+    guild: string;
     data: T extends "GTS" ? GTSData : WordsData;
   };
 

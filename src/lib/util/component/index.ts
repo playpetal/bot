@@ -1,20 +1,11 @@
+import { Button } from "petal";
+
 const buttonStyles = {
   blue: 1,
   gray: 2,
   green: 3,
   red: 4,
 } as const;
-
-type Button = {
-  type: 2;
-  label: string;
-  custom_id: string;
-  style: 1 | 2 | 3 | 4;
-  emoji?: {
-    id: string;
-  };
-  disabled: boolean;
-};
 
 export function button({
   customId,
