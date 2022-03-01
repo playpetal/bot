@@ -23,7 +23,8 @@ const run: Run = async function ({ interaction, user, options }) {
   const minigame = await getMinigame(user);
 
   if (minigame) {
-    if (minigame.type !== "GTS") throw MinigameError.AlreadyPlayingMinigame;
+    if (minigame.type === "WORDS")
+      throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
 
     const {
       data: { startedAt },
