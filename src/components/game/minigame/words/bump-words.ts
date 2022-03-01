@@ -1,4 +1,3 @@
-import { bot } from "../../../..";
 import { MinigameError } from "../../../../lib/error/minigame-error";
 import { canClaimPremiumRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
@@ -26,7 +25,7 @@ const run: RunComponent = async function ({ interaction, user }) {
   const { data } = minigame;
 
   try {
-    await bot.deleteMessage(minigame.channel, minigame.message);
+    await interaction.deleteMessage(minigame.message);
   } catch {}
 
   const correct = data.guesses.find((g) => g === data.answer.toLowerCase());
