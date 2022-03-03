@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client/core";
 import { graphql, GraphQLResponse } from "../../../..";
-import { tokenize } from "../../../../../crypto";
+import { tokenize } from "../../../../crypto";
 
 const COMPLETE_GTS = gql`
   mutation CompleteGTS($guesses: Int!, $time: Int!, $reward: Reward!) {

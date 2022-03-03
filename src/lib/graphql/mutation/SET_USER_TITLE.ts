@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
 import { PartialUser } from "petal";
 import { graphql, GraphQLResponse } from "..";
-import { tokenize } from "../../crypto";
+import { tokenize } from "../crypto";
 
 const mutation = gql`
   mutation SetUserTitle($id: Int!) {

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
 import { Prefab } from "petal";
 import { graphql, GraphQLResponse } from "../../..";
-import { tokenize } from "../../../../crypto";
+import { tokenize } from "../../../crypto";
 
 const query = gql`
   mutation UpdatePrefab(

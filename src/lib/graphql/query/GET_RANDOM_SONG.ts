@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
 import { Song } from "petal";
 import { graphql, GraphQLResponse, Maybe } from "..";
-import { tokenize } from "../../crypto";
+import { tokenize } from "../crypto";
 
 const GET_RANDOM_SONG = gql`
   query ($gender: GroupGender) {

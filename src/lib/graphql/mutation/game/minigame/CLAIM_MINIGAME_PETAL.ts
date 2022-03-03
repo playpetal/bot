@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client/core";
 import { graphql, GraphQLResponse } from "../../..";
-import { tokenize } from "../../../../crypto";
+import { tokenize } from "../../../crypto";
 
 const CLAIM_MINIGAME_PETAL_REWARD = gql`
   mutation ClaimMinigamePetalReward {

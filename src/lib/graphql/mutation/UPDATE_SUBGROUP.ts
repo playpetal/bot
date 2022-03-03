@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client/core";
 import { graphql, GraphQLResponse } from "..";
-import { tokenize } from "../../crypto";
+import { tokenize } from "../crypto";
 
 const UPDATE_SUBGROUP = gql`
   mutation UpdateSubgroup($id: Int!, $name: String, $creation: DateTime) {

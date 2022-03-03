@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client/core";
 import { graphql, GraphQLResponse } from "..";
-import { tokenize } from "../../crypto";
+import { tokenize } from "../crypto";
 
 const CREATE_CHARACTER = gql`
   mutation CreateCharacter(

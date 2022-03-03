@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
 import { Card } from "petal";
 import { graphql, GraphQLResponse } from "..";
-import { tokenize } from "../../crypto";
+import { tokenize } from "../crypto";
 
 const ROLL_CARD = gql`
   mutation RollCards($gender: Gender, $amount: Int!) {

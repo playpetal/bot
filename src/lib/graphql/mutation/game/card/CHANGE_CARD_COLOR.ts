@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
 import { Card } from "petal";
 import { graphql, GraphQLResponse } from "../../..";
-import { tokenize } from "../../../../crypto";
+import { tokenize } from "../../../crypto";
 
 const mutation = gql`
   mutation ChangeCardColor($cardId: Int!, $color: Int!) {
