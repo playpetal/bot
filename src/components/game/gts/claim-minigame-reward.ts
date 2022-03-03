@@ -6,6 +6,7 @@ import { completeGts } from "../../../lib/graphql/mutation/game/minigame/gts/COM
 import { completeWords } from "../../../lib/graphql/mutation/game/minigame/words/COMPLETE_WORDS";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { getCardImage } from "../../../lib/img";
+import { logMinigame } from "../../../lib/logger/minigame";
 import { destroyMinigame, getMinigame } from "../../../lib/minigame";
 import { generateWords } from "../../../lib/minigame/words";
 import { emoji } from "../../../lib/util/formatting/emoji";
@@ -45,6 +46,8 @@ const run: RunComponent = async function ({ interaction, user }) {
 
   if (!isCorrect)
     throw new BotError("you can't claim rewards for a game you didn't win!");
+
+  logMinigame(minigame);
 
   const embed = new Embed().setColor("#3BA55D");
   let image: Buffer | undefined;

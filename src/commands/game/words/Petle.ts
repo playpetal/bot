@@ -1,10 +1,10 @@
 import { WordsData } from "petal";
-import { bot } from "../../..";
 import { MinigameError } from "../../../lib/error/minigame-error";
 import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getWord } from "../../../lib/graphql/query/game/GET_WORD";
 import { isWordValid } from "../../../lib/graphql/query/game/minigame/words/IS_WORD_VALID";
+import { logMinigame } from "../../../lib/logger/minigame";
 import {
   destroyMinigame,
   getMinigame,
@@ -73,6 +73,7 @@ const run: Run = async ({ interaction, user, options }) => {
     if (isFinished) data.elapsed = Date.now() - data.startedAt;
 
     if ((isFinished && !correct) || (isFinished && rewardsRemaining === 0)) {
+      logMinigame({ ...minigame, data });
       await destroyMinigame(user);
     } else {
       await setMinigame(user, data, minigame);

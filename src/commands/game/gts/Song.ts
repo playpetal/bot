@@ -18,6 +18,7 @@ import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
+import { logMinigame } from "../../../lib/logger/minigame";
 
 const run: Run = async function ({ interaction, user, options }) {
   const minigame = await getMinigame(user);
@@ -110,8 +111,6 @@ const run: Run = async function ({ interaction, user, options }) {
       }
     );
 
-    logger.info(state);
-
     const interval = setInterval(async () => {
       const game = await getMinigame<"GTS">(user);
 
@@ -145,8 +144,15 @@ const run: Run = async function ({ interaction, user, options }) {
 
 async function handleGTSEnd(
   interaction: CommandInteraction,
-  { playerId, data: { guesses, correct, song, elapsed } }: Minigame<"GTS">
+  minigame: Minigame<"GTS">
 ) {
+  logMinigame(minigame);
+
+  const {
+    playerId,
+    data: { correct, guesses, song, elapsed },
+  } = minigame;
+
   if (!correct) {
     await destroyMinigame(playerId);
 
