@@ -1,11 +1,7 @@
-import {
-  AutocompleteInteraction,
-  CommandInteraction,
-  ComponentInteraction,
-} from "eris";
+import { CommandInteraction, ComponentInteraction } from "eris";
 import { PartialUser } from "petal";
 import { logger } from "..";
-import { Autocomplete, SlashCommand } from "../../../struct/command";
+import { SlashCommand } from "../../../struct/command";
 import { Component } from "../../../struct/component";
 
 export function logCommandError(
