@@ -18,6 +18,7 @@ import {
 import { InteractionOptions } from "../struct/options";
 import { BotError } from "../struct/error";
 import { logger } from "../lib/logger";
+import { logCommandError, logComponentError } from "../lib/logger/error";
 
 const run = async function (interaction: UnknownInteraction) {
   if (!interaction.member) {
@@ -53,10 +54,10 @@ const run = async function (interaction: UnknownInteraction) {
 
   /* Slash Commands */
   if (interaction instanceof CommandInteraction) {
-    try {
-      const command = bot.findCommand(interaction.data.name);
-      if (!command) return;
+    const command = bot.findCommand(interaction.data.name);
+    if (!command) return;
 
+    try {
       let acknowledged = false;
       const isSubcommand =
         interaction.data.options && interaction.data.options[0].type === 1;
@@ -110,7 +111,7 @@ const run = async function (interaction: UnknownInteraction) {
           flags: 64,
         });
       } else {
-        logger.error((e as Error).message);
+        logCommandError(interaction, user, command, e);
       }
 
       return interaction.createMessage({
@@ -149,10 +150,10 @@ const run = async function (interaction: UnknownInteraction) {
 
   /* Components */
   if (interaction instanceof ComponentInteraction) {
-    try {
-      const component = bot.findComponent(interaction.data.custom_id);
-      if (!component) return;
+    const component = bot.findComponent(interaction.data.custom_id);
+    if (!component) return;
 
+    try {
       if (component.autoAck) await interaction.acknowledge();
       if (!interaction.member) return;
 
@@ -167,7 +168,8 @@ const run = async function (interaction: UnknownInteraction) {
           flags: 64,
         });
       } else {
-        logger.error((e as Error).message);
+        logComponentError(interaction, user, component, e);
+
         return interaction.createMessage({
           embeds: [
             new ErrorEmbed(
