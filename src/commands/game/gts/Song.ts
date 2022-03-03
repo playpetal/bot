@@ -2,7 +2,7 @@ import { CommandInteraction } from "eris";
 import { Minigame } from "petal";
 import { bot } from "../../..";
 import { MinigameError } from "../../../lib/error/minigame-error";
-import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
+import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/minigame/constants";
 import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getRandomSong } from "../../../lib/graphql/query/GET_RANDOM_SONG";

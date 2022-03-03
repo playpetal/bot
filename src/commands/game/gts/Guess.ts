@@ -4,7 +4,7 @@ import { findBestMatch } from "string-similarity";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { bot } from "../../..";
 import { logger } from "../../../lib/logger";
-import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/fun/game/constants";
+import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/minigame/constants";
 import {
   destroyMinigame,
   getMinigame,
