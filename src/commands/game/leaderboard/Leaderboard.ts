@@ -8,7 +8,12 @@ import { Embed } from "../../../struct/embed";
 
 function render(entries: string[]): string {
   return entries
-    .map((v) => `**#${entries.indexOf(v) + 1}** ${emoji.user} ${v}`)
+    .map(
+      (v) =>
+        `\`${`#${entries.indexOf(v) + 1}`.padStart(3, " ")}\` ${
+          emoji.user
+        } ${v}`
+    )
     .join("\n");
 }
 
@@ -30,7 +35,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
       const users = await getGTSTimeLeaderboard();
       const formatted = users.map(
-        (u) => `${displayName(u.account)} - **${(u.time / 1000).toFixed(2)}s**`
+        (u) => `${displayName(u.account)} [**${(u.time / 1000).toFixed(2)}s**]`
       );
 
       body = render(formatted);
@@ -39,7 +44,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
       const users = await getGTSRewardLeaderboard("PETAL");
       const formatted = users.map(
-        (u) => `${displayName(u.account)} - ${emoji.petals} ${strong(u.value)}`
+        (u) => `${displayName(u.account)} [${emoji.petals} ${strong(u.value)}]`
       );
 
       body = render(formatted);
@@ -48,7 +53,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
       const users = await getGTSRewardLeaderboard("LILY");
       const formatted = users.map(
-        (u) => `${displayName(u.account)} - ${emoji.lily} ${strong(u.value)}`
+        (u) => `${displayName(u.account)} [${emoji.lily} ${strong(u.value)}]`
       );
 
       body = render(formatted);
@@ -57,7 +62,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
       const users = await getGTSRewardLeaderboard("CARD");
       const formatted = users.map(
-        (u) => `${displayName(u.account)} - ${emoji.cards} ${strong(u.value)}`
+        (u) => `${displayName(u.account)} [${emoji.cards} ${strong(u.value)}]`
       );
 
       body = render(formatted);
