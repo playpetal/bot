@@ -179,6 +179,7 @@ declare module "petal" {
     video?: string;
   };
 
+  type Reward = "PETAL" | "LILY" | "CARD";
   type MinigameType = "GTS" | "WORDS";
 
   export type UnknownMinigame = {
