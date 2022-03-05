@@ -1,5 +1,7 @@
 import { getGTSRewardLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_GTS_REWARD_LEADERBOARD";
 import { getGTSTimeLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_GTS_TIME_LEADERBOARD";
+import { getWordsRewardLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_WORDS_REWARD_LEADERBOARD";
+import { getWordsTimeLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_WORDS_TIME_LEADERBOARD";
 import { displayName } from "../../../lib/util/displayName";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
@@ -67,6 +69,46 @@ const run: Run = async function ({ interaction, user, options }) {
 
       body = render(formatted);
     }
+  } else if (typeName === "petle") {
+    header = `**leaderboard - petle**\n${emoji.bloom} `;
+
+    if (boardName === "time") {
+      header += `top 10 fastest guessers (average)`;
+
+      const users = await getWordsTimeLeaderboard();
+      const formatted = users.map(
+        (u) => `${displayName(u.account)} [**${(u.time / 1000).toFixed(2)}s**]`
+      );
+
+      body = render(formatted);
+    } else if (boardName === "petals") {
+      header += `top 10 earners (petals)`;
+
+      const users = await getWordsRewardLeaderboard("PETAL");
+      const formatted = users.map(
+        (u) => `${displayName(u.account)} [${emoji.petals} ${strong(u.value)}]`
+      );
+
+      body = render(formatted);
+    } else if (boardName === "lilies") {
+      header += `top 10 earners (lilies)`;
+
+      const users = await getWordsRewardLeaderboard("LILY");
+      const formatted = users.map(
+        (u) => `${displayName(u.account)} [${emoji.lily} ${strong(u.value)}]`
+      );
+
+      body = render(formatted);
+    } else if (boardName === "cards") {
+      header += `top 10 earners (cards)`;
+
+      const users = await getWordsRewardLeaderboard("CARD");
+      const formatted = users.map(
+        (u) => `${displayName(u.account)} [${emoji.cards} ${strong(u.value)}]`
+      );
+
+      body = render(formatted);
+    }
   }
 
   const embed = new Embed().setDescription(`${header}\n\n${body}`);
@@ -103,6 +145,36 @@ export default new SlashCommand("leaderboard")
         name: "cards",
         description:
           "shows the players who have earned the most cards from GTS",
+      },
+    ],
+  })
+  .option({
+    type: "subcommandGroup",
+    name: "petle",
+    description: "petle leaderboards",
+    options: [
+      {
+        type: "subcommand",
+        name: "time",
+        description: "shows the players who finish petle games the fastest",
+      },
+      {
+        type: "subcommand",
+        name: "petals",
+        description:
+          "shows the players who have earned the most petals from petle",
+      },
+      {
+        type: "subcommand",
+        name: "lilies",
+        description:
+          "shows the players who have earned the most lilies from petle",
+      },
+      {
+        type: "subcommand",
+        name: "cards",
+        description:
+          "shows the players who have earned the most cards from petle",
       },
     ],
   })
