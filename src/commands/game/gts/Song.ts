@@ -75,7 +75,7 @@ const run: Run = async function ({ interaction, user, options }) {
     try {
       const embed = new Embed()
         .setDescription(
-          `${emoji.song} **Guess the song by using /guess!**` +
+          `${emoji.song} **Guess the song by using \`/song guess\`!**` +
             `\nTime limit: ${strong(GTS_MAX_MS / 1000)} seconds` +
             `\nMaximum guesses: ${strong(GTS_MAX_GUESSES)}`
         )
