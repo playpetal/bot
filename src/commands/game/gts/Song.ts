@@ -61,7 +61,9 @@ const run: Run = async function ({ interaction, user, options }) {
     const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
     await interaction.createMessage({ embeds: [loading] });
 
-    const gender = options.getOption<"male" | "female">("gender");
+    const gender = options.options[0].options
+      ? (options.options[0].options[0].value as string)
+      : undefined;
 
     const song = await getRandomSong(
       user.discordId,
