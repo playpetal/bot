@@ -1,5 +1,5 @@
 import { CommandInteraction } from "eris";
-import { Minigame } from "petal";
+import { Minigame, UnknownMinigame } from "petal";
 import { bot } from "../../..";
 import { MinigameError } from "../../../lib/error/minigame-error";
 import { GTS_MAX_GUESSES, GTS_MAX_MS } from "../../../lib/minigame/constants";
@@ -10,6 +10,8 @@ import { logger } from "../../../lib/logger";
 import {
   destroyMinigame,
   getMinigame,
+  isGTS,
+  isWords,
   setMinigame,
 } from "../../../lib/minigame";
 import { button, row } from "../../../lib/util/component";
@@ -19,126 +21,206 @@ import { strong } from "../../../lib/util/formatting/strong";
 import { Run, SlashCommand } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { logMinigame } from "../../../lib/logger/minigame";
+import { findBestMatch } from "string-similarity";
 
 const run: Run = async function ({ interaction, user, options }) {
-  const minigame = await getMinigame(user);
+  const subcommand = options.options[0].name;
 
-  if (minigame) {
-    if (minigame.type === "WORDS")
-      throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
+  if (subcommand === "play") {
+    const minigame = await getMinigame(user);
 
-    const {
-      data: { startedAt },
-      channel,
-      message,
-    } = minigame as Minigame<"GTS">;
+    if (minigame) {
+      if (minigame.type === "WORDS")
+        throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
 
-    if (startedAt > Date.now() - GTS_MAX_MS)
-      throw MinigameError.AlreadyPlayingGTS;
+      const {
+        data: { startedAt },
+        channel,
+        message,
+      } = minigame as Minigame<"GTS">;
+
+      if (startedAt > Date.now() - GTS_MAX_MS)
+        throw MinigameError.AlreadyPlayingGTS;
+
+      try {
+        await destroyMinigame(user);
+        const gameMessage = await bot.getMessage(channel, message);
+        await gameMessage.edit({
+          embeds: [
+            new Embed()
+              .setColor("#F04747")
+              .setDescription(
+                "**Better luck next time!**\nYou ran out of time!"
+              ),
+          ],
+          components: [],
+        });
+      } catch {}
+    }
+
+    const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
+    await interaction.createMessage({ embeds: [loading] });
+
+    const gender = options.getOption<"male" | "female">("gender");
+
+    const song = await getRandomSong(
+      user.discordId,
+      gender?.toUpperCase() as "MALE" | "FEMALE" | undefined
+    );
+
+    if (!song) throw MinigameError.NoAvailableSongs;
+
+    const canClaim = await canClaimRewards(user.discordId);
 
     try {
+      const embed = new Embed()
+        .setDescription(
+          `${emoji.song} **Guess the song by using /guess!**` +
+            `\nTime limit: ${strong(GTS_MAX_MS / 1000)} seconds` +
+            `\nMaximum guesses: ${strong(GTS_MAX_GUESSES)}`
+        )
+        .setFooter(
+          canClaim
+            ? `You can claim ${canClaim} more reward${
+                canClaim !== 1 ? "s" : ""
+              } this hour!`
+            : `Rewards won't be given since you've already won 3 games this hour.`
+        )
+        .setImage("https://cdn.playpetal.com/banners/default.png");
+
+      const message = await interaction.editOriginalMessage(
+        {
+          embeds: [embed],
+          components: [
+            row(
+              button({
+                customId: `cancel-gts?${user.id}`,
+                label: "cancel",
+                style: "red",
+              })
+            ),
+          ],
+        },
+        { file: Buffer.from(song.video!, "base64"), name: "song.mp4" }
+      );
+
+      await setMinigame<"GTS">(
+        user,
+        {
+          startedAt: Date.now(),
+          song: { ...song, video: undefined },
+          guesses: 0,
+          correct: false,
+        },
+        {
+          message: message.id,
+          channel: message.channel.id,
+          guild: message.guildID!,
+        }
+      );
+
+      const interval = setInterval(async () => {
+        const game = await getMinigame<"GTS">(user);
+
+        if (!game) {
+          clearInterval(interval);
+          return;
+        }
+
+        if (game.message !== message.id) {
+          await message.delete();
+          clearInterval(interval);
+          return;
+        }
+
+        const { correct, guesses, startedAt } = game.data;
+
+        if (
+          correct ||
+          guesses >= GTS_MAX_GUESSES ||
+          startedAt <= Date.now() - GTS_MAX_MS
+        ) {
+          clearInterval(interval);
+          return await handleGTSEnd(interaction, game);
+        }
+      }, 500);
+    } catch (e) {
+      logger.error(e);
+      throw e;
+    }
+  } else if (subcommand === "guess") {
+    const minigame = await getMinigame(user);
+
+    if (!minigame) throw MinigameError.NotPlayingGTS;
+
+    const data = (minigame as UnknownMinigame).data;
+
+    if (isWords(data))
+      throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
+
+    if (!isGTS(data)) throw MinigameError.NotPlayingGTS;
+
+    if (data.startedAt < Date.now() - GTS_MAX_MS) {
       await destroyMinigame(user);
-      const gameMessage = await bot.getMessage(channel, message);
-      await gameMessage.edit({
-        embeds: [
-          new Embed()
-            .setColor("#F04747")
-            .setDescription("**Better luck next time!**\nYou ran out of time!"),
-        ],
-        components: [],
-      });
-    } catch {}
-  }
 
-  const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
-  await interaction.createMessage({ embeds: [loading] });
+      try {
+        const originalMessage = await bot.getMessage(
+          minigame.channel,
+          minigame.message
+        );
 
-  const gender = options.getOption<"male" | "female">("gender");
+        const embed = new Embed()
+          .setColor("#F04747")
+          .setDescription("**Better luck next time!**\nYou ran out of time!");
 
-  const song = await getRandomSong(
-    user.discordId,
-    gender?.toUpperCase() as "MALE" | "FEMALE" | undefined
-  );
+        await originalMessage.edit({ embeds: [embed] });
+      } catch {}
 
-  if (!song) throw MinigameError.NoAvailableSongs;
+      throw MinigameError.NotPlayingGTS;
+    }
 
-  const canClaim = await canClaimRewards(user.discordId);
+    data.guesses += 1;
 
-  try {
-    const embed = new Embed()
-      .setDescription(
-        `${emoji.song} **Guess the song by using /guess!**` +
-          `\nTime limit: ${strong(GTS_MAX_MS / 1000)} seconds` +
-          `\nMaximum guesses: ${strong(GTS_MAX_GUESSES)}`
-      )
-      .setFooter(
-        canClaim
-          ? `You can claim ${canClaim} more reward${
-              canClaim !== 1 ? "s" : ""
-            } this hour!`
-          : `Rewards won't be given since you've already won 3 games this hour.`
-      )
-      .setImage("https://cdn.playpetal.com/banners/default.png");
+    const answer = options.options[0].options![0].value as string;
 
-    const message = await interaction.editOriginalMessage(
-      {
-        embeds: [embed],
-        components: [
-          row(
-            button({
-              customId: `cancel-gts?${user.id}`,
-              label: "cancel",
-              style: "red",
-            })
-          ),
-        ],
-      },
-      { file: Buffer.from(song.video!, "base64"), name: "song.mp4" }
+    const title = data.song.title.toLowerCase().replace(/[^a-zA-Z0-9]/gm, "");
+    const groupTitle = `${data.song.group || ""}${data.song.title}`
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9]/gm, "");
+
+    const match = findBestMatch(
+      answer.toLowerCase().replace(/[^a-zA-Z0-9]/gm, ""),
+      [title, groupTitle]
     );
 
-    const state = await setMinigame<"GTS">(
-      user,
-      {
-        startedAt: Date.now(),
-        song: { ...song, video: undefined },
-        guesses: 0,
-        correct: false,
-      },
-      {
-        message: message.id,
-        channel: message.channel.id,
-        guild: message.guildID!,
-      }
-    );
+    logger.info(JSON.stringify(match));
 
-    const interval = setInterval(async () => {
-      const game = await getMinigame<"GTS">(user);
+    const correct = match.bestMatch.rating >= 0.75;
 
-      if (!game) {
-        clearInterval(interval);
-        return;
-      }
+    const embed = new Embed();
 
-      if (game.message !== message.id) {
-        await message.delete();
-        clearInterval(interval);
-        return;
-      }
+    if (correct) {
+      data.correct = true;
+      data.elapsed = interaction.createdAt - data.startedAt;
 
-      const { correct, guesses, startedAt } = game.data;
+      await setMinigame<"GTS">(user, data, minigame);
 
-      if (
-        correct ||
-        guesses >= GTS_MAX_GUESSES ||
-        startedAt <= Date.now() - GTS_MAX_MS
-      ) {
-        clearInterval(interval);
-        return await handleGTSEnd(interaction, game);
-      }
-    }, 500);
-  } catch (e) {
-    logger.error(e);
-    throw e;
+      embed
+        .setColor("#3BA55D")
+        .setDescription(`${emoji.song} **${answer}** was correct!`);
+      await interaction.createMessage({ embeds: [embed], flags: 64 });
+    } else {
+      await setMinigame<"GTS">(user, data, minigame);
+
+      embed
+        .setColor("#F04747")
+        .setDescription(
+          `${emoji.song} **${answer}** was incorrect! You have **${
+            GTS_MAX_GUESSES - data.guesses
+          }** guesses remaining!`
+        );
+      await interaction.createMessage({ embeds: [embed], flags: 64 });
+    }
   }
 };
 
@@ -214,11 +296,33 @@ export default new SlashCommand("song")
   .desc("gts")
   .run(run)
   .option({
-    type: "string",
-    name: "gender",
-    description: "limits your song to only boys or girls",
-    choices: [
-      { name: "boys", value: "male" },
-      { name: "girls", value: "female" },
+    type: "subcommand",
+    name: "play",
+    description: "starts a new guess the song game!",
+    options: [
+      {
+        type: "string",
+        name: "gender",
+        description: "limits your song to only boy or girl groups",
+        choices: [
+          { name: "boys", value: "male" },
+          { name: "girls", value: "female" },
+        ],
+      },
+    ],
+  })
+  .option({
+    type: "subcommand",
+    name: "guess",
+    description: "guess the name of the song!",
+    options: [
+      {
+        type: "string",
+        name: "guess",
+        description:
+          "use this to make your guess in the 'guess the song' minigame!",
+        required: true,
+        ephemeral: true,
+      },
     ],
   });
