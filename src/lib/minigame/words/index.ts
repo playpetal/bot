@@ -16,6 +16,13 @@ export function getWordsEmbed(
 
   if (data.guesses.length === 0) {
     prefix = `${emojis.bloom} **welcome to petle!**\n**petle** is a k-pop version of the word game [Wordle](https://www.nytimes.com/games/wordle/index.html).\nyou can guess a word by using **\`/petle guess\`**! good luck!\n\n`;
+    embed.setFooter(
+      rewards > 0
+        ? `you can claim ${rewards} more reward${
+            rewards !== 1 ? "s" : ""
+          } this hour!`
+        : `you've reached your reward limit! you can claim more rewards next hour.`
+    );
   } else if (data.guesses.length === 6) {
     prefix = `${emojis.bloom} **petle X/6**\n\n`;
   } else {

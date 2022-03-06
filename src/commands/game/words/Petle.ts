@@ -35,8 +35,10 @@ const run: Run = async ({ interaction, user, options }) => {
       startedAt: Date.now(),
     };
 
+    const rewardsRemaining = await canClaimRewards(interaction.member!.id);
+
     const message = await interaction.editOriginalMessage({
-      embeds: [getWordsEmbed(data, user, 0)],
+      embeds: [getWordsEmbed(data, user, rewardsRemaining)],
     });
 
     await setMinigame<"WORDS">(user, data, {
