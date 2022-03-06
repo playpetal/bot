@@ -62,7 +62,7 @@ const run: Run = async function ({ interaction, user, options }) {
     await interaction.createMessage({ embeds: [loading] });
 
     const gender = options.options[0].options
-      ? (options.options[0].options[0].value as string)
+      ? (options.options[0].options[0]?.value as string)
       : undefined;
 
     const song = await getRandomSong(
@@ -183,7 +183,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
     data.guesses += 1;
 
-    const answer = options.options[0].options![0].value as string;
+    const answer = options.options[0].options![0]?.value as string;
 
     const title = data.song.title.toLowerCase().replace(/[^a-zA-Z0-9]/gm, "");
     const groupTitle = `${data.song.group || ""}${data.song.title}`
