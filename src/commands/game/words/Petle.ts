@@ -6,7 +6,7 @@ import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAI
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getWord } from "../../../lib/graphql/query/game/GET_WORD";
 import { isWordValid } from "../../../lib/graphql/query/game/minigame/words/IS_WORD_VALID";
-import { logMinigame, logMissingWord } from "../../../lib/logger/minigame";
+import { logMissingWord } from "../../../lib/logger/minigame";
 import {
   destroyMinigame,
   getMinigame,
@@ -91,7 +91,6 @@ const run: Run = async ({ interaction, user, options }) => {
     if (isFinished) data.elapsed = Date.now() - data.startedAt;
 
     if ((isFinished && !correct) || (isFinished && rewardsRemaining === 0)) {
-      logMinigame({ ...minigame, data });
       await destroyMinigame(user);
     } else {
       await setMinigame(user, data, minigame);

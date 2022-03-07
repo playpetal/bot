@@ -44,6 +44,8 @@ const run: RunComponent = async function ({ interaction, user }) {
 
   await destroyMinigame(accountId);
 
+  logMinigame(minigame);
+
   if (!isCorrect)
     throw new BotError("you can't claim rewards for a game you didn't win!");
 

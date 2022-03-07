@@ -20,7 +20,6 @@ import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
 import { Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
-import { logMinigame } from "../../../lib/logger/minigame";
 import { findBestMatch } from "string-similarity";
 import { CONSTANTS } from "../../../lib/constants";
 import { slashCommand } from "../../../lib/command";
@@ -230,8 +229,6 @@ async function handleGTSEnd(
   interaction: CommandInteraction,
   minigame: Minigame<"GTS">
 ) {
-  logMinigame(minigame);
-
   const {
     playerId,
     data: { correct, guesses, song, elapsed },
