@@ -6,6 +6,7 @@ import { parseOptions } from "../command";
 type Command = SlashCommand | ApplicationCommand;
 
 export function slashCommandEquals(a: Command, b: Command): boolean {
+  if (a.type !== b.type) return false;
   if (a.name !== b.name) return false;
   if (a.description !== b.description) return false;
 
