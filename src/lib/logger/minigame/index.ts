@@ -14,3 +14,9 @@ export function logMinigame(minigame: UnknownMinigame): void {
     },
   });
 }
+
+export function logMissingWord(word: string): void {
+  logger.info({
+    word,
+  });
+}
