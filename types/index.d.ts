@@ -145,6 +145,11 @@ declare module "petal" {
     description: string | null;
     ownedCount: number;
   };
+  export type TitleInventory = {
+    id: number;
+    account: PartialUser;
+    title: Title;
+  };
 
   export type Gender = "MALE" | "FEMALE" | "NONBINARY";
   export type GroupGender = "MALE" | "FEMALE" | "COED";
