@@ -5,6 +5,10 @@ import { SlashCommand } from "../../struct/command";
 import { optionTypes } from "../../struct/options";
 import { slashCommandEquals } from "../util/slashCommandEquals";
 
+export function slashCommand(name: string) {
+  return new SlashCommand(name);
+}
+
 export async function processCommands(
   commands: SlashCommand[],
   serverId?: string
