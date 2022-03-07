@@ -1,10 +1,11 @@
+import { CONSTANTS } from "../../lib/constants";
 import { setBio } from "../../lib/graphql/mutation/SET_BIO";
 import { Run, SlashCommand } from "../../struct/command";
 import { Embed } from "../../struct/embed";
 import { BotError } from "../../struct/error";
 
 const run: Run = async function ({ interaction, options }) {
-  const bioText = options.getOption("bio") as string;
+  const bioText = options.getOption<string>("bio")!;
 
   if (bioText.length > 500)
     throw new BotError(
@@ -24,7 +25,7 @@ export default new SlashCommand("bio")
   .desc("change the bio displayed on your profile")
   .run(run)
   .option({
-    type: "string",
+    type: CONSTANTS.OPTION_TYPE.STRING,
     name: "bio",
     description: "the text you'd like to change your bio to",
     required: true,

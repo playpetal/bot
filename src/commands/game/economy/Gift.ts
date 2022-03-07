@@ -1,4 +1,5 @@
 import { ApolloError } from "@apollo/client/core";
+import { CONSTANTS } from "../../../lib/constants";
 import { gift } from "../../../lib/graphql/mutation/game/economy/GIFT";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { displayName } from "../../../lib/util/displayName";
@@ -78,24 +79,24 @@ const run: Run = async ({ interaction, options, user }) => {
 export default new SlashCommand("gift")
   .desc("gift cards or petals to another player!")
   .option({
-    type: "user",
+    type: CONSTANTS.OPTION_TYPE.USER,
     name: "user",
     description: "the user you'd like to gift to",
     required: true,
   })
   .option({
-    type: "string",
+    type: CONSTANTS.OPTION_TYPE.STRING,
     name: "cards",
     description: "the cards, separated by spaces, you'd like to gift",
   })
   .option({
-    type: "integer",
+    type: CONSTANTS.OPTION_TYPE.INTEGER,
     name: "petals",
     description: "the amount of petals you'd like to gift",
     min_value: 1,
   })
   .option({
-    type: "integer",
+    type: CONSTANTS.OPTION_TYPE.INTEGER,
     name: "lilies",
     description: "the amount of lilies you'd like to gift",
     min_value: 1,

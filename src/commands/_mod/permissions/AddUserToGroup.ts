@@ -1,11 +1,11 @@
-import { AutocompleteInteraction, InteractionDataOptionsWithValue } from "eris";
+import { CONSTANTS } from "../../../lib/constants";
 import { assignUserGroup } from "../../../lib/graphql/mutation/ASSIGN_USER_GROUP";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { getUserGroups } from "../../../lib/graphql/query/GET_USER_GROUPS";
 import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
-const run: Run = async ({ interaction }) => {
+const run: Run = async ({ interaction, options }) => {
   const account = (await getUser({ discordId: interaction.member!.user.id }))!;
 
   if (!account.groups.find((g) => g.group.name === "Developer"))
@@ -14,9 +14,7 @@ const run: Run = async ({ interaction }) => {
       flags: 64,
     });
 
-  const options = interaction.data.options as InteractionDataOptionsWithValue[];
-
-  const targetGroup = options.find((o) => o.name === "group")!.value as string;
+  const targetGroup = options.getOption<string>("group")!;
   const group = (await getUserGroups(targetGroup))[0];
 
   if (!group) {
@@ -26,7 +24,7 @@ const run: Run = async ({ interaction }) => {
     });
   }
 
-  const targetUserId = options.find((o) => o.name === "user")!.value as string;
+  const targetUserId = options.getOption<string>("user");
   const targetUser = await getUser({ discordId: targetUserId });
 
   if (!targetUser) {
@@ -83,13 +81,13 @@ export default new SlashCommand("addusertogroup")
   .run(run)
   .autocomplete(autocomplete)
   .option({
-    type: "user",
+    type: CONSTANTS.OPTION_TYPE.USER,
     name: "user",
     description: "the user you'd like to add to the group",
     required: true,
   })
   .option({
-    type: "string",
+    type: CONSTANTS.OPTION_TYPE.STRING,
     name: "group",
     description: "the group you'd like to add the user to",
     required: true,

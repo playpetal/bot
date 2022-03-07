@@ -1,4 +1,4 @@
-import { InteractionOption, SlashCommandOption } from "petal";
+import { CONSTANTS } from "../../lib/constants";
 import { setUserTitle } from "../../lib/graphql/mutation/SET_USER_TITLE";
 import { getTitle } from "../../lib/graphql/query/GET_TITLE";
 import { getUserTitle } from "../../lib/graphql/query/GET_USER_TITLE";
@@ -11,11 +11,12 @@ import { Autocomplete, Run, SlashCommand } from "../../struct/command";
 import { Embed, ErrorEmbed } from "../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
-  const subcommand = options.options[0] as InteractionOption<boolean>;
+  const subcommand = options.getSubcommand()!;
 
   if (subcommand.name === "view") {
-    const id = parseInt(subcommand.options![0].value as string, 10);
-    const title = await getTitle(id);
+    const titleIdStr = options.getOption<string>("title")!;
+    const titleId = parseInt(titleIdStr, 10);
+    const title = await getTitle({ id: titleId });
 
     if (!title) {
       return await interaction.createMessage({
@@ -53,8 +54,8 @@ const run: Run = async ({ interaction, user, options }) => {
 
     await interaction.createMessage({ embeds: [embed] });
   } else if (subcommand.name === "use") {
-    const strTitleId = subcommand.options![0].value as string;
-    const titleId = parseInt(strTitleId, 10);
+    const titleIdStr = options.getOption<string>("title")!;
+    const titleId = parseInt(titleIdStr, 10);
 
     if (isNaN(titleId))
       return await interaction.createMessage({
@@ -128,31 +129,31 @@ export default new SlashCommand("title")
   .run(run)
   .autocomplete(autocomplete)
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "view",
     description: "shows information about a title",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "title",
         description: "the title to view",
         required: true,
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
     ],
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "inventory",
     description: "shows you a list of titles you own",
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "use",
     description: "sets a title as your active title",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "title",
         description: "the title to set as your active title",
         required: true,

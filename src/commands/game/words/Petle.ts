@@ -1,4 +1,5 @@
 import { WordsData } from "petal";
+import { CONSTANTS } from "../../../lib/constants";
 import { MinigameError } from "../../../lib/error/minigame-error";
 import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
@@ -17,7 +18,7 @@ import { getMinigameRewardComponents } from "../../../lib/util/component/minigam
 import { Run, SlashCommand } from "../../../struct/command";
 
 const run: Run = async ({ interaction, user, options }) => {
-  const subcommand = options.options[0];
+  const subcommand = options.getSubcommand()!;
 
   const minigame = await getMinigame(user);
 
@@ -64,7 +65,7 @@ const run: Run = async ({ interaction, user, options }) => {
   const data = minigame.data as WordsData;
 
   if (subcommand.name === "guess") {
-    const guess = (subcommand.options![0].value as string).toLowerCase();
+    const guess = options.getOption<string>("word")!.toLowerCase();
 
     if (data.guesses.length > 6) throw MinigameError.MaxWordsGuessed;
 
@@ -122,14 +123,18 @@ const run: Run = async ({ interaction, user, options }) => {
 
 export default new SlashCommand("petle")
   .desc("word game")
-  .option({ type: "subcommand", name: "play", description: "play petle" })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
+    name: "play",
+    description: "play petle",
+  })
+  .option({
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "guess",
     description: "guess a word",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "word",
         description: "the word you want to guess",
         required: true,

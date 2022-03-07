@@ -1,4 +1,5 @@
 import { Account } from "petal";
+import { CONSTANTS } from "../../lib/constants";
 import { getProfileEmbed } from "../../lib/embed/Profile";
 import { getUser } from "../../lib/graphql/query/GET_USER";
 import { button, row } from "../../lib/util/component";
@@ -6,8 +7,7 @@ import { Run, SlashCommand } from "../../struct/command";
 import { BotError } from "../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
-  const userId =
-    (options.getOption("user") as string | undefined) || user.discordId;
+  const userId = options.getOption<string>("user") || user.discordId;
 
   let target: Account | null;
   if (userId === user.discordId) {
@@ -45,7 +45,7 @@ export default new SlashCommand("profile")
   .desc("view someone's profile")
   .run(run)
   .option({
-    type: "user",
+    type: CONSTANTS.OPTION_TYPE.USER,
     name: "user",
     description: "the user whose profile you'd like to view",
   });

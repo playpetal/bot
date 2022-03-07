@@ -1,6 +1,6 @@
 import axios from "axios";
-import { SlashCommandOption } from "petal";
 import { bot } from "../..";
+import { CONSTANTS } from "../../lib/constants";
 import { getSong } from "../../lib/fun/ping/getSong";
 import { getUserPartial } from "../../lib/graphql/query/GET_USER_PARTIAL";
 import { displayName } from "../../lib/util/displayName";
@@ -93,8 +93,8 @@ const run: Run = async function ({ interaction, user, options }) {
 export default new SlashCommand("ping")
   .desc("you can use this command to check if petal is online!")
   .option({
-    type: "boolean",
+    type: CONSTANTS.OPTION_TYPE.BOOLEAN,
     name: "dev",
     description: "shows advanced connection stats",
-  } as SlashCommandOption<"boolean">)
+  })
   .run(run);

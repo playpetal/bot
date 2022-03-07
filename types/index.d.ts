@@ -17,19 +17,18 @@ declare module "petal" {
     disabled: boolean;
   };
 
-  export interface SlashCommandOptionType {
-    subcommand: 1;
-    subcommandGroup: 2;
-    string: 3;
-    integer: 4;
-    boolean: 5;
-    user: 6;
-    channel: 7;
-    role: 8;
-    mentionable: 9;
-    number: 10;
-    attachment: 11;
-  }
+  export type SlashCommandOptionType =
+    | 1 // subcommand
+    | 2 // subcommand group
+    | 3 // string
+    | 4 // integer
+    | 5 // boolean
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10 // number
+    | 11;
 
   export type DiscordSlashCommandOption<T> = {
     type: T;
@@ -39,41 +38,42 @@ declare module "petal" {
     options?: any[];
   };
 
-  export type SlashCommandOption<T extends keyof SlashCommandOptionType> = {
+  export type SlashCommandOption<T extends SlashCommandOptionType> = {
     type: T;
     name: string;
     description: string;
     required?: boolean;
     autocomplete?: boolean;
-    ephemeral?: T extends "subcommand" ? boolean : never;
+    ephemeral?: T extends 1 ? boolean : never;
     choices?: { name: string; value: string | number }[];
-    min_value?: T extends "number"
+    min_value?: T extends 10
       ? number | undefined
-      : T extends "integer"
+      : T extends 4
       ? number
       : undefined;
-    max_value?: T extends "number"
+    max_value?: T extends 10
       ? number | undefined
-      : T extends "integer"
+      : T extends 4
       ? number
       : undefined;
-    options?: T extends "subcommand"
-      ? SlashCommandOption<keyof SlashCommandOptionType>[]
-      : T extends "subcommandGroup"
-      ? SlashCommandOption<"subcommandGroup">[]
+    options?: T extends 1
+      ? SlashCommandOption<SlashCommandOptionType>[]
+      : T extends 2
+      ? SlashCommandOption<2>[]
       : undefined;
   };
 
-  export type InteractionOption<T extends boolean> = {
+  export type InteractionOption = {
+    type: SlashCommandOptionType;
     name: string;
     value: string | number | boolean;
-    focused?: T;
-    options?: InteractionOption<T>[];
+    focused?: boolean;
+    options?: InteractionOption[];
   };
 
   export type CommandInteraction = {
     interaction: import("eris").CommandInteraction;
-    options: { options: InteractionOption<boolean>[] };
+    options: { options: InteractionOption[] };
   };
 
   export type PartialUser = {

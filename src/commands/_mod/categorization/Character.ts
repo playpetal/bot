@@ -1,4 +1,5 @@
-import { Gender, InteractionOption, SlashCommandOption } from "petal";
+import { Gender } from "petal";
+import { CONSTANTS } from "../../../lib/constants";
 import { createCharacter } from "../../../lib/graphql/mutation/CREATE_CHARACTER";
 import { updateCharacter } from "../../../lib/graphql/mutation/UPDATE_CHARACTER";
 import { getCharacter } from "../../../lib/graphql/query/GET_CHARACTER";
@@ -7,10 +8,10 @@ import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { ErrorEmbed, Embed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
-  const subcommand = options.options[0] as InteractionOption<boolean>;
+  const subcommand = options.getSubcommand()!;
 
   if (subcommand.name === "info") {
-    const strCharacterId = subcommand.options![0].value as string;
+    const strCharacterId = options.getOption<string>("character")!;
     const characterId = parseInt(strCharacterId, 10);
 
     if (isNaN(characterId)) {
@@ -51,16 +52,9 @@ const run: Run = async ({ interaction, user, options }) => {
     return interaction.createMessage({ embeds: [embed] });
   }
 
-  const name = subcommand.options!.find((o) => o.name === "name")!.value as
-    | string
-    | undefined;
-  const birthday = subcommand.options!.find((o) => o.name === "birthday")
-    ?.value as string | undefined;
-  const gender = subcommand.options!.find((o) => o.name === "gender")?.value as
-    | "male"
-    | "female"
-    | "nonbinary"
-    | undefined;
+  const name = options.getOption<string>("name");
+  const birthday = options.getOption<string>("birthday");
+  const gender = options.getOption<"male" | "female" | "nonbinary">("gender");
 
   if (subcommand.name === "create") {
     const date = birthday ? new Date(birthday) : undefined;
@@ -78,7 +72,7 @@ const run: Run = async ({ interaction, user, options }) => {
 
     return interaction.createMessage({ embeds: [embed] });
   } else if (subcommand.name === "edit") {
-    const strCharacterId = subcommand.options![0].value as string;
+    const strCharacterId = options.getOption<string>("character")!;
     const characterId = parseInt(strCharacterId, 10);
 
     if (isNaN(characterId)) {
@@ -151,37 +145,37 @@ export default new SlashCommand("character")
   .run(run)
   .autocomplete(autocomplete)
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "info",
     description: "shows information about a character",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "character",
         description: "the character you'd like to view information about",
         required: true,
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
     ],
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "create",
     description: "creates a new character",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "name",
         description: "the name of the character",
         required: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "birthday",
         description: "the birthday of the character",
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "gender",
         description: "the gender of the character",
         choices: [
@@ -189,33 +183,33 @@ export default new SlashCommand("character")
           { name: "female", value: "female" },
           { name: "nonbinary", value: "nonbinary" },
         ],
-      } as SlashCommandOption<"string">,
+      },
     ],
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "edit",
     description: "edits a character",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "character",
         description: "the name of the character you'd like to edit",
         required: true,
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "name",
         description: "the name of the character",
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "birthday",
         description: "the birthday of the character",
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "gender",
         description: "the gender of the character",
         choices: [
@@ -223,6 +217,6 @@ export default new SlashCommand("character")
           { name: "female", value: "female" },
           { name: "nonbinary", value: "nonbinary" },
         ],
-      } as SlashCommandOption<"string">,
+      },
     ],
   });

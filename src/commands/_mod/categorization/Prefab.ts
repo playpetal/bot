@@ -1,13 +1,6 @@
 import axios from "axios";
-import {
-  Character,
-  Group,
-  InteractionOption,
-  Maybe,
-  Prefab,
-  SlashCommandOption,
-  Subgroup,
-} from "petal";
+import { Character, Group, Maybe, Prefab, Subgroup } from "petal";
+import { CONSTANTS } from "../../../lib/constants";
 import { updatePrefab } from "../../../lib/graphql/mutation/categorization/prefab/UPDATE_PREFAB";
 import { createPrefab } from "../../../lib/graphql/mutation/CREATE_PREFAB";
 import { getPrefab } from "../../../lib/graphql/query/categorization/prefab/GET_PREFAB";
@@ -24,8 +17,7 @@ import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, options, user }) => {
-  const subcommand = options.options[0] as InteractionOption<boolean>;
-  const fields = subcommand.options!;
+  const subcommand = options.getSubcommand()!;
 
   let isEdit: { prefabId: number } | undefined;
   let prefab: Maybe<Prefab> | undefined;
@@ -37,8 +29,7 @@ const run: Run = async ({ interaction, options, user }) => {
   let releaseId: number | undefined;
   let image: string | undefined;
 
-  const attachmentId = subcommand.options!.find((o) => o.name === "image")
-    ?.value as string | undefined;
+  const attachmentId = options.getOption<string>("image");
 
   if (attachmentId) {
     // @ts-ignore
@@ -46,8 +37,7 @@ const run: Run = async ({ interaction, options, user }) => {
   }
 
   if (subcommand.name === "edit") {
-    const strPrefabId = fields.find((o) => o.name === "prefab")!
-      .value as string;
+    const strPrefabId = options.getOption<string>("prefab")!;
     const prefabId = parseInt(strPrefabId, 10);
 
     if (isNaN(prefabId)) {
@@ -67,9 +57,7 @@ const run: Run = async ({ interaction, options, user }) => {
     isEdit = { prefabId: prefab.id };
   }
 
-  const strCharacterId = fields.find((f) => f.name === "character")?.value as
-    | string
-    | undefined;
+  const strCharacterId = options.getOption<string>("character");
 
   if (strCharacterId) {
     const characterId = parseInt(strCharacterId, 10);
@@ -85,9 +73,7 @@ const run: Run = async ({ interaction, options, user }) => {
     character = await getCharacter(characterId);
   }
 
-  const strSubgroupId = fields.find((f) => f.name === "subgroup")?.value as
-    | string
-    | undefined;
+  const strSubgroupId = options.getOption<string>("subgroup");
 
   if (strSubgroupId) {
     const subgroupId = parseInt(strSubgroupId, 10);
@@ -101,9 +87,7 @@ const run: Run = async ({ interaction, options, user }) => {
     subgroup = await getSubgroup(subgroupId);
   }
 
-  const strGroupId = fields.find((f) => f.name === "group")?.value as
-    | string
-    | undefined;
+  const strGroupId = options.getOption<string>("group");
 
   if (strGroupId) {
     const groupId = parseInt(strGroupId, 10);
@@ -117,13 +101,9 @@ const run: Run = async ({ interaction, options, user }) => {
     group = await getGroup(groupId);
   }
 
-  maxCards = fields.find((f) => f.name === "max_cards")?.value as
-    | number
-    | undefined;
-  rarity = fields.find((f) => f.name === "rarity")?.value as number | undefined;
-  releaseId = fields.find((f) => f.name === "release")?.value as
-    | number
-    | undefined;
+  maxCards = options.getOption<number>("max_cards");
+  rarity = options.getOption<number>("rarity");
+  releaseId = options.getOption<number>("release");
 
   if (!releaseId && !isEdit) {
     const lastRelease = await getLastRelease();
@@ -274,102 +254,102 @@ export default new SlashCommand("prefab")
   .run(run)
   .autocomplete(autocomplete)
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "create",
     description: "create a prefab",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "character",
         description: "the character you'd like to set the prefab to",
         required: true,
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "attachment",
+        type: CONSTANTS.OPTION_TYPE.ATTACHMENT,
         name: "image",
         description: "the image of the prefab you'd like to create",
         required: true,
-      } as SlashCommandOption<"attachment">,
+      },
       {
-        type: "integer",
+        type: CONSTANTS.OPTION_TYPE.INTEGER,
         name: "release",
         description:
           "the release to put the prefab in. if empty, creates new release or adds to last undroppable release.",
-      } as SlashCommandOption<"integer">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "subgroup",
         description: "the subgroup you'd like to set the prefab to",
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "group",
         description: "the group you'd like to set the prefab to",
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "number",
+        type: CONSTANTS.OPTION_TYPE.NUMBER,
         name: "max_cards",
         description: "the max cards of the prefab",
-      } as SlashCommandOption<"number">,
+      },
       {
-        type: "number",
+        type: CONSTANTS.OPTION_TYPE.NUMBER,
         name: "rarity",
         description: "the relative rarity of the prefab (currently unused)",
-      } as SlashCommandOption<"number">,
+      },
     ],
   })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "edit",
     description: "edit a prefab",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "prefab",
         description: "the prefab you'd like to edit",
         required: true,
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "character",
         description: "the character you'd like to set the prefab to",
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "attachment",
+        type: CONSTANTS.OPTION_TYPE.ATTACHMENT,
         name: "image",
         description: "the image you'd like to set the prefab to",
-      } as SlashCommandOption<"attachment">,
+      },
       {
-        type: "integer",
+        type: CONSTANTS.OPTION_TYPE.INTEGER,
         name: "release",
         description: "the number of the release to put the prefab in",
-      } as SlashCommandOption<"integer">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "subgroup",
         description: "the subgroup you'd like to set the prefab to",
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "group",
         description: "the group you'd like to set the prefab to",
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "number",
+        type: CONSTANTS.OPTION_TYPE.NUMBER,
         name: "max_cards",
         description: "the new max cards of the prefab",
-      } as SlashCommandOption<"number">,
+      },
       {
-        type: "number",
+        type: CONSTANTS.OPTION_TYPE.NUMBER,
         name: "rarity",
         description: "the new relative rarity of the prefab (currently unused)",
-      } as SlashCommandOption<"number">,
+      },
     ],
-  } as SlashCommandOption<"subcommand">);
+  });

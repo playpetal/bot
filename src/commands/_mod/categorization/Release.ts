@@ -1,4 +1,4 @@
-import { InteractionOption, SlashCommandOption } from "petal";
+import { CONSTANTS } from "../../../lib/constants";
 import { createRelease } from "../../../lib/graphql/mutation/categorization/release/CREATE_RELEASE";
 import { updateRelease } from "../../../lib/graphql/mutation/categorization/release/UPDATE_RELEASE";
 import { getRelease } from "../../../lib/graphql/query/categorization/release/GET_RELEASE";
@@ -6,10 +6,10 @@ import { Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
-  const subcommand = options.options[0] as InteractionOption<boolean>;
+  const subcommand = options.getSubcommand()!;
 
   if (subcommand.name === "edit") {
-    const strReleaseId = subcommand.options![0].value as string;
+    const strReleaseId = options.getOption<string>("release")!;
     const releaseId = parseInt(strReleaseId, 10);
 
     if (isNaN(releaseId)) {
@@ -26,8 +26,7 @@ const run: Run = async ({ interaction, user, options }) => {
       });
     }
 
-    const droppable = subcommand.options!.find((o) => o.name === "droppable")
-      ?.value as boolean | undefined;
+    const droppable = options.getOption<boolean>("droppable");
 
     const newRelease = await updateRelease(user, release.id, droppable);
 
@@ -52,25 +51,25 @@ const run: Run = async ({ interaction, user, options }) => {
 export default new SlashCommand("release")
   .run(run)
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "create",
     description: "creates a release",
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "edit",
     description: "edits a release",
     options: [
       {
-        type: "integer",
+        type: CONSTANTS.OPTION_TYPE.INTEGER,
         name: "release",
         description: "the release you'd like to edit",
         required: true,
       },
       {
-        type: "boolean",
+        type: CONSTANTS.OPTION_TYPE.BOOLEAN,
         name: "droppable",
         description: "if the release should be droppable",
       },
     ],
-  } as SlashCommandOption<"subcommand">);
+  });

@@ -22,11 +22,12 @@ import { Run, SlashCommand } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { logMinigame } from "../../../lib/logger/minigame";
 import { findBestMatch } from "string-similarity";
+import { CONSTANTS } from "../../../lib/constants";
 
 const run: Run = async function ({ interaction, user, options }) {
-  const subcommand = options.options[0].name;
+  const subcommand = options.getSubcommand()!;
 
-  if (subcommand === "play") {
+  if (subcommand.name === "play") {
     const minigame = await getMinigame(user);
 
     if (minigame) {
@@ -61,9 +62,7 @@ const run: Run = async function ({ interaction, user, options }) {
     const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
     await interaction.createMessage({ embeds: [loading] });
 
-    const gender = options.options[0].options
-      ? (options.options[0].options[0]?.value as string)
-      : undefined;
+    const gender = options.getOption<"male" | "female">("gender");
 
     const song = await getRandomSong(
       user.discordId,
@@ -150,7 +149,7 @@ const run: Run = async function ({ interaction, user, options }) {
       logger.error(e);
       throw e;
     }
-  } else if (subcommand === "guess") {
+  } else if (subcommand.name === "guess") {
     const minigame = await getMinigame(user);
 
     if (!minigame) throw MinigameError.NotPlayingGTS;
@@ -183,7 +182,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
     data.guesses += 1;
 
-    const answer = options.options[0].options![0]?.value as string;
+    const answer = options.getOption<string>("guess")!;
 
     const title = data.song.title.toLowerCase().replace(/[^a-zA-Z0-9]/gm, "");
     const groupTitle = `${data.song.group || ""}${data.song.title}`
@@ -298,12 +297,12 @@ export default new SlashCommand("song")
   .desc("gts")
   .run(run)
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "play",
     description: "starts a new guess the song game!",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "gender",
         description: "limits your song to only boy or girl groups",
         choices: [
@@ -314,12 +313,12 @@ export default new SlashCommand("song")
     ],
   })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "guess",
     description: "guess the name of the song!",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "guess",
         description:
           "use this to make your guess in the 'guess the song' minigame!",

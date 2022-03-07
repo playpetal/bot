@@ -1,4 +1,5 @@
-import { GroupGender, InteractionOption, SlashCommandOption } from "petal";
+import { GroupGender } from "petal";
+import { CONSTANTS } from "../../../lib/constants";
 import { createGroup } from "../../../lib/graphql/mutation/CREATE_GROUP";
 import { updateGroup } from "../../../lib/graphql/mutation/UPDATE_GROUP";
 import { getGroup } from "../../../lib/graphql/query/GET_GROUP";
@@ -7,10 +8,10 @@ import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
-  const subcommand = options.options[0] as InteractionOption<boolean>;
+  const subcommand = options.getSubcommand()!;
 
   if (subcommand.name === "info") {
-    const strGroupId = subcommand.options![0].value as string;
+    const strGroupId = options.getOption<string>("group")!;
     const groupId = parseInt(strGroupId, 10);
 
     if (isNaN(groupId)) {
@@ -51,16 +52,9 @@ const run: Run = async ({ interaction, user, options }) => {
     return interaction.createMessage({ embeds: [embed] });
   }
 
-  const name = subcommand.options!.find((o) => o.name === "name")!.value as
-    | string
-    | undefined;
-  const creation = subcommand.options!.find((o) => o.name === "creation")
-    ?.value as string | undefined;
-  const gender = subcommand.options!.find((o) => o.name === "gender")?.value as
-    | "male"
-    | "female"
-    | "coed"
-    | undefined;
+  const name = options.getOption<string>("name");
+  const creation = options.getOption<string>("creation");
+  const gender = options.getOption<"male" | "female" | "coed">("gender");
 
   if (subcommand.name === "create") {
     const group = await createGroup(
@@ -76,7 +70,7 @@ const run: Run = async ({ interaction, user, options }) => {
 
     return interaction.createMessage({ embeds: [embed] });
   } else if (subcommand.name === "edit") {
-    const strGroupId = subcommand.options![0].value as string;
+    const strGroupId = options.getOption<string>("group")!;
     const groupId = parseInt(strGroupId, 10);
 
     if (isNaN(groupId)) {
@@ -134,37 +128,37 @@ export default new SlashCommand("group")
   .run(run)
   .autocomplete(autocomplete)
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "info",
     description: "shows information about a group",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "group",
         description: "the group you'd like to view information about",
         required: true,
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
     ],
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "create",
     description: "create a new group",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "name",
         description: "the name of the group you want to create",
         required: true,
       },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "creation",
         description: "the date your group was created (debut date, etc.)",
       },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "gender",
         description: "the gender of your group",
         choices: [
@@ -174,31 +168,31 @@ export default new SlashCommand("group")
         ],
       },
     ],
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "edit",
     description: "edits a group",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "group",
         description: "the group you want to edit",
         required: true,
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "name",
         description: "the new name of the group",
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "creation",
         description: "the new creation date of the group (debut date, etc.)",
-      } as SlashCommandOption<"string">,
+      },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "gender",
         description: "the new gender date of the group (debut date, etc.)",
         choices: [
@@ -206,6 +200,6 @@ export default new SlashCommand("group")
           { name: "female", value: "female" },
           { name: "coed", value: "coed" },
         ],
-      } as SlashCommandOption<"string">,
+      },
     ],
-  } as SlashCommandOption<"subcommand">);
+  });

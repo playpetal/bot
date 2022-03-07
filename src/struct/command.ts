@@ -1,7 +1,6 @@
 import { AutocompleteInteraction, CommandInteraction } from "eris";
-import { PartialUser, SlashCommandOption } from "petal";
+import { PartialUser, SlashCommandOption, SlashCommandOptionType } from "petal";
 import { InteractionOptions } from "./options";
-import { optionTypes } from "./options";
 
 export type Run = ({
   interaction,
@@ -26,7 +25,7 @@ export class SlashCommand {
   readonly type = 1;
   readonly name: string;
   description: string;
-  options: SlashCommandOption<keyof typeof optionTypes>[] = [];
+  options: SlashCommandOption<SlashCommandOptionType>[] = [];
   isEphemeral: boolean = false;
 
   private _run: Run | undefined;
@@ -44,7 +43,7 @@ export class SlashCommand {
     return this;
   }
 
-  public option(option: SlashCommandOption<keyof typeof optionTypes>) {
+  public option(option: SlashCommandOption<SlashCommandOptionType>) {
     this.options.push(option);
     return this;
   }

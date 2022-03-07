@@ -1,3 +1,4 @@
+import { CONSTANTS } from "../../../lib/constants";
 import { inventory } from "../../../lib/graphql/query/INVENTORY";
 import { inventoryPage } from "../../../lib/graphql/query/INVENTORY_PAGE";
 import { searchCharacters } from "../../../lib/graphql/query/SEARCH_CHARACTERS";
@@ -118,19 +119,19 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
 export default new SlashCommand("inventory")
   .desc("shows you a list of your cards")
   .option({
-    type: "string",
+    type: CONSTANTS.OPTION_TYPE.STRING,
     name: "character",
     description: "show only this character",
     autocomplete: true,
   })
   .option({
-    type: "string",
+    type: CONSTANTS.OPTION_TYPE.STRING,
     name: "subgroup",
     description: "show only this subgroup",
     autocomplete: true,
   })
   .option({
-    type: "string",
+    type: CONSTANTS.OPTION_TYPE.STRING,
     name: "group",
     description: "show only this group",
     autocomplete: true,

@@ -1,8 +1,7 @@
 import { ApplicationCommand } from "eris";
-import { DiscordSlashCommandOption, SlashCommandOption } from "petal";
+import { SlashCommandOption, SlashCommandOptionType } from "petal";
 import { bot } from "../..";
 import { SlashCommand } from "../../struct/command";
-import { optionTypes } from "../../struct/options";
 import { slashCommandEquals } from "../util/slashCommandEquals";
 
 export function slashCommand(name: string) {
@@ -64,43 +63,17 @@ export async function processCommands(
 }
 
 export function parseOptions(
-  options: SlashCommandOption<keyof typeof optionTypes>[]
+  options: SlashCommandOption<SlashCommandOptionType>[]
 ) {
   const parsed = [];
 
   for (let opt of options) {
-    const type = optionTypes[opt.type];
-    const _opt = { ...opt, type };
+    const _opt = { ...opt };
     delete _opt.ephemeral;
 
-    if (type === 1) {
-      parsed.push(_opt as DiscordSlashCommandOption<1>);
-    } else if (type === 2) {
-      parsed.push(_opt as DiscordSlashCommandOption<2>);
-    } else if (type === 3) {
-      parsed.push(_opt as DiscordSlashCommandOption<3>);
-    } else if (type === 4) {
-      parsed.push(_opt as DiscordSlashCommandOption<4>);
-    } else if (type === 5) {
-      parsed.push(_opt as DiscordSlashCommandOption<5>);
-    } else if (type === 6) {
-      parsed.push(_opt as DiscordSlashCommandOption<6>);
-    } else if (type === 7) {
-      parsed.push(_opt as DiscordSlashCommandOption<7>);
-    } else if (type === 8) {
-      parsed.push(_opt as DiscordSlashCommandOption<8>);
-    } else if (type === 9) {
-      parsed.push(_opt as DiscordSlashCommandOption<9>);
-    } else if (type === 10) {
-      parsed.push(_opt as DiscordSlashCommandOption<10>);
-    } else if (type === 11) {
-      // @ts-ignore
-      parsed.push(_opt as DiscordSlashCommandOption<11>);
-    }
+    parsed.push(_opt);
 
     if (opt.options) {
-      // @ts-ignore - i don't know how to change the type of this nested options object.
-      //              it works fine.
       _opt.options = parseOptions(opt.options);
     }
   }

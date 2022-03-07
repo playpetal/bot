@@ -1,4 +1,5 @@
 import { SlashCommandOption } from "petal";
+import { CONSTANTS } from "../../lib/constants";
 import { createAccount } from "../../lib/graphql/mutation/CREATE_ACCOUNT";
 import { getUser } from "../../lib/graphql/query/GET_USER";
 import { getUserPartial } from "../../lib/graphql/query/GET_USER_PARTIAL";
@@ -13,10 +14,7 @@ const run: Run = async function ({ interaction, options }) {
 
   if (user) throw new BotError("**woah there!**\nyou already have an account.");
 
-  const username = options.getOption<string>("username");
-
-  if (!username)
-    throw new BotError("**woah there!**\nplease enter a username.");
+  const username = options.getOption<string>("username")!;
 
   if (username.length > 20 || username.length < 2)
     throw new BotError(
@@ -49,9 +47,9 @@ export default new SlashCommand("register")
   .desc("sign up with this command to start playing petal!")
   .run(run)
   .option({
+    type: CONSTANTS.OPTION_TYPE.STRING,
     name: "username",
     description:
       "your desired username. does not have to be your discord username!",
-    type: "string",
     required: true,
-  } as SlashCommandOption<"string">);
+  });

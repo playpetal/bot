@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Card } from "petal";
+import { CONSTANTS } from "../../../lib/constants";
 import { rollCards } from "../../../lib/graphql/mutation/ROLL_CARD";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { logger } from "../../../lib/logger";
@@ -11,7 +12,7 @@ import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
-  let amount = options.getOption("amount") as number | undefined;
+  let amount = options.getOption<number>("amount");
 
   if (!amount) amount = 1;
 
@@ -20,7 +21,7 @@ const run: Run = async function ({ interaction, user, options }) {
       "**woah there!**\nyou can only roll up to 10 cards at once."
     );
 
-  const gender = options.getOption("gender") as string | undefined;
+  const gender = options.getOption<string>("gender");
 
   const cost = (gender ? 15 : 10) * amount;
   const { currency } = (await getUser({ id: user.id }))!;
@@ -127,14 +128,14 @@ export default new SlashCommand("roll")
   .desc("rolls for a random card")
   .run(run)
   .option({
-    type: "integer",
+    type: CONSTANTS.OPTION_TYPE.INTEGER,
     name: "amount",
     description: "how many cards you want to roll",
     min_value: 1,
     max_value: 10,
   })
   .option({
-    type: "string",
+    type: CONSTANTS.OPTION_TYPE.STRING,
     name: "gender",
     description: "only roll cards of this gender (costs more)",
     choices: [

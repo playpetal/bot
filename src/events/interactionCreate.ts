@@ -19,6 +19,7 @@ import { InteractionOptions } from "../struct/options";
 import { BotError } from "../struct/error";
 import { logger } from "../lib/logger";
 import { logCommandError, logComponentError } from "../lib/logger/error";
+import { CONSTANTS } from "../lib/constants";
 
 const run = async function (interaction: UnknownInteraction) {
   if (!interaction.member) {
@@ -65,9 +66,9 @@ const run = async function (interaction: UnknownInteraction) {
       if (isSubcommand) {
         const subcommand = command.options.find(
           (o) =>
-            o.type === "subcommand" &&
+            o.type === CONSTANTS.OPTION_TYPE.SUBCOMMAND &&
             o.name === interaction.data.options![0].name
-        ) as SlashCommandOption<"subcommand">;
+        ) as SlashCommandOption<1>;
 
         if (subcommand && subcommand.ephemeral) {
           await interaction.acknowledge(64);
@@ -88,7 +89,7 @@ const run = async function (interaction: UnknownInteraction) {
             title: null,
           },
           options: new InteractionOptions(
-            interaction.data.options as InteractionOption<boolean>[]
+            interaction.data.options as InteractionOption[]
           ),
         });
       } else if (!user) {
@@ -98,7 +99,7 @@ const run = async function (interaction: UnknownInteraction) {
       }
 
       const options = new InteractionOptions(
-        interaction.data.options as InteractionOption<boolean>[]
+        interaction.data.options as InteractionOption[]
       );
 
       await command.execute({ interaction, user, options });
@@ -134,7 +135,7 @@ const run = async function (interaction: UnknownInteraction) {
       if (!user) return interaction.acknowledge([]);
 
       const options = new InteractionOptions(
-        interaction.data.options as InteractionOption<boolean>[]
+        interaction.data.options as InteractionOption[]
       );
 
       if (command.getAutocomplete())

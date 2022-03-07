@@ -1,3 +1,4 @@
+import { CONSTANTS } from "../../../lib/constants";
 import { burnCard } from "../../../lib/graphql/mutation/game/BURN_CARD";
 import { changeCardColor } from "../../../lib/graphql/mutation/game/card/CHANGE_CARD_COLOR";
 import { getCard } from "../../../lib/graphql/query/GET_CARD";
@@ -13,8 +14,8 @@ import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
 const run: Run = async ({ interaction, user, options }) => {
-  const subcommand = options.options[0];
-  const strCardId = subcommand.options![0].value as string;
+  const subcommand = options.getSubcommand()!;
+  const strCardId = options.getOption<string>("card")!;
 
   const cardId = parseInt(strCardId, 16);
   const card = await getCard(cardId);
@@ -78,7 +79,7 @@ const run: Run = async ({ interaction, user, options }) => {
       );
     }
 
-    let hex = subcommand.options![1].value as string;
+    let hex = options.getOption<string>("color")!;
     if (!hex.match(/^#?[0-9A-F]{6}$/i))
       throw new BotError(
         "**woah there!**\nplease enter a valid hex code! they look like `#FFAACC`."
@@ -133,12 +134,12 @@ export default new SlashCommand("card")
   .run(run)
   .autocomplete(autocomplete)
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "view",
     description: "shows information about a card",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "card",
         description: "the card you'd like to view",
         required: true,
@@ -147,12 +148,12 @@ export default new SlashCommand("card")
     ],
   })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "burn",
     description: "burns a card! will give you some petals in exchange",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "card",
         description: "the card you'd like to burn",
         required: true,
@@ -161,19 +162,19 @@ export default new SlashCommand("card")
     ],
   })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "dye",
     description: "changes the color of the card! (costs 25 lilies)",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "card",
         description: "the card you'd like to color",
         required: true,
         autocomplete: true,
       },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "color",
         description: "the hex code of the color",
         required: true,

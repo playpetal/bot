@@ -1,4 +1,4 @@
-import { InteractionOption, SlashCommandOption } from "petal";
+import { CONSTANTS } from "../../../lib/constants";
 import { createSubgroup } from "../../../lib/graphql/mutation/CREATE_SUBGROUP";
 import { updateSubgroup } from "../../../lib/graphql/mutation/UPDATE_SUBGROUP";
 import { getSubgroup } from "../../../lib/graphql/query/GET_SUBGROUP";
@@ -7,10 +7,10 @@ import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
-  const subcommand = options.options[0] as InteractionOption<boolean>;
+  const subcommand = options.getSubcommand()!;
 
   if (subcommand.name === "info") {
-    const strSubgroupId = subcommand.options![0].value as string;
+    const strSubgroupId = options.getOption<string>("subgroup")!;
     const subgroupId = parseInt(strSubgroupId, 10);
 
     if (isNaN(subgroupId)) {
@@ -43,10 +43,8 @@ const run: Run = async ({ interaction, user, options }) => {
     return interaction.createMessage({ embeds: [embed] });
   }
 
-  const name = subcommand.options!.find((o) => o.name === "name")!
-    .value as string;
-  const creation = subcommand.options!.find((o) => o.name === "creation")
-    ?.value as string | undefined;
+  const name = options.getOption<string>("name")!;
+  const creation = options.getOption<string>("creation");
 
   if (subcommand.name === "create") {
     const subgroup = await createSubgroup(
@@ -61,7 +59,7 @@ const run: Run = async ({ interaction, user, options }) => {
 
     return interaction.createMessage({ embeds: [embed] });
   } else if (subcommand.name === "edit") {
-    const strSubgroupId = subcommand.options![0].value as string;
+    const strSubgroupId = options.getOption<string>("subgroup")!;
     const subgroupId = parseInt(strSubgroupId, 10);
 
     if (isNaN(subgroupId)) {
@@ -127,59 +125,59 @@ export default new SlashCommand("subgroup")
   .run(run)
   .autocomplete(autocomplete)
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "info",
     description: "view information about a subgroup",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "subgroup",
         description: "the subgroup you'd like to view",
         required: true,
         autocomplete: true,
-      } as SlashCommandOption<"string">,
+      },
     ],
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "create",
     description: "creates a subgroup",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "name",
         description: "the name of the subgroup",
         required: true,
       },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "creation",
         description:
           "the date that the subgroup was created (release date, etc.)",
       },
     ],
-  } as SlashCommandOption<"subcommand">)
+  })
   .option({
-    type: "subcommand",
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "edit",
     description: "edits a subgroup",
     options: [
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "subgroup",
         description: "the subgroup you'd like to edit",
         required: true,
         autocomplete: true,
       },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "name",
         description: "the new name of the subgroup",
       },
       {
-        type: "string",
+        type: CONSTANTS.OPTION_TYPE.STRING,
         name: "creation",
         description: "the new creation date of the subgroup",
       },
     ],
-  } as SlashCommandOption<"subcommand">);
+  });
