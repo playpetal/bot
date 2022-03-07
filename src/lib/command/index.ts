@@ -67,6 +67,7 @@ export function parseOptions(
   for (let opt of options) {
     const type = optionTypes[opt.type];
     const _opt = { ...opt, type };
+    delete _opt.ephemeral;
 
     if (type === 1) {
       parsed.push(_opt as DiscordSlashCommandOption<1>);
