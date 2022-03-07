@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Card } from "petal";
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { rollCards } from "../../../lib/graphql/mutation/ROLL_CARD";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
@@ -7,7 +8,7 @@ import { logger } from "../../../lib/logger";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import { strong } from "../../../lib/util/formatting/strong";
-import { Run, SlashCommand } from "../../../struct/command";
+import { Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
@@ -124,7 +125,7 @@ async function getCollage(cards: Card[]) {
   }
 }
 
-export default new SlashCommand("roll")
+export default slashCommand("roll")
   .desc("rolls for a random card")
   .run(run)
   .option({

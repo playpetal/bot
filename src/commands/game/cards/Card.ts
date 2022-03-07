@@ -1,3 +1,4 @@
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { burnCard } from "../../../lib/graphql/mutation/game/BURN_CARD";
 import { changeCardColor } from "../../../lib/graphql/mutation/game/card/CHANGE_CARD_COLOR";
@@ -9,7 +10,7 @@ import { displayName } from "../../../lib/util/displayName";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import { strong } from "../../../lib/util/formatting/strong";
-import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
+import { Autocomplete, Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
@@ -129,7 +130,7 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
   return interaction.acknowledge(choices);
 };
 
-export default new SlashCommand("card")
+export default slashCommand("card")
   .desc("view a card")
   .run(run)
   .autocomplete(autocomplete)

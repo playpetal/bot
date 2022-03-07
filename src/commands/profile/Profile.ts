@@ -1,9 +1,10 @@
 import { Account } from "petal";
+import { slashCommand } from "../../lib/command";
 import { CONSTANTS } from "../../lib/constants";
 import { getProfileEmbed } from "../../lib/embed/Profile";
 import { getUser } from "../../lib/graphql/query/GET_USER";
 import { button, row } from "../../lib/util/component";
-import { Run, SlashCommand } from "../../struct/command";
+import { Run } from "../../struct/command";
 import { BotError } from "../../struct/error";
 
 const run: Run = async function ({ interaction, user, options }) {
@@ -41,7 +42,7 @@ const run: Run = async function ({ interaction, user, options }) {
   });
 };
 
-export default new SlashCommand("profile")
+export default slashCommand("profile")
   .desc("view someone's profile")
   .run(run)
   .option({

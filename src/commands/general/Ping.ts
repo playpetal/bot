@@ -1,10 +1,11 @@
 import axios from "axios";
 import { bot } from "../..";
+import { slashCommand } from "../../lib/command";
 import { CONSTANTS } from "../../lib/constants";
 import { getSong } from "../../lib/fun/ping/getSong";
 import { getUserPartial } from "../../lib/graphql/query/GET_USER_PARTIAL";
 import { displayName } from "../../lib/util/displayName";
-import { SlashCommand, Run } from "../../struct/command";
+import { Run } from "../../struct/command";
 import { Embed } from "../../struct/embed";
 
 const run: Run = async function ({ interaction, user, options }) {
@@ -90,7 +91,7 @@ const run: Run = async function ({ interaction, user, options }) {
   await interaction.createMessage({ embeds: [embed] });
 };
 
-export default new SlashCommand("ping")
+export default slashCommand("ping")
   .desc("you can use this command to check if petal is online!")
   .option({
     type: CONSTANTS.OPTION_TYPE.BOOLEAN,

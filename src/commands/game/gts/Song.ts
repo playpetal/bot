@@ -18,11 +18,12 @@ import { button, row } from "../../../lib/util/component";
 import { getMinigameRewardComponents } from "../../../lib/util/component/minigame";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
-import { Run, SlashCommand } from "../../../struct/command";
+import { Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { logMinigame } from "../../../lib/logger/minigame";
 import { findBestMatch } from "string-similarity";
 import { CONSTANTS } from "../../../lib/constants";
+import { slashCommand } from "../../../lib/command";
 
 const run: Run = async function ({ interaction, user, options }) {
   const subcommand = options.getSubcommand()!;
@@ -293,7 +294,7 @@ async function handleGTSEnd(
   }
 }
 
-export default new SlashCommand("song")
+export default slashCommand("song")
   .desc("gts")
   .run(run)
   .option({

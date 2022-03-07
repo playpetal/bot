@@ -1,10 +1,11 @@
 import { GroupGender } from "petal";
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { createGroup } from "../../../lib/graphql/mutation/CREATE_GROUP";
 import { updateGroup } from "../../../lib/graphql/mutation/UPDATE_GROUP";
 import { getGroup } from "../../../lib/graphql/query/GET_GROUP";
 import { searchGroups } from "../../../lib/graphql/query/SEARCH_GROUPS";
-import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
+import { Autocomplete, Run } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
@@ -124,7 +125,7 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
   return interaction.acknowledge(choices);
 };
 
-export default new SlashCommand("group")
+export default slashCommand("group")
   .run(run)
   .autocomplete(autocomplete)
   .option({

@@ -1,3 +1,4 @@
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { inventory } from "../../../lib/graphql/query/INVENTORY";
 import { inventoryPage } from "../../../lib/graphql/query/INVENTORY_PAGE";
@@ -7,7 +8,7 @@ import { searchSubgroups } from "../../../lib/graphql/query/SEARCH_SUBGROUPS";
 import { button, row } from "../../../lib/util/component";
 import { displayName } from "../../../lib/util/displayName";
 import { formatCard } from "../../../lib/util/formatting/format";
-import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
+import { Autocomplete, Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 
 export const run: Run = async ({ interaction, user, options }) => {
@@ -116,7 +117,7 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
   return interaction.acknowledge(choices);
 };
 
-export default new SlashCommand("inventory")
+export default slashCommand("inventory")
   .desc("shows you a list of your cards")
   .option({
     type: CONSTANTS.OPTION_TYPE.STRING,

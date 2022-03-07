@@ -1,3 +1,4 @@
+import { slashCommand } from "../../lib/command";
 import { CONSTANTS } from "../../lib/constants";
 import { setUserTitle } from "../../lib/graphql/mutation/SET_USER_TITLE";
 import { getTitle } from "../../lib/graphql/query/GET_TITLE";
@@ -7,7 +8,7 @@ import { searchTitles } from "../../lib/graphql/query/SEARCH_TITLES";
 import { displayName } from "../../lib/util/displayName";
 import { emoji } from "../../lib/util/formatting/emoji";
 import { strong } from "../../lib/util/formatting/strong";
-import { Autocomplete, Run, SlashCommand } from "../../struct/command";
+import { Autocomplete, Run } from "../../struct/command";
 import { Embed, ErrorEmbed } from "../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
@@ -124,7 +125,7 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
   return await interaction.acknowledge([]);
 };
 
-export default new SlashCommand("title")
+export default slashCommand("title")
   .desc("shows info about a title")
   .run(run)
   .autocomplete(autocomplete)

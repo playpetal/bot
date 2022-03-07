@@ -1,11 +1,12 @@
 import { ApolloError } from "@apollo/client/core";
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { gift } from "../../../lib/graphql/mutation/game/economy/GIFT";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { displayName } from "../../../lib/util/displayName";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
-import { Run, SlashCommand } from "../../../struct/command";
+import { Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
@@ -76,7 +77,7 @@ const run: Run = async ({ interaction, options, user }) => {
   }
 };
 
-export default new SlashCommand("gift")
+export default slashCommand("gift")
   .desc("gift cards or petals to another player!")
   .option({
     type: CONSTANTS.OPTION_TYPE.USER,

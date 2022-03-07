@@ -1,10 +1,10 @@
-import { SlashCommandOption } from "petal";
+import { slashCommand } from "../../lib/command";
 import { CONSTANTS } from "../../lib/constants";
 import { createAccount } from "../../lib/graphql/mutation/CREATE_ACCOUNT";
 import { getUser } from "../../lib/graphql/query/GET_USER";
 import { getUserPartial } from "../../lib/graphql/query/GET_USER_PARTIAL";
 import { emoji } from "../../lib/util/formatting/emoji";
-import { Run, SlashCommand } from "../../struct/command";
+import { Run } from "../../struct/command";
 import { Embed } from "../../struct/embed";
 import { BotError } from "../../struct/error";
 
@@ -43,7 +43,7 @@ const run: Run = async function ({ interaction, options }) {
   await interaction.createMessage({ embeds: [embed] });
 };
 
-export default new SlashCommand("register")
+export default slashCommand("register")
   .desc("sign up with this command to start playing petal!")
   .run(run)
   .option({

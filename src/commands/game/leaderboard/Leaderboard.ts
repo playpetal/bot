@@ -1,3 +1,4 @@
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { getGTSRewardLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_GTS_REWARD_LEADERBOARD";
 import { getGTSTimeLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_GTS_TIME_LEADERBOARD";
@@ -6,7 +7,7 @@ import { getWordsTimeLeaderboard } from "../../../lib/graphql/query/game/leaderb
 import { displayName } from "../../../lib/util/displayName";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { strong } from "../../../lib/util/formatting/strong";
-import { Run, SlashCommand } from "../../../struct/command";
+import { Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 
 function render(entries: string[]): string {
@@ -114,7 +115,7 @@ const run: Run = async function ({ interaction, user, options }) {
   return await interaction.createMessage({ embeds: [embed] });
 };
 
-export default new SlashCommand("leaderboard")
+export default slashCommand("leaderboard")
   .desc("views a leaderboard")
   .option({
     type: CONSTANTS.OPTION_TYPE.SUBCOMMAND_GROUP,

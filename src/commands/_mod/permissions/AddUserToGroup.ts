@@ -1,8 +1,9 @@
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { assignUserGroup } from "../../../lib/graphql/mutation/ASSIGN_USER_GROUP";
 import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { getUserGroups } from "../../../lib/graphql/query/GET_USER_GROUPS";
-import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
+import { Autocomplete, Run } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, options }) => {
@@ -76,7 +77,7 @@ const autocomplete: Autocomplete = async ({ interaction }) => {
   await interaction.acknowledge(choices);
 };
 
-export default new SlashCommand("addusertogroup")
+export default slashCommand("addusertogroup")
   .desc("adds a user to a user group")
   .run(run)
   .autocomplete(autocomplete)

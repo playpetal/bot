@@ -1,4 +1,5 @@
 import { WordsData } from "petal";
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { MinigameError } from "../../../lib/error/minigame-error";
 import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
@@ -15,7 +16,7 @@ import {
 import { getWordsEmbed } from "../../../lib/minigame/words";
 import { button, row } from "../../../lib/util/component";
 import { getMinigameRewardComponents } from "../../../lib/util/component/minigame";
-import { Run, SlashCommand } from "../../../struct/command";
+import { Run } from "../../../struct/command";
 
 const run: Run = async ({ interaction, user, options }) => {
   const subcommand = options.getSubcommand()!;
@@ -121,7 +122,7 @@ const run: Run = async ({ interaction, user, options }) => {
   }
 };
 
-export default new SlashCommand("petle")
+export default slashCommand("petle")
   .desc("word game")
   .option({
     type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,

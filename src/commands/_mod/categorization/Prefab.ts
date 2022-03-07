@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Character, Group, Maybe, Prefab, Subgroup } from "petal";
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { updatePrefab } from "../../../lib/graphql/mutation/categorization/prefab/UPDATE_PREFAB";
 import { createPrefab } from "../../../lib/graphql/mutation/CREATE_PREFAB";
@@ -13,7 +14,7 @@ import { searchGroups } from "../../../lib/graphql/query/SEARCH_GROUPS";
 import { searchPrefabs } from "../../../lib/graphql/query/SEARCH_PREFABS";
 import { searchSubgroups } from "../../../lib/graphql/query/SEARCH_SUBGROUPS";
 import { uploadImage } from "../../../lib/img";
-import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
+import { Autocomplete, Run } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, options, user }) => {
@@ -250,7 +251,7 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
   return interaction.acknowledge(choices);
 };
 
-export default new SlashCommand("prefab")
+export default slashCommand("prefab")
   .run(run)
   .autocomplete(autocomplete)
   .option({

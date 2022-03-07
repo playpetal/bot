@@ -1,10 +1,11 @@
 import { Gender } from "petal";
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { createCharacter } from "../../../lib/graphql/mutation/CREATE_CHARACTER";
 import { updateCharacter } from "../../../lib/graphql/mutation/UPDATE_CHARACTER";
 import { getCharacter } from "../../../lib/graphql/query/GET_CHARACTER";
 import { searchCharacters } from "../../../lib/graphql/query/SEARCH_CHARACTERS";
-import { Autocomplete, Run, SlashCommand } from "../../../struct/command";
+import { Autocomplete, Run } from "../../../struct/command";
 import { ErrorEmbed, Embed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
@@ -141,7 +142,7 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
   return interaction.acknowledge(choices);
 };
 
-export default new SlashCommand("character")
+export default slashCommand("character")
   .run(run)
   .autocomplete(autocomplete)
   .option({

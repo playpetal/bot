@@ -1,8 +1,9 @@
+import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { createRelease } from "../../../lib/graphql/mutation/categorization/release/CREATE_RELEASE";
 import { updateRelease } from "../../../lib/graphql/mutation/categorization/release/UPDATE_RELEASE";
 import { getRelease } from "../../../lib/graphql/query/categorization/release/GET_RELEASE";
-import { Run, SlashCommand } from "../../../struct/command";
+import { Run } from "../../../struct/command";
 import { Embed, ErrorEmbed } from "../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
@@ -48,7 +49,7 @@ const run: Run = async ({ interaction, user, options }) => {
   }
 };
 
-export default new SlashCommand("release")
+export default slashCommand("release")
   .run(run)
   .option({
     type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
