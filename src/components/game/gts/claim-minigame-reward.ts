@@ -47,8 +47,6 @@ const run: RunComponent = async function ({ interaction, user }) {
   if (!isCorrect)
     throw new BotError("you can't claim rewards for a game you didn't win!");
 
-  logMinigame(minigame);
-
   const embed = new Embed().setColor("#3BA55D");
   let image: Buffer | undefined;
 
