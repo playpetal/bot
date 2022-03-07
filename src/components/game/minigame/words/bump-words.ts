@@ -4,6 +4,7 @@ import { canClaimRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_RE
 import { getUser } from "../../../../lib/graphql/query/GET_USER";
 import { getMinigame, setMinigame } from "../../../../lib/minigame";
 import { getWordsEmbed } from "../../../../lib/minigame/words";
+import { button, row } from "../../../../lib/util/component";
 import { getMinigameRewardComponents } from "../../../../lib/util/component/minigame";
 import { Component, RunComponent } from "../../../../struct/component";
 import { BotError } from "../../../../struct/error";
@@ -40,6 +41,16 @@ const run: RunComponent = async function ({ interaction, user }) {
             user.id,
             (await canClaimPremiumRewards(interaction.member!.id)) > 0
           )
+        : data.guesses.length < 6
+        ? [
+            row(
+              button({
+                customId: `cancel-words?${user.id}`,
+                style: "red",
+                label: "cancel",
+              })
+            ),
+          ]
         : [],
   });
 

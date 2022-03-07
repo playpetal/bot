@@ -28,6 +28,11 @@ export const MinigameError = {
             customId: `bump-words?${user.id}`,
             style: "gray",
             label: "bump game",
+          }),
+          button({
+            customId: `cancel-words?${user.id}`,
+            style: "red",
+            label: "cancel game",
           })
         ),
       ]

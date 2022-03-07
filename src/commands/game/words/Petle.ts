@@ -12,6 +12,7 @@ import {
   setMinigame,
 } from "../../../lib/minigame";
 import { getWordsEmbed } from "../../../lib/minigame/words";
+import { button, row } from "../../../lib/util/component";
 import { getMinigameRewardComponents } from "../../../lib/util/component/minigame";
 import { Run, SlashCommand } from "../../../struct/command";
 
@@ -39,6 +40,15 @@ const run: Run = async ({ interaction, user, options }) => {
 
     const message = await interaction.editOriginalMessage({
       embeds: [getWordsEmbed(data, user, rewardsRemaining)],
+      components: [
+        row(
+          button({
+            customId: `cancel-words?${user.id}`,
+            style: "red",
+            label: "cancel",
+          })
+        ),
+      ],
     });
 
     await setMinigame<"WORDS">(user, data, {
@@ -89,6 +99,16 @@ const run: Run = async ({ interaction, user, options }) => {
               user.id,
               (await canClaimPremiumRewards(interaction.member!.id)) > 0
             )
+          : data.guesses.length < 6
+          ? [
+              row(
+                button({
+                  customId: `cancel-words?${user.id}`,
+                  style: "red",
+                  label: "cancel",
+                })
+              ),
+            ]
           : [],
     });
 
