@@ -7,7 +7,7 @@ export const MinigameError = {
     "**you're already playing something!**\nfinish your current minigame first 😒"
   ),
   AlreadyPlayingGTS: new BotError(
-    "**you're already guessing a song!**\nyou can use **`/guess`** to guess."
+    "**you're already guessing a song!**\nyou can use **`/song guess`** to guess."
   ),
   AlreadyPlayingWords: ({
     message,
