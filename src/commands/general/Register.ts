@@ -50,7 +50,8 @@ export default new SlashCommand("register")
   .run(run)
   .option({
     name: "username",
-    description: "your desired username",
+    description:
+      "your desired username. does not have to be your discord username!",
     type: "string",
     required: true,
   } as SlashCommandOption<"string">);
