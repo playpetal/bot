@@ -4,7 +4,7 @@ import { canClaimPremiumRewards } from "../../../lib/graphql/query/game/CAN_CLAI
 import { canClaimRewards } from "../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getWord } from "../../../lib/graphql/query/game/GET_WORD";
 import { isWordValid } from "../../../lib/graphql/query/game/minigame/words/IS_WORD_VALID";
-import { logMinigame } from "../../../lib/logger/minigame";
+import { logMinigame, logMissingWord } from "../../../lib/logger/minigame";
 import {
   destroyMinigame,
   getMinigame,
@@ -69,7 +69,11 @@ const run: Run = async ({ interaction, user, options }) => {
     if (data.guesses.length > 6) throw MinigameError.MaxWordsGuessed;
 
     const isValid = await isWordValid(guess);
-    if (!isValid) throw MinigameError.WordNotValid;
+
+    if (!isValid) {
+      if (guess.length === 5) logMissingWord(guess);
+      throw MinigameError.WordNotValid;
+    }
 
     if (data.guesses.includes(guess)) throw MinigameError.WordAlreadyGuessed;
 
