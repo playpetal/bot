@@ -184,10 +184,12 @@ const run: Run = async function ({ interaction, user, options }) {
 
     const answer = options.getOption<string>("guess")!;
 
-    const title = data.song.title.toLowerCase().replace(/[^a-zA-Z0-9]/gm, "");
+    const title = data.song.title
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9]|and/gm, "");
     const groupTitle = `${data.song.group || ""}${data.song.title}`
       .toLowerCase()
-      .replace(/[^a-zA-Z0-9]/gm, "");
+      .replace(/[^a-zA-Z0-9]|and/gm, "");
 
     const match = findBestMatch(
       answer.toLowerCase().replace(/[^a-zA-Z0-9]/gm, ""),
