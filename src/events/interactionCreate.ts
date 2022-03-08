@@ -56,8 +56,6 @@ const run = async function (interaction: UnknownInteraction) {
     });
   }
 
-  if (user) dd.unique(`petal.traffic.online_users`, user.id);
-
   /* Slash Commands */
   if (interaction instanceof CommandInteraction) {
     const command = bot.findCommand(interaction.data.name);
