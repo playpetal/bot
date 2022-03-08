@@ -1,10 +1,10 @@
 import { GTSData, WordsData } from "petal";
+import { MinigameError } from "../../../lib/error/minigame-error";
 import { claimMinigameCardReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_CARD";
 import { claimMinigameLilyReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_LILY";
 import { claimMinigamePetalReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
 import { completeGts } from "../../../lib/graphql/mutation/game/minigame/gts/COMPLETE_GTS";
 import { completeWords } from "../../../lib/graphql/mutation/game/minigame/words/COMPLETE_WORDS";
-import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { getCardImage } from "../../../lib/img";
 import { logMinigame } from "../../../lib/logger/minigame";
 import { destroyMinigame, getMinigame } from "../../../lib/minigame";
@@ -13,7 +13,6 @@ import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import { Component, RunComponent } from "../../../struct/component";
 import { Embed } from "../../../struct/embed";
-import { BotError } from "../../../struct/error";
 
 const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, options] = interaction.data.custom_id.split("?");
@@ -22,14 +21,11 @@ const run: RunComponent = async function ({ interaction, user }) {
   const [_accountId, reward] = options.split("&");
   const accountId = parseInt(_accountId, 10);
 
+  if (accountId !== user.id) throw MinigameError.NotOwnerOfMinigame;
+
   const minigame = await getMinigame(user);
 
-  if (!minigame) throw new BotError("this game doesn't exist!");
-
-  const account = await getUser({ id: accountId });
-
-  if (!account || user.id !== account.id)
-    throw new BotError("that's not your game!");
+  if (!minigame) throw MinigameError.InvalidMinigame;
 
   const data = minigame.data;
   let isCorrect = false;
@@ -46,8 +42,7 @@ const run: RunComponent = async function ({ interaction, user }) {
 
   logMinigame(minigame);
 
-  if (!isCorrect)
-    throw new BotError("you can't claim rewards for a game you didn't win!");
+  if (!isCorrect) throw MinigameError.InvalidMinigame;
 
   const embed = new Embed().setColor("#3BA55D");
   let image: Buffer | undefined;
@@ -61,7 +56,7 @@ const run: RunComponent = async function ({ interaction, user }) {
     } (${(elapsed! / 1000).toFixed(2)}s)!**`;
 
     await completeGts(
-      account.discordId,
+      user.discordId,
       guesses,
       elapsed!,
       reward.toUpperCase() as "CARD" | "PETAL" | "LILY"
@@ -76,7 +71,7 @@ const run: RunComponent = async function ({ interaction, user }) {
     } (${(elapsed! / 1000).toFixed(2)}s)!**`;
 
     await completeWords(
-      account.discordId,
+      user.discordId,
       guesses.length,
       elapsed!,
       reward.toUpperCase() as "CARD" | "PETAL" | "LILY"
@@ -84,20 +79,20 @@ const run: RunComponent = async function ({ interaction, user }) {
   }
 
   if (reward === "petal") {
-    await claimMinigamePetalReward(account.discordId);
+    await claimMinigamePetalReward(user.discordId);
 
     desc += `\nyou were rewarded ${emoji.petals} **5**!`;
   } else if (reward === "card") {
-    const [card] = await claimMinigameCardReward(account.discordId);
+    const [card] = await claimMinigameCardReward(user.discordId);
 
     desc += `\nyou received ${formatCard(card)}!`;
     image = await getCardImage(card);
     embed.setThumbnail(`attachment://card.png`);
   } else if (reward === "lily") {
-    await claimMinigameLilyReward(account.discordId);
+    await claimMinigameLilyReward(user.discordId);
 
     desc += `\nyou were rewarded ${emoji.lily} **1**!`;
-  } else throw new BotError("there is no reward associated with the game :(");
+  }
 
   embed.setDescription(desc);
 
