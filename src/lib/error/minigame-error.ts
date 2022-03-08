@@ -37,11 +37,17 @@ export const MinigameError = {
         ),
       ]
     ),
+  InvalidMinigame: new BotError(
+    `**that minigame doesn't exist!**\neither you already claimed rewards, or an error occurred.`
+  ),
   MaxWordsGuessed: new BotError(
     "**you've guessed six words already!**\nyou can't guess any more."
   ),
   NoAvailableSongs: new BotError(
     "there are no available songs 😔 try again later!"
+  ),
+  NotOwnerOfMinigame: new BotError(
+    `**that game isn't yours!**\nyou can't claim rewards for someone else's minigame.`
   ),
   NotPlayingGTS: new BotError(
     "**you're not playing!**\nuse **`/song`** to start a game."
