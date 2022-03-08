@@ -20,8 +20,11 @@ import { BotError } from "../struct/error";
 import { logger } from "../lib/logger";
 import { logCommandError, logComponentError } from "../lib/logger/error";
 import { CONSTANTS } from "../lib/constants";
+import { dd } from "../lib/statsd";
 
 const run = async function (interaction: UnknownInteraction) {
+  dd.timing(`discord.interaction.intake`, Date.now() - interaction.createdAt);
+
   if (!interaction.member) {
     return interaction.createMessage({
       embeds: [
@@ -52,6 +55,8 @@ const run = async function (interaction: UnknownInteraction) {
       flags: 64,
     });
   }
+
+  if (user) dd.unique(`petal.traffic.online_users`, user.id);
 
   /* Slash Commands */
   if (interaction instanceof CommandInteraction) {

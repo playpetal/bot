@@ -3,6 +3,7 @@ import { CONSTANTS } from "../../lib/constants";
 import { createAccount } from "../../lib/graphql/mutation/CREATE_ACCOUNT";
 import { getUser } from "../../lib/graphql/query/GET_USER";
 import { getUserPartial } from "../../lib/graphql/query/GET_USER_PARTIAL";
+import { dd } from "../../lib/statsd";
 import { emoji } from "../../lib/util/formatting/emoji";
 import { Run } from "../../struct/command";
 import { Embed } from "../../struct/embed";
@@ -34,6 +35,8 @@ const run: Run = async function ({ interaction, options }) {
     );
 
   const account = await createAccount(id, username);
+
+  dd.increment(`petal.account.register`);
 
   const embed = new Embed().setDescription(
     `${emoji.user} **account created!** welcome to petal, **${account.username}**!` +

@@ -1,11 +1,13 @@
 import axios from "axios";
 import { Card } from "petal";
 import { logger } from "../logger";
+import { dd } from "../statsd";
 
 export async function getCardImage(card: Card): Promise<Buffer> {
   const hash = await getHash(card.prefab.id);
 
   try {
+    const start = Date.now();
     const { data } = (await axios.post(`${process.env.ONI_URL!}/card`, [
       {
         frame: card.hasFrame
@@ -19,6 +21,7 @@ export async function getCardImage(card: Card): Promise<Buffer> {
       data: { card: string };
     };
 
+    dd.timing("oni.image.response", Date.now() - start);
     return Buffer.from(data.card, "base64");
   } catch (e) {
     logger.error(e);
@@ -27,12 +30,14 @@ export async function getCardImage(card: Card): Promise<Buffer> {
 }
 
 export async function getHash(number: number): Promise<string> {
+  const start = Date.now();
   const {
     data: { hash },
   } = (await axios.get(`${process.env.ONI_URL!}/hash`, {
     headers: { Authorization: process.env.ONI_SHARED_SECRET! },
     data: { id: number },
   })) as { data: { hash: string } };
+  dd.timing("oni.hash.response", Date.now() - start);
 
   return hash;
 }

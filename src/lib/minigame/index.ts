@@ -17,8 +17,10 @@ export async function setMinigame<T extends MinigameType>(
     guild,
   }: { message: string; channel: string; guild: string }
 ): Promise<Minigame<T>> {
+  const type = isGTS(data) ? "GTS" : "WORDS";
+
   const minigameObject: UnknownMinigame = {
-    type: isGTS(data) ? "GTS" : "WORDS",
+    type,
     playerId: typeof user === "number" ? user : user.id,
     channel,
     message,

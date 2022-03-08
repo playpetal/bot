@@ -14,6 +14,7 @@ import {
   setMinigame,
 } from "../../../lib/minigame";
 import { getWordsEmbed } from "../../../lib/minigame/words";
+import { dd } from "../../../lib/statsd";
 import { button, row } from "../../../lib/util/component";
 import { getMinigameRewardComponents } from "../../../lib/util/component/minigame";
 import { Run } from "../../../struct/command";
@@ -58,6 +59,9 @@ const run: Run = async ({ interaction, user, options }) => {
       channel: message.channel.id,
       guild: interaction.guildID!,
     });
+
+    dd.increment(`petal.minigame.words.started`);
+
     return;
   }
 
@@ -88,7 +92,10 @@ const run: Run = async ({ interaction, user, options }) => {
 
     const rewardsRemaining = await canClaimRewards(interaction.member!.id);
 
-    if (isFinished) data.elapsed = Date.now() - data.startedAt;
+    if (isFinished) {
+      data.elapsed = Date.now() - data.startedAt;
+      dd.increment(`petal.minigame.words.completed`);
+    }
 
     if ((isFinished && !correct) || (isFinished && rewardsRemaining === 0)) {
       await destroyMinigame(user);

@@ -23,6 +23,7 @@ import { Embed } from "../../../struct/embed";
 import { findBestMatch } from "string-similarity";
 import { CONSTANTS } from "../../../lib/constants";
 import { slashCommand } from "../../../lib/command";
+import { dd } from "../../../lib/statsd";
 
 const run: Run = async function ({ interaction, user, options }) {
   const subcommand = options.getSubcommand()!;
@@ -119,6 +120,8 @@ const run: Run = async function ({ interaction, user, options }) {
           guild: message.guildID!,
         }
       );
+
+      dd.increment(`petal.minigame.gts.started`);
 
       const interval = setInterval(async () => {
         const game = await getMinigame<"GTS">(user);
@@ -256,6 +259,8 @@ async function handleGTSEnd(
       components: [],
     });
   }
+
+  dd.increment(`petal.minigame.${minigame.type.toLowerCase()}.completed`);
 
   const embed = new Embed().setColor("#3BA55D");
 

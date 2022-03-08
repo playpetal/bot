@@ -3,6 +3,7 @@ import { PartialUser } from "petal";
 import { logger } from "..";
 import { SlashCommand } from "../../../struct/command";
 import { Component } from "../../../struct/component";
+import { dd } from "../../statsd";
 
 export function logCommandError(
   interaction: CommandInteraction,
@@ -10,6 +11,7 @@ export function logCommandError(
   command: SlashCommand,
   error: unknown
 ): void {
+  dd.increment(`petal.error.command`);
   logger.error({
     command: command.name,
     options: interaction.data.options,
@@ -28,6 +30,7 @@ export function logComponentError(
   component: Component,
   error: unknown
 ): void {
+  dd.increment(`petal.error.component`);
   logger.error({
     component: component.customId,
     parameters: interaction.data.custom_id.split("?")[1],
