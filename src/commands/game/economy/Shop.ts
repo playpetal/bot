@@ -17,7 +17,7 @@ const run: Run = async function run({ interaction, user, options }) {
   if (subcommand.name === "view") {
     if (products.length === 0) {
       const embed = new Embed().setDescription(
-        `**there are no products available at the moment!**\ncheck back later, and join https://discord.gg/petal for updates.`
+        `**there are no items available at the moment!**\ncheck back later, and join https://discord.gg/petal for updates.`
       );
 
       await interaction.createMessage({ embeds: [embed] });
@@ -98,7 +98,7 @@ const run: Run = async function run({ interaction, user, options }) {
 };
 
 export default slashCommand("shop")
-  .desc("support petal by purchasing sprouts!")
+  .desc("support petal!")
   .run(run)
   .option({
     type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
@@ -108,7 +108,7 @@ export default slashCommand("shop")
   .option({
     type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "buy",
-    description: "purchase",
+    description: "purchase an item!",
     options: [
       {
         type: CONSTANTS.OPTION_TYPE.INTEGER,
@@ -118,5 +118,4 @@ export default slashCommand("shop")
       },
     ],
     ephemeral: true,
-  })
-  .modOnly(true);
+  });
