@@ -219,4 +219,21 @@ declare module "petal" {
     elapsed?: number;
     startedAt: number;
   };
+
+  export type Product = {
+    id: number;
+    name: string;
+    available: boolean;
+    price: number;
+  };
+
+  export type Payment = {
+    id: number;
+    accountId: number;
+    cost: number;
+    paymentId: string;
+    productId: string;
+    success: boolean;
+    url: string;
+  };
 }
