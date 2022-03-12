@@ -9,6 +9,7 @@ const query = gql`
         title
         description
       }
+      accountId
     }
   }
 `;
@@ -24,6 +25,7 @@ export async function getUserTitles(accountId: number, search?: string) {
         title: string;
         description: string | null;
       };
+      accountId: number;
     }[];
   }>;
 

@@ -7,6 +7,7 @@ const SEARCH_TITLES = gql`
       id
       title
       description
+      ownedCount
     }
   }
 `;
@@ -20,6 +21,7 @@ export async function searchTitles(search: string) {
       id: number;
       title: string;
       description: string;
+      ownedCount: number;
     }[];
   }>;
 

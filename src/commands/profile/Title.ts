@@ -1,29 +1,27 @@
+import { AutocompleteChoice } from "petal";
 import { slashCommand } from "../../lib/command";
 import { CONSTANTS } from "../../lib/constants";
+import { TitleError } from "../../lib/error/title-error";
 import { setUserTitle } from "../../lib/graphql/mutation/SET_USER_TITLE";
-import { getTitle } from "../../lib/graphql/query/GET_TITLE";
-import { getUserTitle } from "../../lib/graphql/query/GET_USER_TITLE";
 import { getUserTitles } from "../../lib/graphql/query/GET_USER_TITLES";
 import { searchTitles } from "../../lib/graphql/query/SEARCH_TITLES";
 import { displayName } from "../../lib/util/displayName";
 import { emoji } from "../../lib/util/formatting/emoji";
 import { strong } from "../../lib/util/formatting/strong";
 import { Autocomplete, Run } from "../../struct/command";
-import { Embed, ErrorEmbed } from "../../struct/embed";
+import { Embed } from "../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {
   const subcommand = options.getSubcommand()!;
 
   if (subcommand.name === "view") {
-    const titleIdStr = options.getOption<string>("title")!;
-    const titleId = parseInt(titleIdStr, 10);
-    const title = await getTitle({ id: titleId });
+    const titleName = options
+      .getOption<string>("title")!
+      .replace("<username>", "");
 
-    if (!title) {
-      return await interaction.createMessage({
-        embeds: [new ErrorEmbed("i couldn't find that title :(")],
-      });
-    }
+    const title = (await searchTitles(titleName))[0];
+
+    if (!title) throw TitleError.TitleNotFound;
 
     const embed = new Embed().setDescription(
       `${emoji.title} ${displayName({
@@ -47,7 +45,9 @@ const run: Run = async ({ interaction, user, options }) => {
     );
 
     const embed = new Embed().setDescription(
-      `${emoji.user} ${displayName(user)}'s titles\n\n` +
+      `viewing ${displayName(user)}'s titles *(${
+        titles.length
+      } owned)...*\n\n` +
         (titles.length === 0
           ? "you don't have any titles :("
           : formatted.join("\n"))
@@ -55,25 +55,13 @@ const run: Run = async ({ interaction, user, options }) => {
 
     await interaction.createMessage({ embeds: [embed] });
   } else if (subcommand.name === "use") {
-    const titleIdStr = options.getOption<string>("title")!;
-    const titleId = parseInt(titleIdStr, 10);
+    const titleName = options
+      .getOption<string>("title")!
+      .replace("<username>", "");
 
-    if (isNaN(titleId))
-      return await interaction.createMessage({
-        embeds: [new ErrorEmbed("please select a title from the dropdown!")],
-      });
+    const title = (await getUserTitles(user.id, titleName))[0];
 
-    const title = await getUserTitle(titleId);
-
-    if (!title)
-      return await interaction.createMessage({
-        embeds: [new ErrorEmbed("i couldn't find that title :(")],
-      });
-
-    if (title.account.id !== user.id)
-      return await interaction.createMessage({
-        embeds: [new ErrorEmbed("you don't own that title!")],
-      });
+    if (!title) throw TitleError.TitleNotFound;
 
     const _user = await setUserTitle(user.discordId, title.id);
 
@@ -90,39 +78,38 @@ const run: Run = async ({ interaction, user, options }) => {
 };
 
 const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
-  const subcommand = options.getFocused()!;
+  const subcommand = options.getSubcommand()!;
+  let choices: AutocompleteChoice[] = [];
 
   if (subcommand.name === "view") {
-    const search = subcommand.options![0].value as string;
+    const search = options.getOption<string>("title")!;
     const titles = await searchTitles(search);
 
-    const choices = titles.map((t) => {
+    choices = titles.map(({ title }) => {
       {
         return {
-          name: t.title.replace("%u", user.username),
-          value: t.id.toString(),
+          name: title.replace("%u", "<username>"),
+          value: title.replace("%u", "").trim(),
         };
       }
     });
 
     return await interaction.acknowledge(choices);
   } else if (subcommand.name == "use") {
-    const search = subcommand.options![0].value as string;
+    const search = options.getOption<string>("title")!;
     const titles = await getUserTitles(user.id, search);
 
-    const choices = titles.map((t) => {
+    choices = titles.map(({ title: { title } }) => {
       {
         return {
-          name: t.title.title.replace("%u", user.username),
-          value: t.id.toString(),
+          name: title.replace("%u", "<username>"),
+          value: title.replace("%u", "").trim(),
         };
       }
     });
-
-    return await interaction.acknowledge(choices);
   }
 
-  return await interaction.acknowledge([]);
+  return await interaction.acknowledge(choices);
 };
 
 export default slashCommand("title")
