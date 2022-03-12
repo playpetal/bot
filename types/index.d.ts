@@ -255,4 +255,6 @@ declare module "petal" {
 
   export type InventoryOrderOption = "ascending" | "descending";
   export type InventoryOrder = "ASC" | "DESC";
+
+  export type AutocompleteChoice = { name: string; value: string };
 }
