@@ -71,7 +71,7 @@ const run: Run = async function run({ interaction, user, options }) {
       const transaction = await getPayment(user.discordId, payment.paymentId);
 
       if (transaction.success) {
-        const serverTime = (product.price / (68 / 730)).toFixed(2);
+        const serverTime = (product.price / (83 / 730)).toFixed(2);
 
         const embed = new Embed().setDescription(
           `${emoji.bloom} **purchase complete!**\nyou purchased **${
