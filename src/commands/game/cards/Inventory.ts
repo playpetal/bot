@@ -8,6 +8,7 @@ import { searchGroups } from "../../../lib/graphql/query/SEARCH_GROUPS";
 import { searchSubgroups } from "../../../lib/graphql/query/SEARCH_SUBGROUPS";
 import { button, row } from "../../../lib/util/component";
 import { displayName } from "../../../lib/util/displayName";
+import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import {
   parseInventoryOrder,
@@ -47,9 +48,26 @@ export const run: Run = async ({ interaction, user, options }) => {
   const formattedCards = _cards.map((c) => formatCard(c));
 
   if (formattedCards.length === 0) {
-    const embed = new Embed().setDescription(
-      "**you don't have any cards!**\nget some cards first with **/roll** :)"
-    );
+    const hasFilters = Boolean(character || subgroup || group);
+
+    let desc = "";
+
+    if (hasFilters) {
+      desc = `**${
+        target.id === user.id ? "you have" : "that user has"
+      } no cards matching those filters!**\ntry using some different filters?`;
+    } else {
+      desc = `**${
+        target.id === user.id ? "you don't" : "that user doesn't"
+      } have any cards yet!**\n${
+        target.id === user.id ? "you" : "they"
+      } can earn ${emoji.petals} **petals** or ${
+        emoji.cards
+      } **cards** by playing minigames!`;
+    }
+
+    const embed = new Embed().setDescription(desc);
+
     return interaction.createMessage({ embeds: [embed] });
   }
 
