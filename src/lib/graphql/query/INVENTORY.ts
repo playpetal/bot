@@ -1,23 +1,25 @@
 import { gql } from "@apollo/client/core";
-import { Card } from "petal";
+import { Card, InventoryOrder, InventorySort } from "petal";
 import { graphql, GraphQLResponse } from "..";
 
 const query = gql`
   query Inventory(
-    $user: Int!
-    $next: Int
-    $prev: Int
+    $userId: Int!
+    $page: Int!
     $group: String
     $subgroup: String
     $character: String
+    $sort: InventorySort
+    $order: InventoryOrder
   ) {
     inventory(
-      user: $user
-      next: $next
-      prev: $prev
+      userId: $userId
+      page: $page
       group: $group
       subgroup: $subgroup
       character: $character
+      sort: $sort
+      order: $order
     ) {
       id
       prefab {
@@ -50,23 +52,24 @@ const query = gql`
 
 export async function inventory(
   userId: number,
+  page: number,
   {
-    next,
-    prev,
     character,
     subgroup,
     group,
+    sort,
+    order,
   }: {
-    next?: number;
-    prev?: number;
     character?: string;
     group?: string;
     subgroup?: string;
+    sort?: InventorySort;
+    order?: InventoryOrder;
   }
 ) {
   const { data } = (await graphql.query({
     query,
-    variables: { user: userId, next, prev, character, subgroup, group },
+    variables: { userId, page, character, subgroup, group, sort, order },
   })) as GraphQLResponse<{
     inventory: Card[];
   }>;

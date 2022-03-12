@@ -1,3 +1,4 @@
+import { InventoryOrder, InventorySort } from "petal";
 import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
 import { inventory } from "../lib/graphql/query/INVENTORY";
 import { inventoryPage } from "../lib/graphql/query/INVENTORY_PAGE";
@@ -9,23 +10,27 @@ import { Embed } from "../struct/embed";
 
 const run: RunComponent = async function ({ interaction }) {
   const [_customId, data] = interaction.data.custom_id.split("?");
-  const [action, _userId, _cursor, character, subgroup, group] =
+  const [_userId, _page, character, subgroup, group, _sort, _order] =
     data.split("&");
 
   const userId = parseInt(_userId, 10);
-  const cursor = parseInt(_cursor, 10);
-  const _cards = await inventory(userId, {
-    next: action === "next" ? cursor : undefined,
-    prev: action === "prev" ? cursor : undefined,
+  const page = parseInt(_page, 10);
+  const sort = (_sort as InventorySort | "") || undefined;
+  const order = (_order as InventoryOrder | "") || undefined;
+
+  console.log(sort, order);
+
+  const _cards = await inventory(userId, page, {
     character,
     subgroup,
     group,
+    sort,
+    order,
   });
 
-  if (action === "prev") _cards.reverse();
   const strCards = _cards.map((c) => formatCard(c));
 
-  const { current, max, cards } = await inventoryPage(userId, _cards[0].id, {
+  const { max, cards } = await inventoryPage(userId, {
     character,
     subgroup,
     group,
@@ -46,24 +51,26 @@ const run: RunComponent = async function ({ interaction }) {
     components: [
       row(
         button({
-          customId: `inv?prev&${userId}&${_cards[0].id}&${character}&${subgroup}&${group}`,
+          customId: `inv?${userId}&${
+            page - 1
+          }&${character}&${subgroup}&${group}&${sort || ""}&${order || ""}`,
           style: "blue",
           emoji: "862984408076255252",
-          disabled: current <= 1,
+          disabled: page <= 1,
         }),
         button({
           customId: "page",
           style: "gray",
-          label: `page ${current} of ${max}`,
+          label: `page ${page} of ${max}`,
           disabled: true,
         }),
         button({
-          customId: `inv?next&${userId}&${
-            _cards[_cards.length - 1].id
-          }&${character}&${subgroup}&${group}`,
+          customId: `inv?${userId}&${
+            page + 1
+          }&${character}&${subgroup}&${group}&${sort || ""}&${order || ""}`,
           style: "blue",
           emoji: "862984408339578880",
-          disabled: current >= max,
+          disabled: page >= max,
         })
       ),
     ],

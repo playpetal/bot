@@ -8,6 +8,10 @@ import { searchSubgroups } from "../../../lib/graphql/query/SEARCH_SUBGROUPS";
 import { button, row } from "../../../lib/util/component";
 import { displayName } from "../../../lib/util/displayName";
 import { formatCard } from "../../../lib/util/formatting/format";
+import {
+  parseInventoryOrder,
+  parseInventorySort,
+} from "../../../lib/util/options/parseInventoryOptions";
 import { Autocomplete, Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
 
@@ -15,8 +19,20 @@ export const run: Run = async ({ interaction, user, options }) => {
   const character = trimBirthday(options.getOption<string>("character"));
   const subgroup = trimBirthday(options.getOption<string>("subgroup"));
   const group = trimBirthday(options.getOption<string>("group"));
+  const sort = parseInventorySort(options);
+  const order = parseInventoryOrder(options);
 
-  const _cards = await inventory(user.id, { character, subgroup, group });
+  console.log(sort, order);
+
+  const page = 1;
+
+  const _cards = await inventory(user.id, page, {
+    character,
+    subgroup,
+    group,
+    sort,
+    order,
+  });
 
   const formattedCards = _cards.map((c) => formatCard(c));
 
@@ -27,7 +43,7 @@ export const run: Run = async ({ interaction, user, options }) => {
     return interaction.createMessage({ embeds: [embed] });
   }
 
-  const { current, max, cards } = await inventoryPage(user.id, 0, {
+  const { max, cards } = await inventoryPage(user.id, {
     character,
     subgroup,
     group,
@@ -48,23 +64,23 @@ export const run: Run = async ({ interaction, user, options }) => {
         ? [
             row(
               button({
-                customId: `inv?prev&${user.id}&${_cards[0].id}&${
-                  character || ""
-                }&${subgroup || ""}&${group || ""}`,
+                customId: `inv?${user.id}&${page - 1}&${character || ""}&${
+                  subgroup || ""
+                }&${group || ""}&${sort || ""}&${order || ""}`,
                 style: "blue",
                 emoji: "862984408076255252",
                 disabled: true,
               }),
               button({
                 customId: "page",
-                label: `page ${current} of ${max}`,
+                label: `page ${page} of ${max}`,
                 style: "gray",
                 disabled: true,
               }),
               button({
-                customId: `inv?next&${user.id}&${
-                  _cards[_cards.length - 1].id
-                }&${character || ""}&${subgroup || ""}&${group || ""}`,
+                customId: `inv?${user.id}&${page + 1}&${character || ""}&${
+                  subgroup || ""
+                }&${group || ""}&${sort || ""}&${order || ""}`,
                 style: "blue",
                 emoji: "862984408339578880",
               })
@@ -120,6 +136,11 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
 export default slashCommand("inventory")
   .desc("shows you a list of your cards")
   .option({
+    type: CONSTANTS.OPTION_TYPE.USER,
+    name: "user",
+    description: "the user whose inventory you'd like to view",
+  })
+  .option({
     type: CONSTANTS.OPTION_TYPE.STRING,
     name: "character",
     description: "show only this character",
@@ -136,6 +157,28 @@ export default slashCommand("inventory")
     name: "group",
     description: "show only this group",
     autocomplete: true,
+  })
+  .option({
+    type: CONSTANTS.OPTION_TYPE.STRING,
+    name: "sort",
+    description: "what property you want to sort your cards by",
+    choices: [
+      { name: "character", value: "character" },
+      { name: "code", value: "code" },
+      { name: "group", value: "group" },
+      { name: "issue", value: "issue" },
+      { name: "stage", value: "stage" },
+      { name: "subgroup", value: "subgroup" },
+    ],
+  })
+  .option({
+    type: CONSTANTS.OPTION_TYPE.STRING,
+    name: "order",
+    description: "the order you want to sort by (default is ascending)",
+    choices: [
+      { name: "ascending", value: "ascending" },
+      { name: "descending", value: "descending" },
+    ],
   })
   .run(run)
   .autocomplete(autocomplete);

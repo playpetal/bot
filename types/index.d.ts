@@ -236,4 +236,22 @@ declare module "petal" {
     success: boolean;
     url: string;
   };
+
+  export type InventorySortOption =
+    | "issue"
+    | "code"
+    | "group"
+    | "subgroup"
+    | "character"
+    | "stage";
+  export type InventorySort =
+    | "ISSUE"
+    | "CODE"
+    | "GROUP"
+    | "SUBGROUP"
+    | "CHARACTER"
+    | "STAGE";
+
+  export type InventoryOrderOption = "ascending" | "descending";
+  export type InventoryOrder = "ASC" | "DESC";
 }

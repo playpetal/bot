@@ -3,20 +3,17 @@ import { graphql, GraphQLResponse } from "..";
 
 const query = gql`
   query InventoryPage(
-    $cursor: Int!
     $userId: Int!
     $group: String
     $subgroup: String
     $character: String
   ) {
     inventoryPage(
-      cursor: $cursor
       user: $userId
       group: $group
       subgroup: $subgroup
       character: $character
     ) {
-      current
       max
       cards
     }
@@ -25,7 +22,6 @@ const query = gql`
 
 export async function inventoryPage(
   userId: number,
-  cursor: number,
   {
     character,
     subgroup,
@@ -38,9 +34,9 @@ export async function inventoryPage(
 ) {
   const { data } = (await graphql.query({
     query,
-    variables: { userId, cursor, character, subgroup, group },
+    variables: { userId, character, subgroup, group },
   })) as GraphQLResponse<{
-    inventoryPage: { current: number; max: number; cards: number };
+    inventoryPage: { max: number; cards: number };
   }>;
 
   return data.inventoryPage;
