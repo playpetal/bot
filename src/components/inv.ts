@@ -7,13 +7,18 @@ import { displayName } from "../lib/util/displayName";
 import { formatCard } from "../lib/util/formatting/format";
 import { Component, RunComponent } from "../struct/component";
 import { Embed } from "../struct/embed";
+import { BotError } from "../struct/error";
 
-const run: RunComponent = async function ({ interaction }) {
+const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, data] = interaction.data.custom_id.split("?");
   const [_userId, _page, character, subgroup, group, _sort, _order] =
     data.split("&");
 
   const userId = parseInt(_userId, 10);
+
+  if (user.id !== userId)
+    throw new BotError("**woah there!**\nthose buttons aren't for you.");
+
   const page = parseInt(_page, 10);
   const sort = (_sort as InventorySort | "") || undefined;
   const order = (_order as InventoryOrder | "") || undefined;
@@ -36,10 +41,10 @@ const run: RunComponent = async function ({ interaction }) {
     group,
   });
 
-  const user = (await getUserPartial({ id: userId }))!;
+  const target = (await getUserPartial({ id: userId }))!;
 
   const header = `viewing ${displayName(
-    user
+    target
   )}'s inventory **(${cards.toLocaleString()} cards)**...`;
 
   const embed = new Embed().setDescription(

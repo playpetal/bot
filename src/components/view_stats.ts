@@ -2,12 +2,17 @@ import { getStatsEmbed } from "../lib/embed/Stats";
 import { getUser } from "../lib/graphql/query/GET_USER";
 import { row, button } from "../lib/util/component";
 import { Component, RunComponent } from "../struct/component";
+import { BotError } from "../struct/error";
 
-const run: RunComponent = async function ({ interaction }) {
+const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, accountIdStr] = interaction.data.custom_id.split("?");
   if (!accountIdStr) return;
 
   const accountId = parseInt(accountIdStr);
+
+  if (user.id !== accountId)
+    throw new BotError("**woah there!**\nthose buttons aren't for you.");
+
   const account = await getUser({ id: accountId });
 
   if (!account) return;
