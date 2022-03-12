@@ -2,6 +2,7 @@ import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
 import { getGTSRewardLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_GTS_REWARD_LEADERBOARD";
 import { getGTSTimeLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_GTS_TIME_LEADERBOARD";
+import { getSupporterLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_SUPPORTER_LEADERBOARD";
 import { getWordsRewardLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_WORDS_REWARD_LEADERBOARD";
 import { getWordsTimeLeaderboard } from "../../../lib/graphql/query/game/leaderboard/GET_WORDS_TIME_LEADERBOARD";
 import { displayName } from "../../../lib/util/displayName";
@@ -22,25 +23,36 @@ function render(entries: string[]): string {
 }
 
 const run: Run = async function ({ interaction, user, options }) {
-  const subcommandGroup = options.getSubcommandGroup()!;
   const subcommand = options.getSubcommand()!;
 
   let header: string = `${emoji.bloom} **unknown leaderboard**`;
   let body: string = `there's nothing here...?!`;
 
-  if (subcommandGroup.name === "songs") {
-    header = `**leaderboard - guess the song**`;
+  if (subcommand.name === "supporters") {
+    header = `**leaderboard - top supporters**\n${emoji.bloom} top petal supporters (server time purchased)`;
 
-    if (subcommand.name === "time") {
+    const users = await getSupporterLeaderboard();
+    const formatted = users.map(
+      (u) => `${displayName(u.account)} [**${u.value}h**]`
+    );
+
+    body = render(formatted);
+  }
+
+  if (subcommand.name === "songs") {
+    header = `**leaderboard - guess the song**`;
+    const board = options.getOption<string>("board")!;
+
+    if (board === "time") {
       header += `\n${emoji.song} top 10 fastest guessers (average)`;
 
       const users = await getGTSTimeLeaderboard();
       const formatted = users.map(
-        (u) => `${displayName(u.account)} [**${(u.time / 1000).toFixed(2)}s**]`
+        (u) => `${displayName(u.account)} [**${(u.value / 1000).toFixed(2)}s**]`
       );
 
       body = render(formatted);
-    } else if (subcommand.name === "petals") {
+    } else if (board === "petals") {
       header += `\n${emoji.song} top 10 earners (petals)`;
 
       const users = await getGTSRewardLeaderboard("PETAL");
@@ -49,7 +61,7 @@ const run: Run = async function ({ interaction, user, options }) {
       );
 
       body = render(formatted);
-    } else if (subcommand.name === "lilies") {
+    } else if (board === "lilies") {
       header += `\n${emoji.song} top 10 earners (lilies)`;
 
       const users = await getGTSRewardLeaderboard("LILY");
@@ -58,7 +70,7 @@ const run: Run = async function ({ interaction, user, options }) {
       );
 
       body = render(formatted);
-    } else if (subcommand.name === "cards") {
+    } else if (board === "cards") {
       header += `\n${emoji.song} top 10 earners (cards)`;
 
       const users = await getGTSRewardLeaderboard("CARD");
@@ -68,19 +80,20 @@ const run: Run = async function ({ interaction, user, options }) {
 
       body = render(formatted);
     }
-  } else if (subcommandGroup.name === "petle") {
+  } else if (subcommand.name === "petle") {
     header = `**leaderboard - petle**\n${emoji.bloom} `;
+    const board = options.getOption<string>("board")!;
 
-    if (subcommand.name === "time") {
+    if (board === "time") {
       header += `top 10 fastest guessers (average)`;
 
       const users = await getWordsTimeLeaderboard();
       const formatted = users.map(
-        (u) => `${displayName(u.account)} [**${(u.time / 1000).toFixed(2)}s**]`
+        (u) => `${displayName(u.account)} [**${(u.value / 1000).toFixed(2)}s**]`
       );
 
       body = render(formatted);
-    } else if (subcommand.name === "petals") {
+    } else if (board === "petals") {
       header += `top 10 earners (petals)`;
 
       const users = await getWordsRewardLeaderboard("PETAL");
@@ -89,7 +102,7 @@ const run: Run = async function ({ interaction, user, options }) {
       );
 
       body = render(formatted);
-    } else if (subcommand.name === "lilies") {
+    } else if (board === "lilies") {
       header += `top 10 earners (lilies)`;
 
       const users = await getWordsRewardLeaderboard("LILY");
@@ -98,7 +111,7 @@ const run: Run = async function ({ interaction, user, options }) {
       );
 
       body = render(formatted);
-    } else if (subcommand.name === "cards") {
+    } else if (board === "cards") {
       header += `top 10 earners (cards)`;
 
       const users = await getWordsRewardLeaderboard("CARD");
@@ -111,70 +124,52 @@ const run: Run = async function ({ interaction, user, options }) {
   }
 
   const embed = new Embed().setDescription(`${header}\n\n${body}`);
-
   return await interaction.createMessage({ embeds: [embed] });
 };
 
 export default slashCommand("leaderboard")
   .desc("views a leaderboard")
   .option({
-    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND_GROUP,
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "songs",
-    description: "guess the song leaderboards",
+    description: "show leaderboards for 'guess the song'",
     options: [
       {
-        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-        name: "time",
-        description: "guess the song time leaderboards",
-      },
-      {
-        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-        name: "petals",
-        description:
-          "shows the players who have earned the most petals from GTS",
-      },
-      {
-        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-        name: "lilies",
-        description:
-          "shows the players who have earned the most lilies from GTS",
-      },
-      {
-        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-        name: "cards",
-        description:
-          "shows the players who have earned the most cards from GTS",
+        type: CONSTANTS.OPTION_TYPE.STRING,
+        name: "board",
+        description: "the leaderboard you want to view",
+        choices: [
+          { name: "time", value: "time" },
+          { name: "petals", value: "petals" },
+          { name: "lilies", value: "lilies" },
+          { name: "cards", value: "cards" },
+        ],
+        required: true,
       },
     ],
   })
   .option({
-    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND_GROUP,
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
     name: "petle",
-    description: "petle leaderboards",
+    description: "show leaderboards for 'petle'",
     options: [
       {
-        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-        name: "time",
-        description: "shows the players who finish petle games the fastest",
-      },
-      {
-        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-        name: "petals",
-        description:
-          "shows the players who have earned the most petals from petle",
-      },
-      {
-        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-        name: "lilies",
-        description:
-          "shows the players who have earned the most lilies from petle",
-      },
-      {
-        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-        name: "cards",
-        description:
-          "shows the players who have earned the most cards from petle",
+        type: CONSTANTS.OPTION_TYPE.STRING,
+        name: "board",
+        description: "the leaderboard you want to view",
+        choices: [
+          { name: "time", value: "time" },
+          { name: "petals", value: "petals" },
+          { name: "lilies", value: "lilies" },
+          { name: "cards", value: "cards" },
+        ],
+        required: true,
       },
     ],
+  })
+  .option({
+    type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
+    name: "supporters",
+    description: "shows a list of the top petal supporters!",
   })
   .run(run);

@@ -14,18 +14,18 @@ const query = gql`
           title
         }
       }
-      time
+      value
     }
   }
 `;
 
 export async function getWordsTimeLeaderboard(): Promise<
-  { account: PartialUser; time: number }[]
+  { account: PartialUser; value: number }[]
 > {
   const { data } = (await graphql.query({
     query,
   })) as GraphQLResponse<{
-    getWordsTimeLeaderboard: { account: PartialUser; time: number }[];
+    getWordsTimeLeaderboard: { account: PartialUser; value: number }[];
   }>;
 
   return data.getWordsTimeLeaderboard;

@@ -4,8 +4,8 @@ import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
 
 const query = gql`
-  query GetGTSTimeLeaderboard {
-    getGTSTimeLeaderboard {
+  query GetSupporterLeaderboard {
+    getSupporterLeaderboard {
       account {
         id
         username
@@ -19,14 +19,14 @@ const query = gql`
   }
 `;
 
-export async function getGTSTimeLeaderboard(): Promise<
+export async function getSupporterLeaderboard(): Promise<
   { account: PartialUser; value: number }[]
 > {
   const { data } = (await graphql.query({
     query,
   })) as GraphQLResponse<{
-    getGTSTimeLeaderboard: { account: PartialUser; value: number }[];
+    getSupporterLeaderboard: { account: PartialUser; value: number }[];
   }>;
 
-  return data.getGTSTimeLeaderboard;
+  return data.getSupporterLeaderboard;
 }
