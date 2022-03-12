@@ -2,7 +2,9 @@ import { Account } from "petal";
 import { Embed } from "../../struct/embed";
 import { getWordsStats } from "../graphql/query/game/minigame/words/GET_WORDS_STATS";
 import { getGTSStats } from "../graphql/query/GET_GTS_STATS";
+import { getSupporterTime } from "../graphql/query/GET_SUPPORTER_TIME";
 import { displayName } from "../util/displayName";
+import { FLAGS } from "../util/flags";
 import { emoji } from "../util/formatting/emoji";
 import { strong } from "../util/formatting/strong";
 
@@ -25,6 +27,7 @@ export async function getStatsEmbed(account: Account) {
 
   let gtsStats = "";
   let wordsStats = "";
+  let supporterStats = "";
 
   const gts = await getGTSStats(account.id);
 
@@ -128,6 +131,16 @@ export async function getStatsEmbed(account: Account) {
     }
   }
 
+  const publicSupporter = account.flags & FLAGS.PUBLIC_SUPPORTER;
+
+  if (publicSupporter) {
+    const supporterTime = await getSupporterTime(account);
+
+    if (supporterTime) {
+      supporterStats += `\n${emoji.bloom} paid for **${supporterTime}h** of server time`;
+    }
+  }
+
   if (accountStats)
     embed.addField({
       name: "account",
@@ -144,6 +157,9 @@ export async function getStatsEmbed(account: Account) {
 
   if (wordsStats)
     embed.addField({ name: "petle", value: wordsStats, inline: true });
+
+  if (supporterStats)
+    embed.addField({ name: "supporter", value: supporterStats, inline: true });
 
   return embed;
 }

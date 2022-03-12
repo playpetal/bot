@@ -87,6 +87,7 @@ declare module "petal" {
     id: number;
     discordId: string;
     username: string;
+    flags: number;
     title: Maybe<{ title: string }>;
     bio: Maybe<string>;
     currency: number;

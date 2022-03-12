@@ -8,6 +8,7 @@ const GET_USER = gql`
       id
       discordId
       username
+      flags
       createdAt
       bio
       currency
