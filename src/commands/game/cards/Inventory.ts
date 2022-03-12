@@ -1,5 +1,6 @@
 import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
+import { getUserPartial } from "../../../lib/graphql/query/GET_USER_PARTIAL";
 import { inventory } from "../../../lib/graphql/query/INVENTORY";
 import { inventoryPage } from "../../../lib/graphql/query/INVENTORY_PAGE";
 import { searchCharacters } from "../../../lib/graphql/query/SEARCH_CHARACTERS";
@@ -14,19 +15,28 @@ import {
 } from "../../../lib/util/options/parseInventoryOptions";
 import { Autocomplete, Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
+import { BotError } from "../../../struct/error";
 
 export const run: Run = async ({ interaction, user, options }) => {
   const character = trimBirthday(options.getOption<string>("character"));
   const subgroup = trimBirthday(options.getOption<string>("subgroup"));
   const group = trimBirthday(options.getOption<string>("group"));
+  const targetId = options.getOption<string>("user");
   const sort = parseInventorySort(options);
   const order = parseInventoryOrder(options);
 
-  console.log(sort, order);
+  let target = user;
+
+  if (targetId) {
+    const _target = await getUserPartial({ discordId: targetId });
+
+    if (!_target) throw new BotError("that user hasn't registered yet!");
+    target = _target;
+  }
 
   const page = 1;
 
-  const _cards = await inventory(user.id, page, {
+  const _cards = await inventory(target.id, page, {
     character,
     subgroup,
     group,
@@ -43,7 +53,7 @@ export const run: Run = async ({ interaction, user, options }) => {
     return interaction.createMessage({ embeds: [embed] });
   }
 
-  const { max, cards } = await inventoryPage(user.id, {
+  const { max, cards } = await inventoryPage(target.id, {
     character,
     subgroup,
     group,
@@ -51,7 +61,7 @@ export const run: Run = async ({ interaction, user, options }) => {
 
   const embed = new Embed().setDescription(
     `viewing ${displayName(
-      user
+      target
     )}'s inventory **(${cards.toLocaleString()} cards)**...\n\n ${formattedCards.join(
       "\n"
     )}`
@@ -64,7 +74,7 @@ export const run: Run = async ({ interaction, user, options }) => {
         ? [
             row(
               button({
-                customId: `inv?${user.id}&${page - 1}&${character || ""}&${
+                customId: `inv?${target.id}&${page - 1}&${character || ""}&${
                   subgroup || ""
                 }&${group || ""}&${sort || ""}&${order || ""}`,
                 style: "blue",
@@ -78,7 +88,7 @@ export const run: Run = async ({ interaction, user, options }) => {
                 disabled: true,
               }),
               button({
-                customId: `inv?${user.id}&${page + 1}&${character || ""}&${
+                customId: `inv?${target.id}&${page + 1}&${character || ""}&${
                   subgroup || ""
                 }&${group || ""}&${sort || ""}&${order || ""}`,
                 style: "blue",
