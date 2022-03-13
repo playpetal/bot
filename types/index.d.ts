@@ -182,6 +182,7 @@ declare module "petal" {
     id: number;
     title: string;
     group?: string;
+    soloist?: string;
     video?: string;
   };
 

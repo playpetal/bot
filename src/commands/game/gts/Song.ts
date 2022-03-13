@@ -239,6 +239,8 @@ async function handleGTSEnd(
     data: { correct, guesses, song, elapsed },
   } = minigame;
 
+  console.log(song);
+
   if (!correct) {
     await destroyMinigame(playerId);
 
@@ -251,7 +253,7 @@ async function handleGTSEnd(
                 ? "You ran out of guesses!"
                 : "You ran out of time!") +
               `\n\nYou just heard || ${emoji.song} **${song.title}** by ${
-                song.group || "a Soloist"
+                song.group || song.soloist || "an unknown artist"
               }||!`
           )
           .setColor("#F04747"),

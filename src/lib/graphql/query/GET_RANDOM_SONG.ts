@@ -9,6 +9,7 @@ const GET_RANDOM_SONG = gql`
       id
       title
       group
+      soloist
       video
     }
   }
