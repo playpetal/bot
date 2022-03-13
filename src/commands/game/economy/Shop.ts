@@ -5,6 +5,7 @@ import { CONSTANTS } from "../../../lib/constants";
 import { newTransaction } from "../../../lib/graphql/mutation/shop/NEW_TRANSACTION";
 import { getPayment } from "../../../lib/graphql/query/shop/GET_PAYMENT";
 import { getProducts } from "../../../lib/graphql/query/shop/GET_PRODUCTS";
+import { reachedPurchaseLimit } from "../../../lib/graphql/query/shop/REACHED_PURCHASE_LIMIT";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { Run } from "../../../struct/command";
 import { Embed } from "../../../struct/embed";
@@ -27,9 +28,18 @@ const run: Run = async function run({ interaction, user, options }) {
     let shop = `${emoji.bloom} **welcome to the shop!**\nyou can purchase items here and support petal's development!\n`;
 
     for (let product of products) {
-      shop += `\n\`/shop buy ${product.id}\` **${
+      const reachedLimit = await reachedPurchaseLimit(
+        user.discordId,
+        product.id
+      );
+
+      const str = `\n\`/shop buy ${product.id}\` **${
         product.name
       }** ($${product.price.toFixed(2)})`;
+
+      if (reachedLimit) {
+        shop += `~~${str}~~ **Purchased!**`;
+      } else shop += str;
     }
 
     const embed = new Embed().setDescription(shop).setFooter(``);
@@ -43,6 +53,13 @@ const run: Run = async function run({ interaction, user, options }) {
     if (!product)
       throw new BotError(
         `**please enter a valid item!**\nyou can use **\`/shop view\`** to view the shop.`
+      );
+
+    const reachedLimit = await reachedPurchaseLimit(user.discordId, product.id);
+
+    if (reachedLimit)
+      throw new BotError(
+        "**hold up!**\nyou've reached the limit on purchases of that product!"
       );
 
     const payment = await newTransaction(user.discordId, product);
