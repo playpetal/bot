@@ -23,8 +23,6 @@ const run: RunComponent = async function ({ interaction, user }) {
   const sort = (_sort as InventorySort | "") || undefined;
   const order = (_order as InventoryOrder | "") || undefined;
 
-  console.log(sort, order);
-
   const _cards = await inventory(userId, page, {
     character,
     subgroup,
