@@ -181,6 +181,20 @@ declare module "petal" {
   export type Song = {
     id: number;
     title: string;
+    group: Maybe<{
+      name: string;
+    }>;
+    soloist: Maybe<{
+      name: string;
+    }>;
+    release: {
+      id: number;
+    };
+  };
+
+  export type GameSong = {
+    id: number;
+    title: string;
     group?: string;
     soloist?: string;
     video?: string;
@@ -208,7 +222,7 @@ declare module "petal" {
   };
 
   export type GTSData = {
-    song: Song;
+    song: GameSong;
     guesses: number;
     correct: boolean;
     elapsed?: number;
