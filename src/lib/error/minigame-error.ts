@@ -43,9 +43,6 @@ export const MinigameError = {
   MaxWordsGuessed: new BotError(
     "**you've guessed six words already!**\nyou can't guess any more."
   ),
-  NoAvailableSongs: new BotError(
-    "there are no available songs 😔 try again later!"
-  ),
   NotOwnerOfMinigame: new BotError(
     `**that game isn't yours!**\nyou can't claim rewards for someone else's minigame.`
   ),

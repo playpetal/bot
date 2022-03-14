@@ -70,7 +70,14 @@ const run: Run = async function ({ interaction, user, options }) {
       gender?.toUpperCase() as "MALE" | "FEMALE" | undefined
     );
 
-    if (!song) throw MinigameError.NoAvailableSongs;
+    if (!song) {
+      const embed = new Embed().setDescription(
+        "**uh-oh!**\nthere are no available songs 😔 try again later!"
+      );
+
+      await interaction.editOriginalMessage({ embeds: [embed] });
+      return;
+    }
 
     const canClaim = await canClaimRewards(user.discordId);
 
