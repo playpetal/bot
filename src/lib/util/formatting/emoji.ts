@@ -11,5 +11,5 @@ export const emoji = {
   petals: "<:petals:930918815225741383>",
   burn: "<:burn:941818533619322910>",
   cards: "<:cards:941818546026061885>",
-  lily: "<:lily:946679737194008606>",
+  lily: "<:lily:953532258957017108>",
 } as const;
