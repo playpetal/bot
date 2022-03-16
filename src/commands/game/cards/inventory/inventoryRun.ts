@@ -73,6 +73,7 @@ export const run: Run = async ({ interaction, user, options }) => {
     character,
     subgroup,
     group,
+    tag,
   });
 
   const embed = new Embed().setDescription(
@@ -92,7 +93,7 @@ export const run: Run = async ({ interaction, user, options }) => {
               button({
                 customId: `inv?${target.id}&${page - 1}&${character || ""}&${
                   subgroup || ""
-                }&${group || ""}&${sort || ""}&${order || ""}`,
+                }&${group || ""}&${sort || ""}&${order || ""}&${tag || ""}`,
                 style: "blue",
                 emoji: "862984408076255252",
                 disabled: true,
@@ -106,7 +107,7 @@ export const run: Run = async ({ interaction, user, options }) => {
               button({
                 customId: `inv?${target.id}&${page + 1}&${character || ""}&${
                   subgroup || ""
-                }&${group || ""}&${sort || ""}&${order || ""}`,
+                }&${group || ""}&${sort || ""}&${order || ""}&${tag || ""}`,
                 style: "blue",
                 emoji: "862984408339578880",
               })

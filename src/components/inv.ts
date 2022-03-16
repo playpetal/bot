@@ -11,7 +11,7 @@ import { BotError } from "../struct/error";
 
 const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, data] = interaction.data.custom_id.split("?");
-  const [_userId, _page, character, subgroup, group, _sort, _order] =
+  const [_userId, _page, character, subgroup, group, _sort, _order, _tag] =
     data.split("&");
 
   const userId = parseInt(_userId, 10);
@@ -22,6 +22,7 @@ const run: RunComponent = async function ({ interaction, user }) {
   const page = parseInt(_page, 10);
   const sort = (_sort as InventorySort | "") || undefined;
   const order = (_order as InventoryOrder | "") || undefined;
+  const tag = (_tag as string | "") || undefined;
 
   const _cards = await inventory(userId, page, {
     character,
@@ -29,6 +30,7 @@ const run: RunComponent = async function ({ interaction, user }) {
     group,
     sort,
     order,
+    tag,
   });
 
   const strCards = _cards.map((c) => formatCard(c));
@@ -37,6 +39,7 @@ const run: RunComponent = async function ({ interaction, user }) {
     character,
     subgroup,
     group,
+    tag,
   });
 
   const target = (await getUserPartial({ id: userId }))!;
