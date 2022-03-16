@@ -4,6 +4,7 @@ import run from "./inventoryRun";
 import { default as autocompleteCharacter } from "./autocomplete/character";
 import { default as autocompleteSubgroup } from "./autocomplete/subgroup";
 import { default as autocompleteGroup } from "./autocomplete/group";
+import { default as autocompleteTag } from "./autocomplete/tag";
 
 export default slashCommand("inventory")
   .desc("shows you a list of your cards")
@@ -54,5 +55,12 @@ export default slashCommand("inventory")
       { name: "ascending", value: "ascending" },
       { name: "descending", value: "descending" },
     ],
+  })
+  .option({
+    type: CONSTANTS.OPTION_TYPE.STRING,
+    name: "tag",
+    description: "show only cards tagged with a certain tag",
+    autocomplete: true,
+    runAutocomplete: autocompleteTag,
   })
   .run(run);

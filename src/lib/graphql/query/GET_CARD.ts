@@ -30,6 +30,10 @@ const query = gql`
       tint
       createdAt
       hasFrame
+      tag {
+        emoji
+        tag
+      }
     }
   }
 `;

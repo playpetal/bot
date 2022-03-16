@@ -239,6 +239,7 @@ declare module "petal" {
     tint: number;
     createdAt: number;
     hasFrame: boolean;
+    tag: Maybe<Tag>;
   };
 
   export type Song = {

@@ -11,6 +11,7 @@ const query = gql`
     $character: String
     $sort: InventorySort
     $order: InventoryOrder
+    $tag: String
   ) {
     inventory(
       userId: $userId
@@ -20,6 +21,7 @@ const query = gql`
       character: $character
       sort: $sort
       order: $order
+      tag: $tag
     ) {
       id
       prefab {
@@ -46,6 +48,10 @@ const query = gql`
       tint
       createdAt
       hasFrame
+      tag {
+        tag
+        emoji
+      }
     }
   }
 `;
@@ -59,17 +65,19 @@ export async function inventory(
     group,
     sort,
     order,
+    tag,
   }: {
     character?: string;
     group?: string;
     subgroup?: string;
     sort?: InventorySort;
     order?: InventoryOrder;
+    tag?: string;
   }
 ) {
   const { data } = (await graphql.query({
     query,
-    variables: { userId, page, character, subgroup, group, sort, order },
+    variables: { userId, page, character, subgroup, group, sort, order, tag },
   })) as GraphQLResponse<{
     inventory: Card[];
   }>;

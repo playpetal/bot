@@ -9,15 +9,19 @@ export function formatCard(
     group?: boolean;
     subgroup?: boolean;
     issue?: boolean;
+    tag?: boolean;
   } = {
     code: true,
     icon: true,
     group: true,
     subgroup: true,
     issue: true,
+    tag: true,
   }
 ): string {
   let str = "";
+
+  if (options.tag !== false) str += `${card.tag?.emoji || "◽"} `;
 
   if (options.code !== false) str += `\`${card.id.toString(16)}\` `;
   if (options.icon !== false)

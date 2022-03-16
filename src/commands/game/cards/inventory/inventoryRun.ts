@@ -21,6 +21,7 @@ export const run: Run = async ({ interaction, user, options }) => {
   const targetId = options.getOption<string>("user");
   const sort = parseInventorySort(options);
   const order = parseInventoryOrder(options);
+  const tag = options.getOption<string>("tag");
 
   let target = user;
 
@@ -39,12 +40,13 @@ export const run: Run = async ({ interaction, user, options }) => {
     group,
     sort,
     order,
+    tag,
   });
 
   const formattedCards = _cards.map((c) => formatCard(c));
 
   if (formattedCards.length === 0) {
-    const hasFilters = Boolean(character || subgroup || group);
+    const hasFilters = Boolean(character || subgroup || group || tag);
 
     let desc = "";
 
