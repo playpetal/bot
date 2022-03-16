@@ -30,6 +30,17 @@ declare module "petal" {
     | 10 // number
     | 11;
 
+  export type SlashCommandOptionTypeWithoutSubcommand =
+    | 3 // string
+    | 4 // integer
+    | 5 // boolean
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10 // number
+    | 11;
+
   export type DiscordSlashCommandOption<T> = {
     type: T;
     name: string;
@@ -38,30 +49,82 @@ declare module "petal" {
     options?: any[];
   };
 
-  export type SlashCommandOption<T extends SlashCommandOptionType> = {
-    type: T;
+  export type Run = ({
+    interaction,
+    user,
+    options,
+  }: {
+    interaction: import("eris").CommandInteraction;
+    user: PartialUser;
+    options: import("../src/struct/options").InteractionOptions;
+  }) => Promise<unknown> | unknown;
+
+  export type Autocomplete = ({
+    interaction,
+    user,
+    options,
+  }: {
+    interaction: import("eris").AutocompleteInteraction;
+    user: PartialUser;
+    options: import("../src/struct/options").InteractionOptions;
+  }) => Promise<unknown> | unknown;
+
+  export type SlashCommandSubcommand = {
+    type: 1;
+    name: string;
+    description: string;
+    options?: SlashCommandOption[];
+
+    ephemeral?: boolean;
+    run?: Run;
+  };
+
+  export type SlashCommandSubcommandGroup = {
+    type: 2;
+    name: string;
+    description: string;
+    options?: SlashCommandSubcommand[];
+  };
+
+  export type SlashCommandOptionNumeric = {
+    type: 4 | 10;
     name: string;
     description: string;
     required?: boolean;
     autocomplete?: boolean;
-    ephemeral?: T extends 1 ? boolean : never;
-    choices?: { name: string; value: string | number }[];
-    min_value?: T extends 10
-      ? number | undefined
-      : T extends 4
-      ? number
-      : undefined;
-    max_value?: T extends 10
-      ? number | undefined
-      : T extends 4
-      ? number
-      : undefined;
-    options?: T extends 1
-      ? SlashCommandOption<SlashCommandOptionType>[]
-      : T extends 2
-      ? SlashCommandOption<2>[]
-      : undefined;
+    choices?: { name: string; value: number }[];
+    min_value?: number;
+    max_value?: number;
+
+    runAutocomplete?: Autocomplete;
   };
+
+  export type SlashCommandOptionString = {
+    type: 3;
+    name: string;
+    description: string;
+    required?: boolean;
+    autocomplete?: boolean;
+    choices?: { name: string; value: string }[];
+
+    runAutocomplete?: Autocomplete;
+  };
+
+  export type SlashCommandOption = {
+    type: SlashCommandOptionTypeWithoutSubcommand;
+    name: string;
+    description: string;
+    required?: boolean;
+    autocomplete?: boolean;
+    choices?: { name: string; value: string | number }[];
+  };
+
+  export type AnySlashCommandOption =
+    | SlashCommandSubcommand
+    | SlashCommandSubcommandGroup
+    | SlashCommandOptionNumeric
+    | SlashCommandOptionString
+    | SlashCommandOption;
 
   export type InteractionOption = {
     type: SlashCommandOptionType;
@@ -272,4 +335,12 @@ declare module "petal" {
   export type InventoryOrder = "ASC" | "DESC";
 
   export type AutocompleteChoice = { name: string; value: string };
+
+  export type Tag = {
+    id: number;
+    tag: string;
+    emoji: string;
+    accountId: number;
+    updatedAt: string;
+  };
 }

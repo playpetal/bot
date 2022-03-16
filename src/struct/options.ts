@@ -8,23 +8,18 @@ export class InteractionOptions {
     return this.options.find((o) => o.name === name)?.value as T | undefined;
   }
 
-  // shawty rewrite this please
   public getFocused(): InteractionOption | undefined {
-    for (let opt of this.options) {
-      if (opt.focused) return { ...opt, focused: true } as InteractionOption;
-      if (opt.options) {
-        for (let _opt of opt.options) {
-          if (_opt.focused)
-            return { ...opt, focused: true } as InteractionOption;
-          if (_opt.options) {
-            for (let __opt of _opt.options) {
-              if (__opt.focused)
-                return { ...opt, focused: true } as InteractionOption;
-            }
-          }
-        }
-      }
+    let options = this.options;
+
+    if (this.options[0]?.type === CONSTANTS.OPTION_TYPE.SUBCOMMAND) {
+      options = this.options[0].options!;
+    } else if (
+      this.options[0]?.type === CONSTANTS.OPTION_TYPE.SUBCOMMAND_GROUP
+    ) {
+      options = this.options[0].options![0].options!;
     }
+
+    return options.find((o) => o.focused);
   }
 
   public getSubcommandGroup(): InteractionOption | undefined {

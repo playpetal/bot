@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client/core";
 import { PartialUser } from "petal";
 import { graphql, GraphQLResponse } from "../../..";
-import { tokenize } from "../../../crypto";
 
 const query = gql`
   query GetSupporterLeaderboard {

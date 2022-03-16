@@ -10,10 +10,10 @@ import { getUserPartial } from "../lib/graphql/query/GET_USER_PARTIAL";
 import { ErrorEmbed } from "../struct/embed";
 import { Event } from "../struct/event";
 import {
+  AnySlashCommandOption,
   InteractionOption,
   Maybe,
   PartialUser,
-  SlashCommandOption,
 } from "petal";
 import { InteractionOptions } from "../struct/options";
 import { BotError } from "../struct/error";
@@ -73,9 +73,9 @@ const run = async function (interaction: UnknownInteraction) {
           (o) =>
             o.type === CONSTANTS.OPTION_TYPE.SUBCOMMAND &&
             o.name === interaction.data.options![0].name
-        ) as SlashCommandOption<1>;
+        ) as AnySlashCommandOption;
 
-        if (subcommand && subcommand.ephemeral) {
+        if (subcommand && subcommand.type === 1 && subcommand.ephemeral) {
           await interaction.acknowledge(64);
           acknowledged = true;
         }
@@ -143,8 +143,7 @@ const run = async function (interaction: UnknownInteraction) {
         interaction.data.options as InteractionOption[]
       );
 
-      if (command.getAutocomplete())
-        await command.executeAutocomplete({ interaction, user, options });
+      await command.executeAutocomplete({ interaction, user, options });
     } catch (e) {
       logger.error(e);
 
@@ -163,20 +162,26 @@ const run = async function (interaction: UnknownInteraction) {
       if (component.autoAck) await interaction.acknowledge();
       if (!interaction.member) return;
 
-      if (!user) return;
+      if (!user)
+        throw new BotError(
+          "please sign up by using **/register `username`** to play petal!"
+        );
 
-      return await component.execute({ interaction, user });
+      await component.execute({ interaction, user });
+      return;
     } catch (e) {
       if (e instanceof BotError) {
-        return interaction.createMessage({
+        await interaction.createMessage({
           embeds: [new ErrorEmbed(e.message)],
           components: e.components,
           flags: 64,
         });
+
+        return;
       } else {
         logComponentError(interaction, user, component, e);
 
-        return interaction.createMessage({
+        await interaction.createMessage({
           embeds: [
             new ErrorEmbed(
               "**an unexpected error occurred.**\nplease try again in a few moments."
@@ -184,6 +189,7 @@ const run = async function (interaction: UnknownInteraction) {
           ],
           flags: 64,
         });
+        return;
       }
     }
   }

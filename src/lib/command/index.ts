@@ -1,5 +1,4 @@
-import { ApplicationCommand } from "eris";
-import { SlashCommandOption, SlashCommandOptionType } from "petal";
+import { ApplicationCommand, ApplicationCommandStructure } from "eris";
 import { bot } from "../..";
 import { SlashCommand } from "../../struct/command";
 import { slashCommandEquals } from "../util/slashCommandEquals";
@@ -33,14 +32,13 @@ export async function processCommands(
 
     // check for slash command equality in name, description, and options
     const isEqual = slashCommandEquals(command, cmd);
-    const parsed = { ...command, options: parseOptions(command.options) };
 
     if (!isEqual) {
+      const _command = command as ApplicationCommandStructure;
+
       if (serverId) {
-        // @ts-ignore
-        await bot.editGuildCommand(serverId, cmd.id, parsed);
-        // @ts-ignore
-      } else await bot.editCommand(cmd.id, parsed);
+        await bot.editGuildCommand(serverId, cmd.id, _command);
+      } else await bot.editCommand(cmd.id, _command);
     }
   }
 
@@ -50,33 +48,12 @@ export async function processCommands(
   );
 
   for (let command of newCommands) {
-    const parsed = { ...command, options: parseOptions(command.options) };
+    const _command = command as ApplicationCommandStructure;
 
     if (serverId) {
-      // @ts-ignore
-      await bot.createGuildCommand(serverId, parsed);
-      // @ts-ignore
-    } else await bot.createCommand(parsed);
+      await bot.createGuildCommand(serverId, _command);
+    } else await bot.createCommand(_command);
   }
 
   return;
-}
-
-export function parseOptions(
-  options: SlashCommandOption<SlashCommandOptionType>[]
-) {
-  const parsed = [];
-
-  for (let opt of options) {
-    const _opt = { ...opt };
-    delete _opt.ephemeral;
-
-    parsed.push(_opt);
-
-    if (opt.options) {
-      _opt.options = parseOptions(opt.options);
-    }
-  }
-
-  return parsed;
 }

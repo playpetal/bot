@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client/core";
-import { Prefab, Release } from "petal";
+import { Release } from "petal";
 import { graphql, GraphQLResponse } from "..";
 import { tokenize } from "../crypto";
 

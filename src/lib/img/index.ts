@@ -57,3 +57,41 @@ export async function uploadImage(
 
   return url;
 }
+
+export async function getCollage(cards: Card[]) {
+  const oniCards: {
+    frame: string;
+    name: string;
+    id: number;
+    character: string;
+  }[] = [];
+
+  for (let card of cards) {
+    const {
+      data: { hash },
+    } = (await axios.get(`${process.env.ONI_URL!}/hash`, {
+      headers: { Authorization: process.env.ONI_SHARED_SECRET! },
+      data: { id: card.prefab.id },
+    })) as { data: { hash: string } };
+
+    oniCards.push({
+      frame: `#${card.tint.toString(16)}`,
+      name: card.prefab.character.name,
+      id: card.id,
+      character: `https://cdn.playpetal.com/p/${hash}.png`,
+    });
+  }
+
+  try {
+    const {
+      data: { card },
+    } = (await axios.post(`${process.env.ONI_URL!}/card`, oniCards)) as {
+      data: { card: string };
+    };
+
+    return card;
+  } catch (e) {
+    logger.error(e);
+    return "";
+  }
+}

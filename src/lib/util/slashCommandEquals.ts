@@ -1,7 +1,14 @@
 import { ApplicationCommand } from "eris";
 import { SlashCommand } from "../../struct/command";
 import equal from "fast-deep-equal";
-import { parseOptions } from "../command";
+import {
+  AnySlashCommandOption,
+  SlashCommandOption,
+  SlashCommandOptionNumeric,
+  SlashCommandOptionString,
+  SlashCommandSubcommand,
+  SlashCommandSubcommandGroup,
+} from "petal";
 
 type Command = SlashCommand | ApplicationCommand;
 
@@ -24,4 +31,51 @@ export function slashCommandEquals(a: Command, b: Command): boolean {
   if (optA.length !== optB.length) return false;
 
   return equal(optA, optB);
+}
+
+function parseOptions(
+  options: AnySlashCommandOption[]
+): AnySlashCommandOption[] {
+  const parsed: AnySlashCommandOption[] = [];
+
+  for (let opt of options) {
+    const _opt = { ...opt } as AnySlashCommandOption;
+
+    if (isSubcommand(_opt)) {
+      if (_opt.options) {
+        _opt.options = parseOptions(_opt.options) as SlashCommandOption[];
+      }
+    } else if (isSubcommandGroup(_opt)) {
+      _opt.options = parseOptions(_opt.options!) as SlashCommandSubcommand[];
+    }
+
+    if (isSubcommand(_opt)) {
+      delete _opt.ephemeral;
+      delete _opt.run;
+    } else if (isAutocompletable(_opt)) {
+      delete _opt.runAutocomplete;
+    }
+
+    parsed.push(_opt);
+  }
+
+  return parsed;
+}
+
+function isSubcommand(
+  option: AnySlashCommandOption
+): option is SlashCommandSubcommand {
+  return option.type === 1;
+}
+
+function isSubcommandGroup(
+  option: AnySlashCommandOption
+): option is SlashCommandSubcommandGroup {
+  return option.type === 2;
+}
+
+function isAutocompletable(
+  option: AnySlashCommandOption
+): option is SlashCommandOptionNumeric | SlashCommandOptionString {
+  return option.type === 3 || option.type === 4 || option.type === 10;
 }
