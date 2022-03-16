@@ -21,7 +21,7 @@ export async function getMinigameRewardComponents(
       button({
         customId: `claim-minigame-reward?${userId}&lily`,
         label: "1 lily",
-        emoji: "946679737194008606",
+        emoji: "953532258957017108",
         style: "gray",
         disabled: canClaimPremiumRewards ? false : true,
       })
