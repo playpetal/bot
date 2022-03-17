@@ -59,7 +59,9 @@ const run: RunComponent = async function ({ interaction, user }) {
         button({
           customId: `inv?${userId}&${
             page - 1
-          }&${character}&${subgroup}&${group}&${sort || ""}&${order || ""}`,
+          }&${character}&${subgroup}&${group}&${sort || ""}&${order || ""}&${
+            tag || ""
+          }`,
           style: "blue",
           emoji: "862984408076255252",
           disabled: page <= 1,
@@ -73,7 +75,9 @@ const run: RunComponent = async function ({ interaction, user }) {
         button({
           customId: `inv?${userId}&${
             page + 1
-          }&${character}&${subgroup}&${group}&${sort || ""}&${order || ""}`,
+          }&${character}&${subgroup}&${group}&${sort || ""}&${order || ""}&${
+            tag || ""
+          }`,
           style: "blue",
           emoji: "862984408339578880",
           disabled: page >= max,
