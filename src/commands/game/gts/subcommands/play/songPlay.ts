@@ -1,6 +1,6 @@
 import { SlashCommandSubcommand } from "petal";
 import { CONSTANTS } from "../../../../../lib/constants";
-import run from "./songPlayRun";
+import { songPlayRun } from "./songPlayRun";
 
 export const SongPlay: SlashCommandSubcommand = {
   type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
@@ -17,5 +17,5 @@ export const SongPlay: SlashCommandSubcommand = {
       ],
     },
   ],
-  run,
+  run: songPlayRun,
 };

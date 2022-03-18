@@ -17,7 +17,7 @@ import {
 import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../../struct/embed";
 
-const run: Run = async function ({ interaction, user, options }) {
+export const songGuessRun: Run = async function ({ courier, user, options }) {
   const minigame = await getMinigame(user);
 
   if (!minigame) throw MinigameError.NotPlayingGTS;
@@ -70,14 +70,14 @@ const run: Run = async function ({ interaction, user, options }) {
 
   if (correct) {
     data.correct = true;
-    data.elapsed = interaction.createdAt - data.startedAt;
+    data.elapsed = courier.interaction!.createdAt - data.startedAt;
 
     await setMinigame<"GTS">(user, data, minigame);
 
     embed
       .setColor("#3BA55D")
       .setDescription(`${emoji.song} **${answer}** was correct!`);
-    await interaction.createMessage({ embeds: [embed], flags: 64 });
+    await courier.send({ embeds: [embed], flags: 64 });
   } else {
     await setMinigame<"GTS">(user, data, minigame);
 
@@ -88,8 +88,6 @@ const run: Run = async function ({ interaction, user, options }) {
           GTS_MAX_GUESSES - data.guesses
         }** guesses remaining!`
       );
-    await interaction.createMessage({ embeds: [embed], flags: 64 });
+    await courier.send({ embeds: [embed], flags: 64 });
   }
 };
-
-export default run;

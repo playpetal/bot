@@ -20,7 +20,12 @@ import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { strong } from "../../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../../struct/embed";
 
-const run: Run = async function run({ interaction, user, options }) {
+export const songPlayRun: Run = async function run({
+  courier,
+  interaction,
+  user,
+  options,
+}) {
   const minigame = await getMinigame(user);
 
   if (minigame) {
@@ -51,7 +56,7 @@ const run: Run = async function run({ interaction, user, options }) {
   }
 
   const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
-  await interaction.createMessage({ embeds: [loading] });
+  await courier.send({ embeds: [loading] });
 
   const gender = options.getOption<"male" | "female">("gender");
 
@@ -150,5 +155,3 @@ const run: Run = async function run({ interaction, user, options }) {
     throw e;
   }
 };
-
-export default run;
