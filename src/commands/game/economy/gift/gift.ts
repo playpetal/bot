@@ -1,6 +1,6 @@
 import { slashCommand } from "../../../../lib/command";
 import { CONSTANTS } from "../../../../lib/constants";
-import run from "./giftRun";
+import { giftRun } from "./giftRun";
 
 export default slashCommand("gift")
   .desc("gift cards or petals to another player!")
@@ -27,4 +27,4 @@ export default slashCommand("gift")
     description: "the amount of lilies you'd like to gift",
     min_value: 1,
   })
-  .run(run);
+  .run(giftRun);

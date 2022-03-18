@@ -4,7 +4,7 @@ import { reachedPurchaseLimit } from "../../../../../../lib/graphql/query/shop/R
 import { emoji } from "../../../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../../../struct/embed";
 
-const run: Run = async function run({ interaction, user }) {
+export const shopViewRun: Run = async function run({ courier, user }) {
   const products: Product[] = await getProducts();
 
   if (products.length === 0) {
@@ -12,7 +12,7 @@ const run: Run = async function run({ interaction, user }) {
       `**there are no items available at the moment!**\ncheck back later, and join https://discord.gg/petal for updates.`
     );
 
-    await interaction.createMessage({ embeds: [embed] });
+    await courier.send({ embeds: [embed] });
     return;
   }
 
@@ -32,8 +32,6 @@ const run: Run = async function run({ interaction, user }) {
 
   const embed = new Embed().setDescription(shop).setFooter(``);
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
   return;
 };
-
-export default run;

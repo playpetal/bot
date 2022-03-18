@@ -8,7 +8,7 @@ import { strong } from "../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../struct/embed";
 import { BotError } from "../../../../struct/error";
 
-const run: Run = async ({ interaction, options, user }) => {
+export const giftRun: Run = async ({ courier, options, user }) => {
   const targetId = options.getOption<string>("user")!;
   const cardIds = options.getOption<string>("cards");
   const petals = options.getOption<number>("petals");
@@ -66,7 +66,7 @@ const run: Run = async ({ interaction, options, user }) => {
       )}.`
     );
 
-    await interaction.createMessage({ embeds: [embed] });
+    await courier.send({ embeds: [embed] });
   } catch (e) {
     if (e instanceof ApolloError && e.graphQLErrors.length > 0) {
       const errors = e.graphQLErrors;
@@ -74,5 +74,3 @@ const run: Run = async ({ interaction, options, user }) => {
     } else throw e;
   }
 };
-
-export default run;

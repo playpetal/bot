@@ -8,7 +8,7 @@ import { emoji } from "../../../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
-const run: Run = async function run({ interaction, user, options }) {
+export const shopBuyRun: Run = async function run({ courier, user, options }) {
   const products: Product[] = await getProducts();
 
   const itemId = options.getOption<number>("item")!;
@@ -38,7 +38,7 @@ const run: Run = async function run({ interaction, user, options }) {
     }) to make your purchase!`
   );
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
 
   let checks = 0;
   const interval = setInterval(async () => {
@@ -63,7 +63,7 @@ const run: Run = async function run({ interaction, user, options }) {
       );
 
       try {
-        await interaction.createMessage({ embeds: [embed] });
+        await courier.send({ embeds: [embed] });
       } catch {
         const channel = await bot.getDMChannel(user.discordId);
 
@@ -76,5 +76,3 @@ const run: Run = async function run({ interaction, user, options }) {
   }, 10000);
   return;
 };
-
-export default run;

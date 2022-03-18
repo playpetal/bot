@@ -1,6 +1,6 @@
 import { SlashCommandSubcommand } from "petal";
 import { CONSTANTS } from "../../../../../../lib/constants";
-import run from "./shopBuyRun";
+import { shopBuyRun } from "./shopBuyRun";
 
 export const ShopBuy: SlashCommandSubcommand = {
   type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
@@ -15,5 +15,5 @@ export const ShopBuy: SlashCommandSubcommand = {
     },
   ],
   ephemeral: true,
-  run,
+  run: shopBuyRun,
 };
