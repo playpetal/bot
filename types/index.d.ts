@@ -50,10 +50,12 @@ declare module "petal" {
   };
 
   export type Run = ({
+    courier,
     interaction,
     user,
     options,
   }: {
+    courier: import("../src/struct/courier").Courier;
     interaction: import("eris").CommandInteraction;
     user: PartialUser;
     options: import("../src/struct/options").InteractionOptions;
