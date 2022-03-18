@@ -6,7 +6,15 @@ jobs:
       - image: arvindr226/alpine-ssh
     steps:
       - checkout
-      - run: ssh -oStrictHostKeyChecking=no -v $USER@$IP "./deploy.sh"
+      - run:
+          command: ssh -oStrictHostKeyChecking=no -v $USER@$IP "./build.sh"
+          name: build
+      - run:
+          command: ssh -oStrictHostKeyChecking=no -v $USER@$IP "./test.sh"
+          name: test
+      - run:
+          command: ssh -oStrictHostKeyChecking=no -v $USER@$IP "./deploy.sh"
+          name: deploy
 
 workflows:
   version: 2
