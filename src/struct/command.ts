@@ -8,6 +8,7 @@ import {
   SlashCommandSubcommand,
   SlashCommandSubcommandGroup,
 } from "petal";
+import { Courier } from "./courier";
 import { InteractionOptions } from "./options";
 
 export class SlashCommand {
@@ -58,6 +59,8 @@ export class SlashCommand {
     const subcommandGroup = options.getSubcommandGroup();
     const subcommand = options.getSubcommand();
 
+    const courier = new Courier(interaction);
+
     if (subcommandGroup) {
       const targetGroup = this.options.find(
         (g) => g.name === subcommandGroup.name
@@ -67,7 +70,7 @@ export class SlashCommand {
         (s) => s.name === subcommand!.name
       )!;
 
-      await targetSubcommand.run!({ interaction, user, options });
+      await targetSubcommand.run!({ courier, interaction, user, options });
       return;
     }
 
@@ -76,7 +79,7 @@ export class SlashCommand {
         (s) => s.name === subcommand.name
       ) as SlashCommandSubcommand;
 
-      await target.run!({ interaction, user, options });
+      await target.run!({ courier, interaction, user, options });
       return;
     }
 
@@ -86,6 +89,7 @@ export class SlashCommand {
       );
 
     return this._run({
+      courier,
       interaction,
       user,
       options,
