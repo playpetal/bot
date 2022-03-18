@@ -1,8 +1,8 @@
-import { Courier } from "../src/struct/courier";
-import { InteractionOptions } from "../src/struct/options";
+import { Courier } from "../../src/struct/courier";
+import { InteractionOptions } from "../../src/struct/options";
 import { expect } from "chai";
-import { CONSTANTS } from "../src/lib/constants";
-import { pingRun } from "../src/commands/general/ping/pingRun";
+import { CONSTANTS } from "../../src/lib/constants";
+import { pingRun } from "../../src/commands/general/ping/pingRun";
 
 describe("commands", function () {
   describe("ping", function () {
