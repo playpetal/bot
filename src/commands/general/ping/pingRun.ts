@@ -1,19 +1,20 @@
 import axios from "axios";
 import { Run } from "petal";
-import { bot } from "../../..";
 import { getSong } from "../../../lib/fun/ping/getSong";
 import { getUserPartial } from "../../../lib/graphql/query/GET_USER_PARTIAL";
 import { displayName } from "../../../lib/util/displayName";
+import { Bot } from "../../../struct/client";
 import { Embed } from "../../../struct/embed";
 
-const run: Run = async function ({ interaction, user, options }) {
+export const pingRun: Run = async function ({ courier, user, options }) {
   const isDevMode = options.getOption<boolean>("dev");
 
   let embed: Embed = new Embed();
 
   if (isDevMode) {
+    const bot = require("../../../") as Bot;
     const latency = bot.shards.get(0)?.latency!;
-    const processTime = Date.now() - interaction.createdAt;
+    const processTime = Date.now() - (courier.interaction?.createdAt || 0);
 
     let now = Date.now();
     let oniLatency: number | undefined;
@@ -61,7 +62,8 @@ const run: Run = async function ({ interaction, user, options }) {
         inline: true,
       });
 
-    return await interaction.createMessage({ embeds: [embed] });
+    await courier.send({ embeds: [embed] });
+    return;
   }
 
   const song = getSong();
@@ -86,7 +88,6 @@ const run: Run = async function ({ interaction, user, options }) {
     )
     .setImage("https://cdn.playpetal.com/banners/default.png");
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
+  return;
 };
-
-export default run;

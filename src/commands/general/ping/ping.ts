@@ -1,6 +1,6 @@
 import { slashCommand } from "../../../lib/command";
 import { CONSTANTS } from "../../../lib/constants";
-import run from "./pingRun";
+import { pingRun } from "./pingRun";
 
 export default slashCommand("ping")
   .desc("you can use this command to check if petal is online!")
@@ -9,4 +9,4 @@ export default slashCommand("ping")
     name: "dev",
     description: "shows advanced connection stats",
   })
-  .run(run);
+  .run(pingRun);
