@@ -12,7 +12,7 @@ export const pingRun: Run = async function ({ courier, user, options }) {
   let embed: Embed = new Embed();
 
   if (isDevMode) {
-    const bot = require("../../../") as Bot;
+    const bot = require("../../..").bot as Bot;
     const latency = bot.shards.get(0)?.latency!;
     const processTime = Date.now() - (courier.interaction?.createdAt || 0);
 
