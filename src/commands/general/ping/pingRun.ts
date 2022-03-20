@@ -50,15 +50,9 @@ export const pingRun: Run = async function ({ courier, user, options }) {
       .addField({
         name: "services",
         value:
-          `yume response: **${
-            yumeLatency ? `${yumeLatency}ms` : "error"
-          }**\n||yume is petal's api service||` +
-          `\noni response: **${
-            oniLatency ? `${oniLatency}ms` : "error"
-          }**\n||oni is petal's image generation service||` +
-          `\nyure response: **${
-            yureLatency ? `${yureLatency}ms` : "ERROR"
-          }**\n||yure is petal's video generation service||`,
+          `api response: **${yumeLatency ? `${yumeLatency}ms` : "error"}**` +
+          `\nimage response: **${oniLatency ? `${oniLatency}ms` : "error"}**` +
+          `\nvideo response: **${yureLatency ? `${yureLatency}ms` : "ERROR"}**`,
         inline: true,
       });
 
