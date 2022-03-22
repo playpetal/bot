@@ -8,10 +8,8 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
   const focused = options.getFocused()!;
   let choices: { name: string; value: string }[] = [];
 
-  const nested = focused.options!.find((o) => o.focused)!;
-
-  if (nested.name === "prefab") {
-    const search = await searchPrefabs(nested.value as string);
+  if (focused.name === "prefab") {
+    const search = await searchPrefabs(focused.value as string);
 
     choices = search.map((p) => {
       let str = p.character.name;
@@ -23,8 +21,8 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
 
       return { name: str, value: p.id.toString() };
     });
-  } else if (nested.name === "character") {
-    const search = await searchCharacters(nested.value as string);
+  } else if (focused.name === "character") {
+    const search = await searchCharacters(focused.value as string);
 
     choices = search.map((c) => {
       const birthday = c.birthday
@@ -32,8 +30,8 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
         : "No Birthday";
       return { name: `${c.name} (${birthday})`, value: c.id.toString() };
     });
-  } else if (nested.name === "subgroup") {
-    const search = await searchSubgroups(nested.value as string);
+  } else if (focused.name === "subgroup") {
+    const search = await searchSubgroups(focused.value as string);
 
     choices = search.map((c) => {
       const date = c.creation
@@ -41,8 +39,8 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
         : "No Date";
       return { name: `${c.name} (${date})`, value: c.id.toString() };
     });
-  } else if (nested.name === "group") {
-    const search = await searchGroups(nested.value as string);
+  } else if (focused.name === "group") {
+    const search = await searchGroups(focused.value as string);
 
     choices = search.map((c) => {
       const date = c.creation
