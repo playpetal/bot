@@ -13,6 +13,7 @@ export const SubgroupInfo: SlashCommandSubcommand = {
       name: "subgroup",
       description: "the subgroup you'd like to view",
       required: true,
+      autocomplete: true,
       runAutocomplete: autocomplete,
     } as SlashCommandOptionString,
   ],

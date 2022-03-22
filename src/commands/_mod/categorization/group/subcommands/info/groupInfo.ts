@@ -13,6 +13,7 @@ export const GroupInfo: SlashCommandSubcommand = {
       name: "group",
       description: "the group you'd like to view information about",
       required: true,
+      autocomplete: true,
       runAutocomplete: autocomplete,
     } as SlashCommandOptionString,
   ],
