@@ -13,6 +13,7 @@ export const CharacterInfo: SlashCommandSubcommand = {
       name: "character",
       description: "the character you'd like to view information about",
       required: true,
+      autocomplete: true,
       runAutocomplete: autocomplete,
     } as SlashCommandOptionString,
   ],
