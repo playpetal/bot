@@ -21,8 +21,8 @@ const run: RunComponent = async function ({ interaction, user }) {
     )
     .setFooter(
       `${_tag.cardCount} card${
-        _tag.cardCount === 1 ? "" : "s"
-      } have been untagged.`
+        _tag.cardCount === 1 ? " has" : "s have"
+      } been untagged.`
     );
 
   await interaction.editOriginalMessage({ embeds: [embed], components: [] });

@@ -32,8 +32,8 @@ const run: Run = async function tagDeleteRun({ courier, user, options }) {
     `**wait a sec!**\nare you sure you want to delete ${targetTag.emoji} \`${
       targetTag.tag
     }\`?\n${strong(targetTag.cardCount)} card${
-      targetTag.cardCount === 1 ? "" : "s"
-    } have this tag, and this can't be reversed!`
+      targetTag.cardCount === 1 ? " has" : "s have"
+    } this tag, and this can't be reversed!`
   );
 
   return courier.send({
