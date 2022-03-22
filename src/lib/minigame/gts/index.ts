@@ -2,6 +2,8 @@ import { CommandInteraction } from "eris";
 import { Minigame } from "petal";
 import { destroyMinigame } from "..";
 import { Embed } from "../../../struct/embed";
+import { claimMinigamePetalReward } from "../../graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
+import { completeGts } from "../../graphql/mutation/game/minigame/gts/COMPLETE_GTS";
 import { canClaimPremiumRewards } from "../../graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../graphql/query/game/CAN_CLAIM_REWARDS";
 import { dd } from "../../statsd";
@@ -52,8 +54,11 @@ export async function handleGTSEnd(
   if (rewardsRemaining === 0) {
     await destroyMinigame(playerId);
 
+    await completeGts(interaction.member!.id, guesses, elapsed!, "PETAL");
+    await claimMinigamePetalReward(interaction.member!.id);
+
     embed.setDescription(
-      description + `\nYou've already claimed all the rewards this hour.`
+      description + `\nYou earned ${emoji.petals} **1** for playing.`
     );
   } else {
     embed.setDescription(

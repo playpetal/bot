@@ -1,5 +1,7 @@
 import { Run, WordsData } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
+import { claimMinigamePetalReward } from "../../../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
+import { completeWords } from "../../../../../lib/graphql/mutation/game/minigame/words/COMPLETE_WORDS";
 import { canClaimPremiumRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { isWordValid } from "../../../../../lib/graphql/query/game/minigame/words/IS_WORD_VALID";
@@ -48,21 +50,38 @@ const run: Run = async function run({ interaction, user, options }) {
     dd.increment(`petal.minigame.words.completed`);
   }
 
-  if ((isFinished && !correct) || (isFinished && rewardsRemaining === 0)) {
+  const embed = getWordsEmbed(data, user, rewardsRemaining);
+
+  if (isFinished && !correct) {
     await destroyMinigame(user);
+    embed.setColor("#F04747");
   } else {
     await setMinigame(user, data, minigame);
   }
 
+  if (isFinished && correct && rewardsRemaining <= 0) {
+    await destroyMinigame(user);
+
+    await completeWords(
+      interaction.member!.id,
+      data.guesses.length,
+      data.elapsed!,
+      "PETAL"
+    );
+    await claimMinigamePetalReward(interaction.member!.id);
+
+    embed.setColor("#3BA55D");
+  }
+
   await interaction.editMessage(minigame.message, {
-    embeds: [getWordsEmbed(data, user, rewardsRemaining)],
+    embeds: [embed],
     components:
       correct && rewardsRemaining > 0
         ? await getMinigameRewardComponents(
             user.id,
             (await canClaimPremiumRewards(interaction.member!.id)) > 0
           )
-        : data.guesses.length < 6
+        : !correct && data.guesses.length < 6
         ? [
             row(
               button({

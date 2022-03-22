@@ -83,14 +83,14 @@ export const songPlayRun: Run = async function run({
           `\nTime limit: ${strong(GTS_MAX_MS / 1000)} seconds` +
           `\nMaximum guesses: ${strong(GTS_MAX_GUESSES)}`
       )
-      .setFooter(
-        canClaim
-          ? `You can claim ${canClaim} more reward${
-              canClaim !== 1 ? "s" : ""
-            } this hour!`
-          : `Rewards won't be given since you've already won 3 games this hour.`
-      )
       .setImage("https://cdn.playpetal.com/banners/default.png");
+
+    if (canClaim)
+      embed.setFooter(
+        `You can claim ${canClaim} more reward${
+          canClaim !== 1 ? "s" : ""
+        } this hour!`
+      );
 
     const message = await interaction.editOriginalMessage(
       {

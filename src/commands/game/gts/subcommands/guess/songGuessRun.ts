@@ -77,6 +77,7 @@ export const songGuessRun: Run = async function ({ courier, user, options }) {
     embed
       .setColor("#3BA55D")
       .setDescription(`${emoji.song} **${answer}** was correct!`);
+
     await courier.send({ embeds: [embed], flags: 64 });
   } else {
     await setMinigame<"GTS">(user, data, minigame);

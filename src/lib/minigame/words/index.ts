@@ -1,7 +1,7 @@
 import { PartialUser, WordsData } from "petal";
 import { Embed } from "../../../struct/embed";
 import { displayName } from "../../util/displayName";
-import { emoji as emojis } from "../../util/formatting/emoji";
+import { emoji } from "../../util/formatting/emoji";
 
 export function getWordsEmbed(
   data: WordsData,
@@ -15,27 +15,27 @@ export function getWordsEmbed(
   const correct = data.guesses.find((g) => g === data.answer.toLowerCase());
 
   if (data.guesses.length === 0) {
-    prefix = `${emojis.bloom} **welcome to petle!**\n**petle** is a k-pop version of the word game [Wordle](https://www.nytimes.com/games/wordle/index.html).\nyou can guess a word by using **\`/petle guess\`**! good luck!\n\n`;
-    embed.setFooter(
-      rewards > 0
-        ? `you can claim ${rewards} more reward${
-            rewards !== 1 ? "s" : ""
-          } this hour!`
-        : `you've reached your reward limit! you can claim more rewards next hour.`
-    );
+    prefix = `${emoji.bloom} **welcome to petle!**\n**petle** is a k-pop version of the word game [Wordle](https://www.nytimes.com/games/wordle/index.html).\nyou can guess a word by using **\`/petle guess\`**! good luck!\n\n`;
+
+    if (rewards > 0)
+      embed.setFooter(
+        `you can claim ${rewards} more reward${
+          rewards !== 1 ? "s" : ""
+        } this hour!`
+      );
   } else if (data.guesses.length === 6) {
-    prefix = `${emojis.bloom} **petle X/6**\n\n`;
+    prefix = `${emoji.bloom} **petle X/6**\n\n`;
   } else {
-    prefix = `${emojis.bloom} **petle ${data.guesses.length}/6**\n\n`;
+    prefix = `${emoji.bloom} **petle ${data.guesses.length}/6**\n\n`;
   }
 
   if (correct) {
-    suffix = `\n\n${emojis.bloom} **you got it in ${data.guesses.length} guess${
+    suffix = `\n\n${emoji.bloom} **you got it in ${data.guesses.length} guess${
       data.guesses.length !== 1 ? "es" : ""
     } (${(data.elapsed! / 1000).toFixed(2)}s)!**`;
 
     if (rewards < 1) {
-      suffix += `\nyou can't claim any more rewards this hour.`;
+      suffix += `\nyou were rewarded ${emoji.petals} **1** for playing.`;
     } else {
       suffix += `\nchoose your reward from the options below!`;
     }
@@ -56,17 +56,17 @@ export function generateWords(data: WordsData): string {
   const answer = data.answer.toLowerCase();
 
   let rows = [
-    emoji.EMPTY.repeat(5),
-    emoji.EMPTY.repeat(5),
-    emoji.EMPTY.repeat(5),
-    emoji.EMPTY.repeat(5),
-    emoji.EMPTY.repeat(5),
-    emoji.EMPTY.repeat(5),
+    letters.EMPTY.repeat(5),
+    letters.EMPTY.repeat(5),
+    letters.EMPTY.repeat(5),
+    letters.EMPTY.repeat(5),
+    letters.EMPTY.repeat(5),
+    letters.EMPTY.repeat(5),
   ];
 
   for (let [index, guess] of data.guesses.entries()) {
-    const emojis = generateWordEmojis(guess, answer);
-    rows[index] = emojis;
+    const letterss = generateWordletterss(guess, answer);
+    rows[index] = letterss;
 
     if (guess === answer) {
       rows = rows.slice(0, index + 1);
@@ -77,7 +77,7 @@ export function generateWords(data: WordsData): string {
   return rows.join("\n");
 }
 
-function generateWordEmojis(_guess: string, _answer: string): string {
+function generateWordletterss(_guess: string, _answer: string): string {
   const guess = _guess.toLowerCase();
   const answer = _answer.toLowerCase();
 
@@ -94,7 +94,7 @@ function generateWordEmojis(_guess: string, _answer: string): string {
 
   for (let [index, letter] of [...guess].entries()) {
     if (answer[index] === letter) {
-      str += emoji.CORRECT[letter as keyof typeof emoji.CORRECT];
+      str += letters.CORRECT[letter as keyof typeof letters.CORRECT];
     } else if (answer.includes(letter)) {
       const expr = new RegExp(letter, "gi");
       const count = answer.match(expr)!.length;
@@ -104,20 +104,21 @@ function generateWordEmojis(_guess: string, _answer: string): string {
       );
 
       if (matched.length >= count) {
-        str += emoji.INCORRECT[letter as keyof typeof emoji.INCORRECT];
+        str += letters.INCORRECT[letter as keyof typeof letters.INCORRECT];
       } else {
         incorrectPositions.push({ letter, position: index });
-        str += emoji.INCORRECT_POS[letter as keyof typeof emoji.INCORRECT_POS];
+        str +=
+          letters.INCORRECT_POS[letter as keyof typeof letters.INCORRECT_POS];
       }
     } else {
-      str += emoji.INCORRECT[letter as keyof typeof emoji.INCORRECT];
+      str += letters.INCORRECT[letter as keyof typeof letters.INCORRECT];
     }
   }
 
   return str;
 }
 
-const emoji = {
+const letters = {
   EMPTY: "<:empty:947071036661321751>",
   CORRECT: {
     a: "<:a1:946994235008245781>",
