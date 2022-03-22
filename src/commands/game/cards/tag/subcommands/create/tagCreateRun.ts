@@ -9,9 +9,14 @@ const run: Run = async ({ interaction, user, options }) => {
   const name = options.getOption<string>("name")!;
   const emoji = options.getOption<string>("emoji")!;
 
-  if (name.length > 15)
+  if (name.length > 15 || name.length < 1)
+    throw new BotError("**woah there!**\n`name` can't exceed 1-15 characters.");
+
+  const nameIsInvalid = name.match(/[^a-z0-9]/gim);
+
+  if (nameIsInvalid)
     throw new BotError(
-      "**woah there!**\n`name` can't be longer than 15 characters."
+      "**woah there!**\ntag names may only contain alphanumeric characters."
     );
 
   const isValidEmoji = await isEmoji(emoji);
