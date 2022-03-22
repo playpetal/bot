@@ -345,5 +345,6 @@ declare module "petal" {
     emoji: string;
     accountId: number;
     updatedAt: string;
+    cardCount: number;
   };
 }

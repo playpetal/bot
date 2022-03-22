@@ -8,6 +8,7 @@ const query = gql`
     getTag(tag: $tag) {
       tag
       emoji
+      cardCount
     }
   }
 `;
