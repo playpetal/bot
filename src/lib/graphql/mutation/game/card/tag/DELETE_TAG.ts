@@ -11,6 +11,7 @@ const mutation = gql`
       emoji
       accountId
       updatedAt
+      cardCount
     }
   }
 `;
