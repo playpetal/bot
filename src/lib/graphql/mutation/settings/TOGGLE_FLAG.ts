@@ -22,11 +22,6 @@ const mutation = gql`
       title {
         title
       }
-      groups {
-        group {
-          name
-        }
-      }
     }
   }
 `;
