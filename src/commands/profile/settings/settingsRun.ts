@@ -13,7 +13,7 @@ const run: Run = async function ({ interaction, user, options }) {
 
       const embed = new Embed().setDescription(
         `**success!**\nyou have **opted ${
-          flags & FLAGS.PUBLIC_SUPPORTER ? "in** to" : "out** of"
+          flags & (1 << FLAGS.PUBLIC_SUPPORTER) ? "in** to" : "out** of"
         } being a public supporter!`
       );
 
