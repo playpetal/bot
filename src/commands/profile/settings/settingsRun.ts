@@ -1,6 +1,5 @@
 import { Run } from "petal";
-import { updateFlags } from "../../../lib/graphql/mutation/UPDATE_FLAGS";
-import { getUser } from "../../../lib/graphql/query/GET_USER";
+import { togglePublicSupporter } from "../../../lib/graphql/mutation/settings/TOGGLE_PUBLIC_SUPPORTER";
 import { FLAGS } from "../../../lib/util/flags";
 import { Embed } from "../../../struct/embed";
 
@@ -10,14 +9,11 @@ const run: Run = async function ({ interaction, user, options }) {
 
   if (group.name === "toggle") {
     if (subcommand.name === "public-supporter") {
-      const account = (await getUser({ id: user.id }))!;
-
-      const newFlags = (account.flags ^= FLAGS.PUBLIC_SUPPORTER);
-      await updateFlags(account.discordId, newFlags);
+      const { flags } = await togglePublicSupporter(user.discordId);
 
       const embed = new Embed().setDescription(
         `**success!**\nyou have **opted ${
-          newFlags & FLAGS.PUBLIC_SUPPORTER ? "in** to" : "out** of"
+          flags & FLAGS.PUBLIC_SUPPORTER ? "in** to" : "out** of"
         } being a public supporter!`
       );
 
