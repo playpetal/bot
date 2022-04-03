@@ -11,6 +11,7 @@ const GET_USER_PARTIAL = gql`
       title {
         title
       }
+      flags
     }
   }
 `;

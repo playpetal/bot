@@ -146,6 +146,7 @@ declare module "petal" {
     discordId: string;
     username: string;
     title: Maybe<{ title: string }>;
+    flags: number;
   };
 
   export type Account = {
@@ -162,11 +163,6 @@ declare module "petal" {
       cardCount: number;
       rollCount: number;
     };
-    groups: {
-      group: {
-        name: string;
-      };
-    }[];
   };
 
   export type Prefab = {
@@ -235,6 +231,7 @@ declare module "petal" {
       discordId: string;
       username: string;
       title: Maybe<{ title: string }>;
+      flags: number;
     }>;
     issue: number;
     quality: Quality;

@@ -92,6 +92,7 @@ const run = async function (interaction: UnknownInteraction) {
             discordId: interaction.member.id,
             username: "",
             title: null,
+            flags: 0,
           },
           options: new InteractionOptions(
             interaction.data.options as InteractionOption[]

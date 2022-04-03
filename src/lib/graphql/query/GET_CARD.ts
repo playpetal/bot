@@ -24,6 +24,7 @@ const query = gql`
         title {
           title
         }
+        flags
       }
       issue
       quality

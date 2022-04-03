@@ -20,11 +20,6 @@ const GET_USER = gql`
       title {
         title
       }
-      groups {
-        group {
-          name
-        }
-      }
     }
   }
 `;
