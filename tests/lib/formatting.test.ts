@@ -10,6 +10,7 @@ describe("lib", () => {
         title: { title: "%u the Tester" },
         id: 0,
         discordId: "TEST",
+        flags: 0,
       });
 
       expect(name).to.equal("**Test** the Tester");

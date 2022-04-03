@@ -15,7 +15,13 @@ describe("commands", function () {
 
       await pingRun({
         courier,
-        user: { id: 0, username: "test", title: null, discordId: "test" },
+        user: {
+          id: 0,
+          username: "test",
+          title: null,
+          discordId: "test",
+          flags: 0,
+        },
         options,
         interaction: courier.interaction!,
       });
