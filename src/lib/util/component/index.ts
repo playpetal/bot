@@ -72,9 +72,9 @@ export function selectOption({
   return { label, value, description, emoji, default: isDefault };
 }
 
-export function row(...buttons: Button[]) {
+export function row(...components: (Button | Select)[]) {
   return {
     type: 1 as const,
-    components: buttons,
+    components,
   };
 }

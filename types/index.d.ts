@@ -7,7 +7,7 @@ declare module "petal" {
 
   type Components = {
     type: 1;
-    components: Button[];
+    components: (Button | Select)[];
   }[];
 
   type Button = {
