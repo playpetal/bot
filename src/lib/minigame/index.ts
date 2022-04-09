@@ -22,7 +22,11 @@ export async function setMinigame<T extends MinigameType>(
     guild,
   }: { message: string; channel: string; guild: string }
 ) {
-  const type = isCharacterGuess(data) ? "GUESS_CHARACTER" : "GUESS_CHARACTER";
+  const type = isCharacterGuess(data)
+    ? "GUESS_CHARACTER"
+    : isGTS(data)
+    ? "GTS"
+    : "WORDS";
   const playerId = typeof user === "number" ? user : user.id;
 
   const minigameObject: UnknownMinigame = {
