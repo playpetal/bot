@@ -41,10 +41,21 @@ const run = async function (interaction: UnknownInteraction) {
   try {
     user = await getUserPartial({ discordId: interaction.member.id });
   } catch (e) {
-    logger.error(e);
+    if (e instanceof BotError) {
+      if (interaction instanceof AutocompleteInteraction)
+        return interaction.acknowledge([]);
 
-    if (interaction instanceof AutocompleteInteraction)
-      return interaction.acknowledge([]);
+      const embed = new ErrorEmbed(e.message);
+
+      await interaction.createMessage({
+        embeds: [embed],
+        components: e.components,
+      });
+
+      return;
+    }
+
+    logger.error(e);
 
     return interaction.createMessage({
       embeds: [
