@@ -1,6 +1,6 @@
 import { Run, Gender } from "petal";
 import { updateCharacter } from "../../../../../../lib/graphql/mutation/UPDATE_CHARACTER";
-import { getCharacter } from "../../../../../../lib/graphql/query/GET_CHARACTER";
+import { getCharacter } from "../../../../../../lib/graphql/query/categorization/character/getCharacter";
 import { ErrorEmbed, Embed } from "../../../../../../struct/embed";
 
 const run: Run = async ({ interaction, user, options }) => {

@@ -3,7 +3,7 @@ import { Maybe } from "graphql/jsutils/Maybe";
 import { Run, Character, Group, Prefab, Subgroup } from "petal";
 import { createPrefab } from "../../../../../../lib/graphql/mutation/CREATE_PREFAB";
 import { getLastRelease } from "../../../../../../lib/graphql/query/categorization/release/GET_LAST_RELEASE";
-import { getCharacter } from "../../../../../../lib/graphql/query/GET_CHARACTER";
+import { getCharacter } from "../../../../../../lib/graphql/query/categorization/character/getCharacter";
 import { getGroup } from "../../../../../../lib/graphql/query/GET_GROUP";
 import { getSubgroup } from "../../../../../../lib/graphql/query/GET_SUBGROUP";
 import { uploadImage } from "../../../../../../lib/img";

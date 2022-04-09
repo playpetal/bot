@@ -4,7 +4,7 @@ import { Run, Character, Group, Prefab, Subgroup } from "petal";
 import { updatePrefab } from "../../../../../../lib/graphql/mutation/categorization/prefab/UPDATE_PREFAB";
 import { getPrefab } from "../../../../../../lib/graphql/query/categorization/prefab/GET_PREFAB";
 import { getLastRelease } from "../../../../../../lib/graphql/query/categorization/release/GET_LAST_RELEASE";
-import { getCharacter } from "../../../../../../lib/graphql/query/GET_CHARACTER";
+import { getCharacter } from "../../../../../../lib/graphql/query/categorization/character/getCharacter";
 import { getGroup } from "../../../../../../lib/graphql/query/GET_GROUP";
 import { getSubgroup } from "../../../../../../lib/graphql/query/GET_SUBGROUP";
 import { uploadImage } from "../../../../../../lib/img";

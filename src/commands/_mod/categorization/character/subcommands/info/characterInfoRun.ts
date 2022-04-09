@@ -1,5 +1,5 @@
 import { Run } from "petal";
-import { getCharacter } from "../../../../../../lib/graphql/query/GET_CHARACTER";
+import { getCharacter } from "../../../../../../lib/graphql/query/categorization/character/getCharacter";
 import { ErrorEmbed, Embed } from "../../../../../../struct/embed";
 
 const run: Run = async ({ interaction, options }) => {
