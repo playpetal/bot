@@ -7,7 +7,10 @@ import {
   UnknownMinigame,
   WordsData,
 } from "petal";
+import { bot } from "../..";
+import { Embed } from "../../struct/embed";
 import { redis } from "../redis";
+import { GTS_MAX_MS } from "./constants";
 
 export async function setMinigame<T extends MinigameType>(
   user: PartialUser | number,
@@ -46,8 +49,36 @@ export async function getMinigame<T extends MinigameType>(
     `minigame:${typeof user === "number" ? user : user.id}`
   );
 
-  if (!minigame) return null;
-  return JSON.parse(minigame) as Minigame<never>;
+  if (!minigame) return;
+
+  const object = JSON.parse(minigame) as Minigame<T>;
+
+  if (object.data.type === "GTS") {
+    const {
+      data: { startedAt },
+      channel,
+      message,
+    } = object;
+
+    if (startedAt > Date.now() - GTS_MAX_MS) return object;
+
+    try {
+      await destroyMinigame(user);
+      const gameMessage = await bot.getMessage(channel, message);
+      await gameMessage.edit({
+        embeds: [
+          new Embed()
+            .setColor("#F04747")
+            .setDescription("**Better luck next time!**\nYou ran out of time!"),
+        ],
+        components: [],
+      });
+    } catch {}
+
+    return undefined;
+  }
+
+  return object;
 }
 
 export async function destroyMinigame(
