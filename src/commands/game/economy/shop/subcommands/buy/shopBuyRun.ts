@@ -1,9 +1,12 @@
 import { Product, Run } from "petal";
 import { bot } from "../../../../../..";
+import { announcer } from "../../../../../../lib/announcer/announcer";
 import { newTransaction } from "../../../../../../lib/graphql/mutation/shop/NEW_TRANSACTION";
 import { getPayment } from "../../../../../../lib/graphql/query/shop/GET_PAYMENT";
 import { getProducts } from "../../../../../../lib/graphql/query/shop/GET_PRODUCTS";
 import { reachedPurchaseLimit } from "../../../../../../lib/graphql/query/shop/REACHED_PURCHASE_LIMIT";
+import { displayName } from "../../../../../../lib/util/displayName";
+import { hasFlag } from "../../../../../../lib/util/flags";
 import { emoji } from "../../../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
@@ -68,6 +71,14 @@ export const shopBuyRun: Run = async function run({ courier, user, options }) {
         const channel = await bot.getDMChannel(user.discordId);
 
         await channel.createMessage({ embeds: [embed] });
+      }
+
+      if (hasFlag("PUBLIC_SUPPORTER", user.flags)) {
+        await announcer.announce(
+          `${displayName(
+            user
+          )} has chosen to support petal! thanks to their generosity, petal can run for another **${serverTime} hours**!`
+        );
       }
 
       clearInterval(interval);
