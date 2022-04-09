@@ -22,9 +22,9 @@ const run: Run = async ({ interaction, user, options }) => {
 
   const { premiumCurrency, discordId } = (await getUser({ id: user.id }))!;
 
-  if (premiumCurrency < 25) {
+  if (premiumCurrency < 1) {
     throw new BotError(
-      `**woah there!**` + `\nyou need ${emoji.lily} ${strong(25)} to do that.`
+      `**woah there!**` + `\nyou need ${emoji.lily} ${strong(1)} to do that.`
     );
   }
 
@@ -43,7 +43,7 @@ const run: Run = async ({ interaction, user, options }) => {
 
   const embed = new Embed()
     .setDescription(
-      `${emoji.cards} **you use ${emoji.lily} 25 to brew a dye...**` +
+      `${emoji.cards} **you use ${emoji.lily} 1 to brew a dye...**` +
         `\nyour card has been dyed to \`#${_card.tint
           .toString(16)
           .toUpperCase()}\`!`

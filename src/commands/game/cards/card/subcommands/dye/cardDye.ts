@@ -6,7 +6,7 @@ import run from "./cardDyeRun";
 export const CardDye: SlashCommandSubcommand = {
   type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
   name: "dye",
-  description: "changes the color of the card! (costs 25 lilies)",
+  description: "changes the color of the card! (costs 1 lily)",
   options: [
     {
       type: CONSTANTS.OPTION_TYPE.STRING,

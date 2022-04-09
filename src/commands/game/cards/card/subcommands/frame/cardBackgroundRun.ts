@@ -23,9 +23,9 @@ const run: Run = async function cardFrameRun({ interaction, user, options }) {
 
   const { premiumCurrency, discordId } = (await getUser({ id: user.id }))!;
 
-  if (premiumCurrency < 100) {
+  if (premiumCurrency < 1) {
     throw new BotError(
-      `**woah there!**` + `\nyou need ${emoji.lily} ${strong(100)} to do that.`
+      `**woah there!**` + `\nyou need ${emoji.lily} ${strong(1)} to do that.`
     );
   }
 
@@ -61,7 +61,7 @@ const run: Run = async function cardFrameRun({ interaction, user, options }) {
 
   const embed = new Embed()
     .setDescription(
-      `${emoji.cards} **you use ${emoji.lily} 100 to make a background...**` +
+      `${emoji.cards} **you use ${emoji.lily} 1 to make a background...**` +
         `\nyour card's background has been changed!`
     )
     .setThumbnail(`attachment://${card.id.toString(16)}.png`);

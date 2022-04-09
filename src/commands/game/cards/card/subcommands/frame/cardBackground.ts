@@ -6,7 +6,7 @@ import cardFrameRun from "./cardBackgroundRun";
 export const CardBackground: SlashCommandSubcommand = {
   type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
   name: "background",
-  description: "changes the background of the card, in exchange for 100 lilies",
+  description: "changes the background of the card, in exchange for 1 lily",
   options: [
     {
       type: CONSTANTS.OPTION_TYPE.STRING,
