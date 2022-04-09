@@ -2,8 +2,7 @@ import { MinigameError } from "../../../lib/error/minigame-error";
 import { claimMinigameCardReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_CARD";
 import { claimMinigameLilyReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_LILY";
 import { claimMinigamePetalReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
-import { completeGts } from "../../../lib/graphql/mutation/game/minigame/gts/COMPLETE_GTS";
-import { completeWords } from "../../../lib/graphql/mutation/game/minigame/words/COMPLETE_WORDS";
+import { completeMinigame } from "../../../lib/graphql/mutation/game/minigame/completeMinigame";
 import { getCardImage } from "../../../lib/img";
 import { logMinigame } from "../../../lib/logger/minigame";
 import { destroyMinigame, getMinigame } from "../../../lib/minigame";
@@ -51,38 +50,41 @@ const run: RunComponent = async function ({ interaction, user }) {
 
   let desc: string = "";
 
+  const rewardSelection = reward.toUpperCase() as "CARD" | "PETAL" | "LILY";
+
+  let guesses: number = 0;
+  let elapsed: number = 0;
+
   if (data.type === "GTS") {
-    const { guesses, elapsed } = data;
+    guesses = data.guesses;
+    elapsed = data.elapsed!;
+
     desc = `${emoji.song} **You got it in ${guesses} guess${
       guesses !== 1 ? "es" : ""
     } (${(elapsed! / 1000).toFixed(2)}s)!**`;
-
-    await completeGts(
-      user.discordId,
-      guesses,
-      elapsed!,
-      reward.toUpperCase() as "CARD" | "PETAL" | "LILY"
-    );
   } else if (data.type === "WORDS") {
-    const { guesses, elapsed } = data;
+    guesses = data.guesses.length;
+    elapsed = data.elapsed!;
 
-    desc = `${emoji.bloom} **petle ${guesses.length}/6**\n\n${generateWords(
+    desc = `${emoji.bloom} **petle ${guesses}/6**\n\n${generateWords(
       data
-    )}\n\n${emoji.bloom} **you got it in ${guesses.length} guess${
-      guesses.length !== 1 ? "es" : ""
-    } (${(elapsed! / 1000).toFixed(2)}s)!**`;
-
-    await completeWords(
-      user.discordId,
-      guesses.length,
-      elapsed!,
-      reward.toUpperCase() as "CARD" | "PETAL" | "LILY"
-    );
+    )}\n\n${emoji.bloom} **you got it in ${guesses} guess${
+      guesses !== 1 ? "es" : ""
+    } (${(elapsed / 1000).toFixed(2)}s)!**`;
   } else if (data.type === "GUESS_CHARACTER") {
-    const { guesses, elapsed } = data;
+    guesses = data.guesses.length;
+    elapsed = data.elapsed!;
 
-    desc = `${emoji.bloom} ${guesses} ${elapsed}`;
+    desc = `${emoji.bloom} **you got \`${data.answer.name}\` in ${guesses} guesses!**`;
   }
+
+  await completeMinigame(
+    data.type,
+    user.discordId,
+    guesses,
+    elapsed,
+    rewardSelection
+  );
 
   if (reward === "petal") {
     await claimMinigamePetalReward(user.discordId);

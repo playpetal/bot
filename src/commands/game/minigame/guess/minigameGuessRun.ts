@@ -1,10 +1,16 @@
-import { Run } from "petal";
+import { Button, Run } from "petal";
+import { claimMinigamePetalReward } from "../../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
+import { completeMinigame } from "../../../../lib/graphql/mutation/game/minigame/completeMinigame";
 import { searchCharacters } from "../../../../lib/graphql/query/categorization/character/searchCharacters";
+import { canClaimPremiumRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
+import { canClaimRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import {
   destroyMinigame,
   getMinigame,
   setMinigame,
 } from "../../../../lib/minigame";
+import { getMinigameRewardComponents } from "../../../../lib/util/component/minigame";
+import { emoji } from "../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../struct/embed";
 
 export const minigameGuessRun: Run = async ({ courier, user, options }) => {
@@ -66,14 +72,51 @@ export const minigameGuessRun: Run = async ({ courier, user, options }) => {
     const character = matches[0];
     data.guesses.push(character);
 
-    if (character.id === data.answer.id) {
-      const embed = new Embed().setDescription(
-        `**correct!**\ni was thinking of \`${data.answer.name}\`!`
-      );
+    const isCorrect = character.id === data.answer.id;
+    if (isCorrect) data.elapsed = Date.now() - data.startedAt;
 
-      await courier.send({ embeds: [embed] });
-      await destroyMinigame(user);
+    await setMinigame(user, data, activeMinigame);
 
+    if (isCorrect) {
+      data.elapsed = Date.now() - data.startedAt;
+
+      let embed = new Embed();
+      let components: {
+        type: 1;
+        components: Button[];
+      }[] = [];
+
+      let desc = `**you got \`${data.answer.name}\` in ${
+        data.guesses.length
+      } guess${data.guesses.length === 1 ? "" : "es"}!**`;
+
+      const rewardsRemaining = await canClaimRewards(user.discordId);
+
+      if (rewardsRemaining === 0) {
+        desc += `\nyou were rewarded ${emoji.petals} **1** for playing.`;
+
+        await destroyMinigame(user);
+
+        await completeMinigame(
+          "GUESS_CHARACTER",
+          user.discordId,
+          data.guesses.length,
+          data.elapsed,
+          "PETAL"
+        );
+
+        await claimMinigamePetalReward(user.discordId);
+      } else {
+        desc += `\nchoose your reward from the options below!`;
+        components = await getMinigameRewardComponents(
+          user.id,
+          (await canClaimPremiumRewards(user.discordId)) > 0
+        );
+      }
+
+      embed.setDescription(desc);
+
+      await courier.send({ embeds: [embed], components });
       return;
     }
 

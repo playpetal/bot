@@ -1,7 +1,7 @@
 import { Run, WordsData } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
 import { claimMinigamePetalReward } from "../../../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
-import { completeWords } from "../../../../../lib/graphql/mutation/game/minigame/words/COMPLETE_WORDS";
+import { completeMinigame } from "../../../../../lib/graphql/mutation/game/minigame/completeMinigame";
 import { canClaimPremiumRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { isWordValid } from "../../../../../lib/graphql/query/game/minigame/words/IS_WORD_VALID";
@@ -62,7 +62,8 @@ const run: Run = async function run({ interaction, user, options }) {
   if (isFinished && correct && rewardsRemaining <= 0) {
     await destroyMinigame(user);
 
-    await completeWords(
+    await completeMinigame(
+      "WORDS",
       interaction.member!.id,
       data.guesses.length,
       data.elapsed!,
