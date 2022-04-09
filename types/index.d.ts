@@ -405,4 +405,10 @@ declare module "petal" {
     account: PartialUser;
     value: number;
   };
+
+  export type Announcement = {
+    id: number;
+    announcement: string;
+    createdAt: number;
+  };
 }

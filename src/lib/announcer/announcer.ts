@@ -6,16 +6,17 @@ import {
   TextChannel,
 } from "eris";
 import { bot } from "../..";
+import { getAnnouncements } from "../graphql/query/getAnnouncements";
 import { logger } from "../logger";
 
 class Announcer {
   private channel: TextChannel | NewsChannel | undefined;
+  private pollInterval: NodeJS.Timer | undefined;
 
   public async fetchChannel(): Promise<TextChannel | undefined> {
     if (this.channel) return this.channel;
 
-    // TODO: remove hardcode once i get my laptop back
-    const channelId = "960911514632605786";
+    const channelId = process.env.ANNOUNCE_CHANNEL_ID;
     if (!channelId) return;
 
     try {
@@ -37,6 +38,27 @@ class Announcer {
     } catch (e) {
       logger.warn(`Failed to load announcements channel: ${e}`);
     }
+  }
+
+  public async beginPolling() {
+    if (this.pollInterval) return;
+
+    this.pollInterval = setInterval(async () => {
+      try {
+        const announcements = await getAnnouncements();
+
+        for (let announcement of announcements) {
+          const ms = Math.min(Date.now() - announcement.createdAt, 0);
+
+          setTimeout(
+            async () => await this.announce(announcement.announcement),
+            ms
+          );
+        }
+      } catch {
+        // fail silently if we can't connect to the api
+      }
+    }, 2500);
   }
 
   public async announce(

@@ -1,4 +1,5 @@
 import { bot } from "..";
+import { announcer } from "../lib/announcer/announcer";
 import { processCommands } from "../lib/command";
 import { Event } from "../struct/event";
 
@@ -24,6 +25,8 @@ const run = async function () {
       `\n\\_/ \\_/     loaded ${commands.length} commands (${globalCommands.length} global, ${modCommands.length} mod)` +
       `\n  \`-'`
   );
+
+  await announcer.beginPolling();
 };
 
 export default new Event(["ready"], run);
