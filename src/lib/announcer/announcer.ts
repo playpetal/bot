@@ -51,7 +51,8 @@ class Announcer {
           const ms = Math.min(Date.now() - announcement.createdAt, 0);
 
           setTimeout(
-            async () => await this.announce(announcement.announcement),
+            async () =>
+              await this.announce(announcement.announcement, { publish: true }),
             ms
           );
         }
