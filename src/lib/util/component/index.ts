@@ -1,4 +1,4 @@
-import { Button } from "petal";
+import { Button, Emoji, Select, SelectOption } from "petal";
 
 const buttonStyles = {
   blue: 1,
@@ -28,6 +28,48 @@ export function button({
     disabled,
     emoji: emoji ? { id: emoji } : undefined,
   };
+}
+
+export function select({
+  customId,
+  options,
+  placeholder,
+  min_values,
+  max_values,
+  disabled,
+}: {
+  customId: string;
+  options: SelectOption[];
+  placeholder?: string;
+  min_values?: number;
+  max_values?: number;
+  disabled?: boolean;
+}): Select {
+  return {
+    type: 3 as const,
+    custom_id: customId,
+    options,
+    placeholder,
+    min_values,
+    max_values,
+    disabled,
+  };
+}
+
+export function selectOption({
+  label,
+  value,
+  description,
+  emoji,
+  isDefault,
+}: {
+  label: string;
+  value: string;
+  description?: string;
+  emoji?: Emoji;
+  isDefault?: boolean;
+}): SelectOption {
+  return { label, value, description, emoji, default: isDefault };
 }
 
 export function row(...buttons: Button[]) {

@@ -1,6 +1,10 @@
 declare module "petal" {
   export type Maybe<T> = T | null;
 
+  type Emoji = {
+    id: string | null;
+  };
+
   type Components = {
     type: 1;
     components: Button[];
@@ -15,6 +19,23 @@ declare module "petal" {
       id: string;
     };
     disabled: boolean;
+  };
+
+  type Select = {
+    type: 3;
+    custom_id: string;
+    options: SelectOption[];
+    placeholder?: string;
+    min_values?: number;
+    max_values?: number;
+    disabled?: boolean;
+  };
+  type SelectOption = {
+    label: string;
+    value: string;
+    description?: string;
+    emoji?: Emoji;
+    default?: boolean;
   };
 
   export type SlashCommandOptionType =
