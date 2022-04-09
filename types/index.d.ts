@@ -264,7 +264,7 @@ declare module "petal" {
   };
 
   type Reward = "PETAL" | "LILY" | "CARD";
-  type MinigameType = "GTS" | "WORDS";
+  type MinigameType = "GTS" | "WORDS" | "GUESS_CHARACTER";
 
   export type UnknownMinigame = {
     playerId: number;
@@ -272,7 +272,7 @@ declare module "petal" {
     message: string;
     channel: string;
     guild: string;
-    data: GTSData | WordsData;
+    data: GTSData | WordsData | CharacterGuessData;
   };
 
   export type Minigame<T extends MinigameType | never> = {
@@ -281,7 +281,11 @@ declare module "petal" {
     message: string;
     channel: string;
     guild: string;
-    data: T extends "GTS" ? GTSData : WordsData;
+    data: T extends "GTS"
+      ? GTSData
+      : T extends "GUESS_CHARACTER"
+      ? CharacterGuessData
+      : WordsData;
   };
 
   export type GTSData = {
@@ -295,6 +299,14 @@ declare module "petal" {
   export type WordsData = {
     answer: string;
     guesses: string[];
+    elapsed?: number;
+    startedAt: number;
+  };
+
+  export type CharacterGuessData = {
+    type: "GUESS_CHARACTER";
+    answer: Character;
+    guesses: Character[];
     elapsed?: number;
     startedAt: number;
   };

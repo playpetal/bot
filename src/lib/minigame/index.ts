@@ -1,5 +1,6 @@
 import {
   GTSData,
+  CharacterGuessData,
   Minigame,
   MinigameType,
   PartialUser,
@@ -10,28 +11,31 @@ import { redis } from "../redis";
 
 export async function setMinigame<T extends MinigameType>(
   user: PartialUser | number,
-  data: T extends "GTS" ? GTSData : WordsData,
+  data: T extends "GTS"
+    ? GTSData
+    : T extends "WORDS"
+    ? WordsData
+    : CharacterGuessData,
   {
     message,
     channel,
     guild,
   }: { message: string; channel: string; guild: string }
-): Promise<Minigame<T>> {
-  const type = isGTS(data) ? "GTS" : "WORDS";
+) {
+  const type = isCharacterGuess(data) ? "GUESS_CHARACTER" : "GUESS_CHARACTER";
+  const playerId = typeof user === "number" ? user : user.id;
 
   const minigameObject: UnknownMinigame = {
     type,
-    playerId: typeof user === "number" ? user : user.id,
+    playerId,
     channel,
     message,
     guild,
     data,
   };
 
-  await redis.set(
-    `minigame:${typeof user === "number" ? user : user.id}`,
-    JSON.stringify(minigameObject)
-  );
+  await redis.set(`minigame:${playerId}`, JSON.stringify(minigameObject));
+
   return minigameObject as Minigame<T>;
 }
 
@@ -61,4 +65,8 @@ export function isGTS(data: any): data is GTSData {
 
 export function isWords(data: any): data is WordsData {
   return data?.answer !== undefined;
+}
+
+export function isCharacterGuess(data: any): data is CharacterGuessData {
+  return data?.type === "GUESS_CHARACTER";
 }
