@@ -6,6 +6,8 @@ export const logger = createLogger({
   exitOnError: false,
   format: format.json(),
   transports: [
-    new transports.File({ filename: path.join("./", "/logs/log.log") }),
+    process.env.ENVIRONMENT === "DEVELOPMENT"
+      ? new transports.Console()
+      : new transports.File({ filename: path.join("./", "/logs/log.log") }),
   ],
 });
