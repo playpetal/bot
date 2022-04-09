@@ -85,7 +85,7 @@ export class Embed {
 }
 
 export class ErrorEmbed {
-  color?: number = parseInt("FFAACC", 16);
+  color?: number = parseInt("F04747", 16);
   description: string;
 
   constructor(description: string) {
