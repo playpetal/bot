@@ -1,3 +1,4 @@
+import { bot } from "../../../..";
 import { getUser } from "../../../../lib/graphql/query/GET_USER";
 import { destroyMinigame, getMinigame } from "../../../../lib/minigame";
 import { Component, RunComponent } from "../../../../struct/component";
@@ -23,7 +24,14 @@ const run: RunComponent = async function ({ interaction, user }) {
   const embed = new Embed()
     .setColor("#F04747")
     .setDescription("**better luck next time!**\nyou cancelled this game.");
-  await interaction.editOriginalMessage({ embeds: [embed], components: [] });
+
+  try {
+    await bot.editMessage(game.channel, game.message, {
+      embeds: [embed],
+      components: [],
+    });
+    await interaction.deleteOriginalMessage();
+  } catch {}
 
   return;
 };
