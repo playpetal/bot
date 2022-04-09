@@ -7,8 +7,6 @@ import {
   getMinigame,
   destroyMinigame,
   setMinigame,
-  isWords,
-  isGTS,
 } from "../../../../../lib/minigame";
 import {
   GTS_MAX_MS,
@@ -24,10 +22,10 @@ export const songGuessRun: Run = async function ({ courier, user, options }) {
 
   const data = (minigame as UnknownMinigame).data;
 
-  if (isWords(data))
+  if (data.type === "WORDS")
     throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
 
-  if (!isGTS(data)) throw MinigameError.NotPlayingGTS;
+  if (data.type === "GUESS_CHARACTER") throw MinigameError.AlreadyPlayingGTS;
 
   if (data.startedAt < Date.now() - GTS_MAX_MS) {
     await destroyMinigame(user);

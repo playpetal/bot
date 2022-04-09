@@ -15,18 +15,16 @@ export async function setMinigame<T extends MinigameType>(
     ? GTSData
     : T extends "WORDS"
     ? WordsData
-    : CharacterGuessData,
+    : T extends "GUESS_CHARACTER"
+    ? CharacterGuessData
+    : never,
   {
     message,
     channel,
     guild,
   }: { message: string; channel: string; guild: string }
 ) {
-  const type = isCharacterGuess(data)
-    ? "GUESS_CHARACTER"
-    : isGTS(data)
-    ? "GTS"
-    : "WORDS";
+  const type = data.type;
   const playerId = typeof user === "number" ? user : user.id;
 
   const minigameObject: UnknownMinigame = {
@@ -61,16 +59,4 @@ export async function destroyMinigame(
     await redis.del(`minigame:${user}`);
   } else await redis.del(`minigame:${user.id}`);
   return;
-}
-
-export function isGTS(data: any): data is GTSData {
-  return data?.song !== undefined;
-}
-
-export function isWords(data: any): data is WordsData {
-  return data?.answer !== undefined;
-}
-
-export function isCharacterGuess(data: any): data is CharacterGuessData {
-  return data?.type === "GUESS_CHARACTER";
 }

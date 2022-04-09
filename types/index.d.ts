@@ -289,6 +289,7 @@ declare module "petal" {
   };
 
   export type GTSData = {
+    type: "GTS";
     song: GameSong;
     guesses: number;
     correct: boolean;
@@ -297,6 +298,7 @@ declare module "petal" {
   };
 
   export type WordsData = {
+    type: "WORDS";
     answer: string;
     guesses: string[];
     elapsed?: number;

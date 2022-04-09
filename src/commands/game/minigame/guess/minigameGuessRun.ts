@@ -3,7 +3,6 @@ import { searchCharacters } from "../../../../lib/graphql/query/categorization/c
 import {
   destroyMinigame,
   getMinigame,
-  isCharacterGuess,
   setMinigame,
 } from "../../../../lib/minigame";
 import { Embed } from "../../../../struct/embed";
@@ -23,7 +22,7 @@ export const minigameGuessRun: Run = async ({ courier, user, options }) => {
 
   const { data } = activeMinigame;
 
-  if (isCharacterGuess(data)) {
+  if (data.type === "GUESS_CHARACTER") {
     const guess = options.getOption<string>("idol");
 
     if (!guess) {

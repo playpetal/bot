@@ -1,6 +1,6 @@
 import { Autocomplete } from "petal";
 import { searchCharacters } from "../../../../../lib/graphql/query/categorization/character/searchCharacters";
-import { getMinigame, isCharacterGuess } from "../../../../../lib/minigame";
+import { getMinigame } from "../../../../../lib/minigame";
 
 export const minigameGuessAutocompleteIdol: Autocomplete = async ({
   interaction,
@@ -13,7 +13,7 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
   const minigame = await getMinigame(user);
   let birthdayBefore: Date | undefined, birthdayAfter: Date | undefined;
 
-  if (minigame && isCharacterGuess(minigame.data)) {
+  if (minigame && minigame.data.type === "GUESS_CHARACTER") {
     if (minigame.data.guesses.length > 0) {
       const birthdays = minigame.data.guesses
         .map((c) => c.birthday)
