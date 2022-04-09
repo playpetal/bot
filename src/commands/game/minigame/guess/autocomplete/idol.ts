@@ -14,9 +14,7 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
   let birthdayBefore: Date | undefined, birthdayAfter: Date | undefined;
 
   if (minigame && isCharacterGuess(minigame.data)) {
-    console.log("A");
     if (minigame.data.guesses.length > 0) {
-      console.log("B");
       const birthdays = minigame.data.guesses
         .map((c) => c.birthday)
         .filter((d) => d !== null) as Date[];
@@ -24,18 +22,13 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
       const answer = minigame.data.answer.birthday;
 
       if (answer) {
-        console.log("C");
         for (let birthday of birthdays) {
           if (birthday < answer) {
-            console.log("D");
             if (!birthdayAfter || birthdayAfter < birthday) {
-              console.log("E");
               birthdayAfter = birthday;
             }
           } else if (birthday > answer) {
-            console.log("F");
             if (!birthdayBefore || birthdayBefore > birthday) {
-              console.log("G");
               birthdayBefore = birthday;
             }
           }
