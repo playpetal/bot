@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client/core";
 import { Account } from "petal";
-import { graphql, GraphQLResponse, Maybe } from "..";
+import { Maybe } from "..";
+import { query } from "../request";
 
 const GET_USER = gql`
   query GetUser($id: Int, $username: String, $discordId: String) {
@@ -32,13 +33,11 @@ export async function getUser({
   id?: number;
   discordId?: string;
   username?: string;
-}) {
-  const query = (await graphql.query({
+}): Promise<Maybe<Account>> {
+  const data = await query<{ user: Maybe<Account> }>({
     query: GET_USER,
     variables: { discordId, id, username },
-  })) as GraphQLResponse<{
-    user: Maybe<Account>;
-  }>;
+  });
 
-  return query.data.user;
+  return data.user;
 }
