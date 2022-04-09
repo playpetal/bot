@@ -1,4 +1,5 @@
 import { CharacterGuessData, Run } from "petal";
+import { MinigameError } from "../../../../lib/error/minigame-error";
 import { getRandomCharacter } from "../../../../lib/graphql/query/categorization/character/getRandomCharacter";
 import { getMinigame, setMinigame } from "../../../../lib/minigame";
 import { Embed } from "../../../../struct/embed";
@@ -7,12 +8,12 @@ export const minigamePlayRun: Run = async ({ courier, options, user }) => {
   const activeMinigame = await getMinigame(user);
 
   if (activeMinigame) {
-    const embed = new Embed().setDescription(
-      "**woah there!**\nyou already have an active minigame."
-    );
+    const type = activeMinigame.data.type;
 
-    await courier.send({ embeds: [embed] });
-    return;
+    if (type === "GTS") throw MinigameError.AlreadyPlayingGTS;
+    if (type === "GUESS_CHARACTER") throw MinigameError.AlreadyPlayingIdols;
+    if (type === "WORDS")
+      throw MinigameError.AlreadyPlayingWords({ ...activeMinigame, user });
   }
 
   const minigameType = options.getOption<"idols">("minigame")!;

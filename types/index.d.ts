@@ -268,7 +268,6 @@ declare module "petal" {
 
   export type UnknownMinigame = {
     playerId: number;
-    type: MinigameType;
     message: string;
     channel: string;
     guild: string;
@@ -277,7 +276,6 @@ declare module "petal" {
 
   export type Minigame<T extends MinigameType | never> = {
     playerId: number;
-    type: T;
     message: string;
     channel: string;
     guild: string;
@@ -285,7 +283,9 @@ declare module "petal" {
       ? GTSData
       : T extends "GUESS_CHARACTER"
       ? CharacterGuessData
-      : WordsData;
+      : T extends "WORDS"
+      ? WordsData
+      : never;
   };
 
   export type GTSData = {

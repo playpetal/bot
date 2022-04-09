@@ -10,10 +10,13 @@ import { row, button } from "../../../../../lib/util/component";
 const run: Run = async function run({ interaction, user }) {
   const minigame = await getMinigame(user);
 
-  if (minigame && minigame.data.type !== "WORDS")
-    throw MinigameError.AlreadyPlayingMinigame;
-
-  if (minigame) throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
+  if (minigame) {
+    if (minigame.data.type === "GTS") throw MinigameError.AlreadyPlayingGTS;
+    if (minigame.data.type === "GUESS_CHARACTER")
+      throw MinigameError.AlreadyPlayingIdols;
+    if (minigame.data.type === "WORDS")
+      throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
+  }
 
   const word = await getWord(user.discordId);
 

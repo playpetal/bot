@@ -1,4 +1,3 @@
-import { GTSData, WordsData } from "petal";
 import { MinigameError } from "../../../lib/error/minigame-error";
 import { claimMinigameCardReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_CARD";
 import { claimMinigameLilyReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_LILY";
@@ -30,12 +29,15 @@ const run: RunComponent = async function ({ interaction, user }) {
   const data = minigame.data;
   let isCorrect = false;
 
-  if (minigame.type === "GTS") {
-    const { correct } = data as GTSData;
+  if (data.type === "GTS") {
+    const { correct } = data;
     isCorrect = correct;
-  } else if (minigame.type === "WORDS") {
-    const { guesses, answer } = data as WordsData;
+  } else if (data.type === "WORDS") {
+    const { guesses, answer } = data;
     isCorrect = !!guesses.find((g) => g === answer.toLowerCase());
+  } else if (data.type === "GUESS_CHARACTER") {
+    const { guesses, answer } = data;
+    isCorrect = !!guesses.find((g) => g.id === answer.id);
   }
 
   await destroyMinigame(accountId);
@@ -49,8 +51,8 @@ const run: RunComponent = async function ({ interaction, user }) {
 
   let desc: string = "";
 
-  if (minigame.type === "GTS") {
-    const { guesses, elapsed } = data as GTSData;
+  if (data.type === "GTS") {
+    const { guesses, elapsed } = data;
     desc = `${emoji.song} **You got it in ${guesses} guess${
       guesses !== 1 ? "es" : ""
     } (${(elapsed! / 1000).toFixed(2)}s)!**`;
@@ -61,11 +63,11 @@ const run: RunComponent = async function ({ interaction, user }) {
       elapsed!,
       reward.toUpperCase() as "CARD" | "PETAL" | "LILY"
     );
-  } else if (minigame.type === "WORDS") {
-    const { guesses, elapsed } = data as WordsData;
+  } else if (data.type === "WORDS") {
+    const { guesses, elapsed } = data;
 
     desc = `${emoji.bloom} **petle ${guesses.length}/6**\n\n${generateWords(
-      data as WordsData
+      data
     )}\n\n${emoji.bloom} **you got it in ${guesses.length} guess${
       guesses.length !== 1 ? "es" : ""
     } (${(elapsed! / 1000).toFixed(2)}s)!**`;
@@ -76,6 +78,10 @@ const run: RunComponent = async function ({ interaction, user }) {
       elapsed!,
       reward.toUpperCase() as "CARD" | "PETAL" | "LILY"
     );
+  } else if (data.type === "GUESS_CHARACTER") {
+    const { guesses, elapsed } = data;
+
+    desc = `${emoji.bloom} ${guesses} ${elapsed}`;
   }
 
   if (reward === "petal") {

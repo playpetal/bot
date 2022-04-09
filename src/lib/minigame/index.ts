@@ -24,11 +24,9 @@ export async function setMinigame<T extends MinigameType>(
     guild,
   }: { message: string; channel: string; guild: string }
 ) {
-  const type = data.type;
   const playerId = typeof user === "number" ? user : user.id;
 
   const minigameObject: UnknownMinigame = {
-    type,
     playerId,
     channel,
     message,
@@ -43,7 +41,7 @@ export async function setMinigame<T extends MinigameType>(
 
 export async function getMinigame<T extends MinigameType>(
   user: PartialUser | number
-): Promise<Minigame<T> | null> {
+): Promise<Minigame<T> | undefined> {
   const minigame = await redis.get(
     `minigame:${typeof user === "number" ? user : user.id}`
   );

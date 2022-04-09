@@ -1,14 +1,9 @@
-import { Minigame, Run } from "petal";
-import { bot } from "../../../../..";
+import { Run } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
 import { canClaimRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getRandomSong } from "../../../../../lib/graphql/query/GET_RANDOM_SONG";
 import { logger } from "../../../../../lib/logger";
-import {
-  getMinigame,
-  destroyMinigame,
-  setMinigame,
-} from "../../../../../lib/minigame";
+import { getMinigame, setMinigame } from "../../../../../lib/minigame";
 import {
   GTS_MAX_MS,
   GTS_MAX_GUESSES,
@@ -29,30 +24,13 @@ export const songPlayRun: Run = async function run({
   const minigame = await getMinigame(user);
 
   if (minigame) {
-    if (minigame.type === "WORDS")
+    if (minigame.data.type === "GTS") throw MinigameError.AlreadyPlayingGTS;
+
+    if (minigame.data.type === "GUESS_CHARACTER")
+      throw MinigameError.AlreadyPlayingIdols;
+
+    if (minigame.data.type === "WORDS")
       throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
-
-    const {
-      data: { startedAt },
-      channel,
-      message,
-    } = minigame as Minigame<"GTS">;
-
-    if (startedAt > Date.now() - GTS_MAX_MS)
-      throw MinigameError.AlreadyPlayingGTS;
-
-    try {
-      await destroyMinigame(user);
-      const gameMessage = await bot.getMessage(channel, message);
-      await gameMessage.edit({
-        embeds: [
-          new Embed()
-            .setColor("#F04747")
-            .setDescription("**Better luck next time!**\nYou ran out of time!"),
-        ],
-        components: [],
-      });
-    } catch {}
   }
 
   const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
@@ -111,6 +89,7 @@ export const songPlayRun: Run = async function run({
     await setMinigame<"GTS">(
       user,
       {
+        type: "GTS",
         startedAt: Date.now(),
         song: { ...song, video: undefined },
         guesses: 0,

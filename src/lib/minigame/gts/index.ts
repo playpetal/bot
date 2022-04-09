@@ -41,7 +41,7 @@ export async function handleGTSEnd(
     });
   }
 
-  dd.increment(`petal.minigame.${minigame.type.toLowerCase()}.completed`);
+  dd.increment(`petal.minigame.${minigame.data.type.toLowerCase()}.completed`);
 
   const embed = new Embed().setColor("#3BA55D");
 
