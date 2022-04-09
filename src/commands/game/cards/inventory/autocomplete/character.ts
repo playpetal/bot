@@ -1,11 +1,13 @@
 import { Autocomplete } from "petal";
-import { searchCharacters } from "../../../../../lib/graphql/query/SEARCH_CHARACTERS";
+import { searchCharacters } from "../../../../../lib/graphql/query/categorization/character/searchCharacters";
 
 const autocomplete: Autocomplete = async ({ interaction, options }) => {
   const focused = options.getFocused()!;
   let choices: { name: string; value: string }[] = [];
 
-  const characters = await searchCharacters(focused.value as string);
+  const characters = await searchCharacters({
+    search: focused.value as string,
+  });
 
   choices = characters.map((c) => {
     const birthday = c.birthday

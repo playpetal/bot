@@ -1,5 +1,5 @@
 import { Autocomplete } from "petal";
-import { searchCharacters } from "../../../../../lib/graphql/query/SEARCH_CHARACTERS";
+import { searchCharacters } from "../../../../../lib/graphql/query/categorization/character/searchCharacters";
 
 const autocomplete: Autocomplete = async function autocomplete({
   interaction,
@@ -7,7 +7,7 @@ const autocomplete: Autocomplete = async function autocomplete({
 }) {
   const focused = options.getFocused()!;
 
-  const search = await searchCharacters(focused.value as string);
+  const search = await searchCharacters({ search: focused.value as string });
 
   const choices = search.map((c) => {
     const birthday = c.birthday

@@ -1,5 +1,5 @@
 import { Autocomplete } from "petal";
-import { searchCharacters } from "../../../../../lib/graphql/query/SEARCH_CHARACTERS";
+import { searchCharacters } from "../../../../../lib/graphql/query/categorization/character/searchCharacters";
 import { searchGroups } from "../../../../../lib/graphql/query/SEARCH_GROUPS";
 import { searchPrefabs } from "../../../../../lib/graphql/query/SEARCH_PREFABS";
 import { searchSubgroups } from "../../../../../lib/graphql/query/SEARCH_SUBGROUPS";
@@ -22,7 +22,7 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
       return { name: str, value: p.id.toString() };
     });
   } else if (focused.name === "character") {
-    const search = await searchCharacters(focused.value as string);
+    const search = await searchCharacters({ search: focused.value as string });
 
     choices = search.map((c) => {
       const birthday = c.birthday
