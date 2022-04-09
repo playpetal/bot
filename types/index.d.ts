@@ -389,4 +389,20 @@ declare module "petal" {
     updatedAt: string;
     cardCount: number;
   };
+
+  export type LeaderboardType =
+    | "PUBLIC_SUPPORTER"
+    | "GTS_PETAL"
+    | "GTS_CARD"
+    | "GTS_LILY"
+    | "GTS_TIME"
+    | "WORDS_PETAL"
+    | "WORDS_CARD"
+    | "WORDS_LILY"
+    | "WORDS_TIME";
+
+  export type Leaderboard = {
+    account: PartialUser;
+    value: number;
+  };
 }

@@ -1,6 +1,5 @@
 import { Run } from "petal";
-import { getWordsRewardLeaderboard } from "../../../../../lib/graphql/query/game/leaderboard/GET_WORDS_REWARD_LEADERBOARD";
-import { getWordsTimeLeaderboard } from "../../../../../lib/graphql/query/game/leaderboard/GET_WORDS_TIME_LEADERBOARD";
+import { getLeaderboard } from "../../../../../lib/graphql/query/game/leaderboard/getLeaderboard";
 import { displayName } from "../../../../../lib/util/displayName";
 import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { renderLeaderboard } from "../../../../../lib/util/formatting/leaderboard";
@@ -16,7 +15,7 @@ const run: Run = async function run({ interaction, options }) {
   if (board === "time") {
     header += `top 10 fastest guessers (average)`;
 
-    const users = await getWordsTimeLeaderboard();
+    const users = await getLeaderboard("WORDS_TIME");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [**${(u.value / 1000).toFixed(2)}s**]`
     );
@@ -25,7 +24,7 @@ const run: Run = async function run({ interaction, options }) {
   } else if (board === "petals") {
     header += `top 10 earners (petals)`;
 
-    const users = await getWordsRewardLeaderboard("PETAL");
+    const users = await getLeaderboard("WORDS_PETAL");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.petals} ${strong(u.value)}]`
     );
@@ -34,7 +33,7 @@ const run: Run = async function run({ interaction, options }) {
   } else if (board === "lilies") {
     header += `top 10 earners (lilies)`;
 
-    const users = await getWordsRewardLeaderboard("LILY");
+    const users = await getLeaderboard("WORDS_LILY");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.lily} ${strong(u.value)}]`
     );
@@ -43,7 +42,7 @@ const run: Run = async function run({ interaction, options }) {
   } else if (board === "cards") {
     header += `top 10 earners (cards)`;
 
-    const users = await getWordsRewardLeaderboard("CARD");
+    const users = await getLeaderboard("WORDS_CARD");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.cards} ${strong(u.value)}]`
     );

@@ -1,5 +1,5 @@
 import { Run } from "petal";
-import { getSupporterLeaderboard } from "../../../../../lib/graphql/query/game/leaderboard/GET_SUPPORTER_LEADERBOARD";
+import { getLeaderboard } from "../../../../../lib/graphql/query/game/leaderboard/getLeaderboard";
 import { displayName } from "../../../../../lib/util/displayName";
 import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { renderLeaderboard } from "../../../../../lib/util/formatting/leaderboard";
@@ -11,7 +11,7 @@ const run: Run = async function run({ interaction }) {
 
   header = `**leaderboard - top supporters**\n${emoji.bloom} top petal supporters (server time purchased)`;
 
-  const users = await getSupporterLeaderboard();
+  const users = await getLeaderboard("PUBLIC_SUPPORTER");
   const formatted = users.map(
     (u) => `${displayName(u.account)} [**${u.value}h**]`
   );
