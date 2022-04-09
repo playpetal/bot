@@ -1,4 +1,9 @@
-import { CommandInteraction, InteractionContent, TextableChannel } from "eris";
+import {
+  CommandInteraction,
+  InteractionContent,
+  Message,
+  TextableChannel,
+} from "eris";
 
 export class Courier {
   public readonly interaction: CommandInteraction<TextableChannel> | undefined;
@@ -8,10 +13,15 @@ export class Courier {
     this.interaction = interaction;
   }
 
-  public async send(content: InteractionContent): Promise<InteractionContent> {
-    if (this.interaction) await this.interaction.createMessage(content);
+  public async send(
+    content: InteractionContent
+  ): Promise<Message<TextableChannel> | undefined> {
     this.responses.push(content);
-    return content;
+
+    if (!this.interaction) return;
+
+    const message = await this.interaction.createFollowup(content);
+    return message;
   }
 
   public getInitialResponse(): InteractionContent | undefined {
