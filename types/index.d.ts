@@ -186,6 +186,16 @@ declare module "petal" {
     };
   };
 
+  export type MinigameStats<T extends MinigameType> = {
+    type: T;
+    totalAttempts: number;
+    totalCards: number;
+    totalCurrency: number;
+    totalGames: number;
+    totalPremiumCurrency: number;
+    totalTime: number;
+  };
+
   export type Prefab = {
     id: number;
     character: { id: number; name: string };

@@ -1,4 +1,4 @@
-import { Button, Run } from "petal";
+import { Components, Run } from "petal";
 import { claimMinigamePetalReward } from "../../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
 import { completeMinigame } from "../../../../lib/graphql/mutation/game/minigame/completeMinigame";
 import { searchCharacters } from "../../../../lib/graphql/query/categorization/character/searchCharacters";
@@ -81,10 +81,7 @@ export const minigameGuessRun: Run = async ({ courier, user, options }) => {
       data.elapsed = Date.now() - data.startedAt;
 
       let embed = new Embed();
-      let components: {
-        type: 1;
-        components: Button[];
-      }[] = [];
+      let components: Components = [];
 
       let desc = `**you got \`${data.answer.name}\` in ${
         data.guesses.length
