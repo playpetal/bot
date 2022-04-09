@@ -53,6 +53,11 @@ export async function getMinigame<T extends MinigameType>(
 
   const object = JSON.parse(minigame) as Minigame<T>;
 
+  if (object.data.startedAt < Date.now() - 30 * 60 * 1000) {
+    await destroyMinigame(user);
+    return;
+  }
+
   if (object.data.type === "GTS") {
     const {
       data: { startedAt },
@@ -75,7 +80,7 @@ export async function getMinigame<T extends MinigameType>(
       });
     } catch {}
 
-    return undefined;
+    return;
   }
 
   return object;
