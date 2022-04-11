@@ -339,6 +339,7 @@ declare module "petal" {
   export type CharacterGuessData = {
     type: "GUESS_CHARACTER";
     answer: Character;
+    isGendered: boolean;
     guesses: Character[];
     elapsed?: number;
     startedAt: number;

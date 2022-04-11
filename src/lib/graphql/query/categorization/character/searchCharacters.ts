@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client/core";
-import { Character } from "petal";
+import { Character, Gender } from "petal";
 import { query } from "../../../request";
 
 const operation = gql`
@@ -9,12 +9,14 @@ const operation = gql`
     $birthdayBefore: DateTime
     $birthdayAfter: DateTime
     $page: Int
+    $gender: Gender
   ) {
     searchCharacters(
       search: $search
       birthday: $birthday
       birthdayBefore: $birthdayBefore
       birthdayAfter: $birthdayAfter
+      gender: $gender
       page: $page
     ) {
       id
@@ -31,18 +33,27 @@ export async function searchCharacters({
   birthdayBefore,
   birthdayAfter,
   page,
+  gender,
 }: {
   search: string;
   birthday?: Date;
   birthdayBefore?: Date;
   birthdayAfter?: Date;
   page?: number;
+  gender?: Gender | null;
 }): Promise<Character[]> {
   const data = await query<{
     searchCharacters: Character[];
   }>({
     query: operation,
-    variables: { search, birthday, birthdayBefore, birthdayAfter, page },
+    variables: {
+      search,
+      birthday,
+      birthdayBefore,
+      birthdayAfter,
+      page,
+      gender,
+    },
   });
 
   return data.searchCharacters;

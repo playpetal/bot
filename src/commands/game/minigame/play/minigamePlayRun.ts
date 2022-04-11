@@ -39,6 +39,7 @@ export const minigamePlayRun: Run = async ({ courier, options, user }) => {
       answer: character,
       guesses: [],
       startedAt: Date.now(),
+      isGendered: gender !== undefined,
     };
 
     await setMinigame(user, data, {

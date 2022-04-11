@@ -9,7 +9,7 @@ export async function query<T>({
   authorization,
 }: {
   query: DocumentNode;
-  variables?: { [key: string]: string | number | Date | undefined };
+  variables?: { [key: string]: string | number | Date | undefined | null };
   authorization?: string;
 }) {
   const result = await graphql.query({

@@ -1,4 +1,4 @@
-import { Autocomplete } from "petal";
+import { Autocomplete, Gender } from "petal";
 import { searchCharacters } from "../../../../../lib/graphql/query/categorization/character/searchCharacters";
 import { getMinigame } from "../../../../../lib/minigame";
 
@@ -11,7 +11,9 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
   let choices: { name: string; value: string }[] = [];
 
   const minigame = await getMinigame(user);
-  let birthdayBefore: Date | undefined, birthdayAfter: Date | undefined;
+  let birthdayBefore: Date | undefined,
+    birthdayAfter: Date | undefined,
+    gender: Gender | null | undefined;
 
   if (minigame && minigame.data.type === "GUESS_CHARACTER") {
     if (minigame.data.guesses.length > 0) {
@@ -35,12 +37,15 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
         }
       }
     }
+
+    if (minigame.data.isGendered) gender = minigame.data.answer.gender;
   }
 
   const characters = await searchCharacters({
     search: focused.value as string,
     birthdayBefore,
     birthdayAfter,
+    gender: gender,
   });
 
   choices = characters.map((c) => {
