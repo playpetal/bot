@@ -13,7 +13,9 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
   const minigame = await getMinigame(user);
   let birthdayBefore: Date | undefined,
     birthdayAfter: Date | undefined,
-    gender: Gender | null | undefined;
+    gender: Gender | null | undefined,
+    minLetters: number | undefined,
+    maxLetters: number | undefined;
 
   if (minigame && minigame.data.type === "GUESS_CHARACTER") {
     if (minigame.data.guesses.length > 0) {
@@ -36,6 +38,19 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
           }
         }
       }
+
+      const lengths = minigame.data.guesses.map((c) => c.name.length);
+
+      for (let length of lengths) {
+        if (minigame.data.answer.name.length === length) {
+          maxLetters = length;
+          minLetters = length;
+        } else if (minigame.data.answer.name.length < length) {
+          maxLetters = length - 1;
+        } else if (minigame.data.answer.name.length > length) {
+          minLetters = length + 1;
+        }
+      }
     }
 
     if (minigame.data.isGendered) gender = minigame.data.answer.gender;
@@ -46,6 +61,8 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
     birthdayBefore,
     birthdayAfter,
     gender: gender,
+    minLetters,
+    maxLetters,
   });
 
   choices = characters.map((c) => {

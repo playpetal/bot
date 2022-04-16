@@ -10,6 +10,8 @@ const operation = gql`
     $birthdayAfter: DateTime
     $page: Int
     $gender: Gender
+    $minLetters: Int
+    $maxLetters: Int
   ) {
     searchCharacters(
       search: $search
@@ -18,6 +20,8 @@ const operation = gql`
       birthdayAfter: $birthdayAfter
       gender: $gender
       page: $page
+      minLetters: $minLetters
+      maxLetters: $maxLetters
     ) {
       id
       name
@@ -34,6 +38,8 @@ export async function searchCharacters({
   birthdayAfter,
   page,
   gender,
+  minLetters,
+  maxLetters,
 }: {
   search: string;
   birthday?: Date;
@@ -41,6 +47,8 @@ export async function searchCharacters({
   birthdayAfter?: Date;
   page?: number;
   gender?: Gender | null;
+  minLetters?: number;
+  maxLetters?: number;
 }): Promise<Character[]> {
   const data = await query<{
     searchCharacters: Character[];
@@ -53,6 +61,8 @@ export async function searchCharacters({
       birthdayAfter,
       page,
       gender,
+      minLetters,
+      maxLetters,
     },
   });
 
