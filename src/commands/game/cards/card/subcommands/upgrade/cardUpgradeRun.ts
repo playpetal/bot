@@ -74,7 +74,7 @@ export const cardUpgradeRun: Run = async ({ interaction, options, user }) => {
     .setDescription(
       `**upgrade successful!**\n${formatCard(_card, {
         issue: false,
-      })} has been upgraded to **${_card.quality}**!`
+      })} has been upgraded!`
     )
     .setThumbnail(`attachment://${_card.id.toString(16)}.png`);
 
