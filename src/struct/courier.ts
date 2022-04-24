@@ -26,7 +26,7 @@ export class Courier {
       : InteractionContent,
     files?: FileContent | FileContent[]
   ): Promise<Message<TextableChannel> | undefined> {
-    if (this.interaction instanceof CommandInteraction) {
+    if (this.interaction instanceof CommandInteraction || !this.interaction) {
       this.responses.push(content as InteractionContent);
     }
 
