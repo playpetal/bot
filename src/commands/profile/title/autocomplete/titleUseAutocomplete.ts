@@ -1,7 +1,7 @@
-import { Autocomplete } from "petal";
+import { Run } from "petal";
 import { getUserTitles } from "../../../../lib/graphql/query/GET_USER_TITLES";
 
-const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
+const autocomplete: Run = async ({ courier, user, options }) => {
   const search = options.getOption<string>("title")!;
   const titles = await getUserTitles(user.id, search);
 
@@ -14,7 +14,7 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
     }
   });
 
-  await interaction.acknowledge(choices);
+  await courier.send(choices);
   return;
 };
 

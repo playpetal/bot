@@ -1,8 +1,8 @@
-import { Autocomplete } from "petal";
+import { Run } from "petal";
 import { searchTags } from "../../../../../lib/graphql/query/SEARCH_TAGS";
 
-export const tagAutocomplete: Autocomplete = async function tagAutocomplete({
-  interaction,
+export const tagAutocomplete: Run = async function tagAutocomplete({
+  courier,
   user,
   options,
 }) {
@@ -15,6 +15,6 @@ export const tagAutocomplete: Autocomplete = async function tagAutocomplete({
     value: t.tag,
   }));
 
-  await interaction.acknowledge(choices);
+  await courier.send(choices);
   return;
 };

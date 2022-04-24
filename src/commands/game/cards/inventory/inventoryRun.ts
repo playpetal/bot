@@ -14,7 +14,7 @@ import {
 import { Embed } from "../../../../struct/embed";
 import { BotError } from "../../../../struct/error";
 
-export const run: Run = async ({ interaction, user, options }) => {
+export const run: Run = async ({ courier, user, options }) => {
   const character = trimBirthday(options.getOption<string>("character"));
   const subgroup = trimBirthday(options.getOption<string>("subgroup"));
   const group = trimBirthday(options.getOption<string>("group"));
@@ -66,7 +66,7 @@ export const run: Run = async ({ interaction, user, options }) => {
 
     const embed = new Embed().setDescription(desc);
 
-    return interaction.createMessage({ embeds: [embed] });
+    return courier.send({ embeds: [embed] });
   }
 
   const { max, cards } = await inventoryPage(target.id, {
@@ -84,7 +84,7 @@ export const run: Run = async ({ interaction, user, options }) => {
     )}`
   );
 
-  return interaction.createMessage({
+  return courier.send({
     embeds: [embed],
     components:
       cards > 10

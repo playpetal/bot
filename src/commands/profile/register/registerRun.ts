@@ -7,8 +7,8 @@ import { emoji } from "../../../lib/util/formatting/emoji";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
-const run: Run = async function ({ interaction, options }) {
-  const id = interaction.member!.id;
+const run: Run = async function ({ courier, options }) {
+  const id = courier.interaction!.member!.id;
   const user = await getUserPartial({ discordId: id });
 
   if (user) throw new BotError("**woah there!**\nyou already have an account.");
@@ -41,7 +41,7 @@ const run: Run = async function ({ interaction, options }) {
       `\nfeel free to join us at https://discord.gg/petal for news and support!`
   );
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
 };
 
 export default run;

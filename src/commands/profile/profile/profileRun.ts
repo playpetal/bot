@@ -4,7 +4,7 @@ import { getUser } from "../../../lib/graphql/query/GET_USER";
 import { row, button } from "../../../lib/util/component";
 import { BotError } from "../../../struct/error";
 
-const run: Run = async function ({ interaction, user, options }) {
+const run: Run = async function ({ courier, user, options }) {
   const userId = options.getOption<string>("user") || user.discordId;
 
   let target: Account | null;
@@ -19,7 +19,7 @@ const run: Run = async function ({ interaction, user, options }) {
       "**uh oh!**\nthat user hasn't registered yet, or doesn't exist!"
     );
 
-  await interaction.createMessage({
+  await courier.send({
     embeds: [getProfileEmbed(target)],
     components: [
       row(

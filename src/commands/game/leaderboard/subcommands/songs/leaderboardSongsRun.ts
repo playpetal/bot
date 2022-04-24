@@ -6,7 +6,7 @@ import { renderLeaderboard } from "../../../../../lib/util/formatting/leaderboar
 import { strong } from "../../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../../struct/embed";
 
-const run: Run = async function run({ interaction, options }) {
+const run: Run = async function run({ courier, options }) {
   const board = options.getOption<string>("board")!;
 
   let header = `**leaderboard - guess the song**\n${emoji.song} `;
@@ -51,7 +51,7 @@ const run: Run = async function run({ interaction, options }) {
   }
 
   const embed = new Embed().setDescription(`${header}\n\n${body}`);
-  return await interaction.createMessage({ embeds: [embed] });
+  return await courier.send({ embeds: [embed] });
 };
 
 export default run;

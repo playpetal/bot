@@ -1,3 +1,4 @@
+import { CommandInteraction } from "eris";
 import { Run, WordsData } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
 import { claimMinigamePetalReward } from "../../../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
@@ -16,7 +17,7 @@ import { dd } from "../../../../../lib/statsd";
 import { row, button } from "../../../../../lib/util/component";
 import { getMinigameRewardComponents } from "../../../../../lib/util/component/minigame";
 
-const run: Run = async function run({ interaction, user, options }) {
+const run: Run = async function run({ courier, user, options }) {
   const minigame = await getMinigame(user);
 
   if (!minigame) throw MinigameError.NotPlayingWords;
@@ -36,14 +37,14 @@ const run: Run = async function run({ interaction, user, options }) {
 
   if (data.guesses.includes(guess)) throw MinigameError.WordAlreadyGuessed;
 
-  await interaction.createMessage(`you guessed **${guess}**!`);
+  await courier.send({ content: `you guessed **${guess}**!` });
 
   data.guesses.push(guess);
 
   const correct = data.guesses.find((g) => g === data.answer.toLowerCase());
   const isFinished = correct || data.guesses.length >= 6;
 
-  const rewardsRemaining = await canClaimRewards(interaction.member!.id);
+  const rewardsRemaining = await canClaimRewards(user.discordId);
 
   if (isFinished) {
     data.elapsed = Date.now() - data.startedAt;
@@ -64,36 +65,39 @@ const run: Run = async function run({ interaction, user, options }) {
 
     await completeMinigame(
       "WORDS",
-      interaction.member!.id,
+      user.discordId,
       data.guesses.length,
       data.elapsed!,
       "PETAL"
     );
-    await claimMinigamePetalReward(interaction.member!.id);
+    await claimMinigamePetalReward(user.discordId);
 
     embed.setColor("#3BA55D");
   }
 
-  await interaction.editMessage(minigame.message, {
-    embeds: [embed],
-    components:
-      correct && rewardsRemaining > 0
-        ? await getMinigameRewardComponents(
-            user.id,
-            (await canClaimPremiumRewards(interaction.member!.id)) > 0
-          )
-        : !correct && data.guesses.length < 6
-        ? [
-            row(
-              button({
-                customId: `cancel-words?${user.id}`,
-                style: "red",
-                label: "cancel",
-              })
-            ),
-          ]
-        : [],
-  });
+  await (courier.interaction as CommandInteraction).editMessage(
+    minigame.message,
+    {
+      embeds: [embed],
+      components:
+        correct && rewardsRemaining > 0
+          ? await getMinigameRewardComponents(
+              user.id,
+              (await canClaimPremiumRewards(user.discordId)) > 0
+            )
+          : !correct && data.guesses.length < 6
+          ? [
+              row(
+                button({
+                  customId: `cancel-words?${user.id}`,
+                  style: "red",
+                  label: "cancel",
+                })
+              ),
+            ]
+          : [],
+    }
+  );
 
   return;
 };

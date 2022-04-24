@@ -2,7 +2,7 @@ import { Run, GroupGender } from "petal";
 import { createGroup } from "../../../../../../lib/graphql/mutation/CREATE_GROUP";
 import { Embed } from "../../../../../../struct/embed";
 
-const run: Run = async ({ interaction, user, options }) => {
+const run: Run = async ({ courier, user, options }) => {
   const name = options.getOption<string>("name");
   const creation = options.getOption<string>("creation");
   const gender = options.getOption<"male" | "female" | "coed">("gender");
@@ -18,7 +18,7 @@ const run: Run = async ({ interaction, user, options }) => {
     `the group **${group.name}** has been created!`
   );
 
-  return interaction.createMessage({ embeds: [embed] });
+  return courier.send({ embeds: [embed] });
 };
 
 export default run;

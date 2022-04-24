@@ -1,7 +1,7 @@
-import { Autocomplete } from "petal";
+import { Run } from "petal";
 import { searchCharacters } from "../../../../../lib/graphql/query/categorization/character/searchCharacters";
 
-const autocomplete: Autocomplete = async ({ interaction, options }) => {
+const autocomplete: Run = async ({ courier, options }) => {
   const focused = options.getFocused()!;
 
   const characters = await searchCharacters({
@@ -15,7 +15,7 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
     return { name: `${c.name} (${birthday})`, value: c.id.toString() };
   });
 
-  await interaction.acknowledge(choices);
+  await courier.send(choices);
   return;
 };
 

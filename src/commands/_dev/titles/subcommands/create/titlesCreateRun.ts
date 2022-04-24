@@ -5,7 +5,7 @@ import { displayName } from "../../../../../lib/util/displayName";
 import { Embed } from "../../../../../struct/embed";
 import { BotError } from "../../../../../struct/error";
 
-const run: Run = async function run({ interaction, user, options }) {
+const run: Run = async function run({ courier, user, options }) {
   const name = options.getOption<string>("title")!;
   const desc = options.getOption<string>("description");
 
@@ -24,7 +24,7 @@ const run: Run = async function run({ interaction, user, options }) {
   const embed = new Embed().setDescription(
     `**success!**\nthe title ${displayName(_user)} has been created!`
   );
-  return await interaction.createMessage({ embeds: [embed] });
+  return await courier.send({ embeds: [embed] });
 };
 
 export default run;

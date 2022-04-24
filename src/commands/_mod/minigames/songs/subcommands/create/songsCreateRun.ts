@@ -5,7 +5,7 @@ import { emoji } from "../../../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
-const run: Run = async function run({ interaction, user, options }) {
+const run: Run = async function run({ courier, user, options }) {
   const url = options.getOption<string>("url")!;
 
   try {
@@ -43,7 +43,7 @@ const run: Run = async function run({ interaction, user, options }) {
     }**.\nLink: https://cdn.playpetal.com/songs/${song.id}.m4a`
   );
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
   return;
 };
 

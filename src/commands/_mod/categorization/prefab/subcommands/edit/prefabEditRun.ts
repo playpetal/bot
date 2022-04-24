@@ -8,9 +8,10 @@ import { getCharacter } from "../../../../../../lib/graphql/query/categorization
 import { getGroup } from "../../../../../../lib/graphql/query/GET_GROUP";
 import { getSubgroup } from "../../../../../../lib/graphql/query/GET_SUBGROUP";
 import { uploadImage } from "../../../../../../lib/img";
-import { ErrorEmbed, Embed } from "../../../../../../struct/embed";
+import { Embed } from "../../../../../../struct/embed";
+import { BotError } from "../../../../../../struct/error";
 
-const run: Run = async ({ interaction, options, user }) => {
+const run: Run = async ({ courier, options, user }) => {
   let isEdit: { prefabId: number } | undefined;
   let prefab: Maybe<Prefab> | undefined;
   let character: Maybe<Character> | undefined;
@@ -31,19 +32,13 @@ const run: Run = async ({ interaction, options, user }) => {
   const strPrefabId = options.getOption<string>("prefab")!;
   const prefabId = parseInt(strPrefabId, 10);
 
-  if (isNaN(prefabId)) {
-    return interaction.createMessage({
-      embeds: [new ErrorEmbed("please select a prefab from the dropdown!")],
-    });
-  }
+  if (isNaN(prefabId))
+    throw new BotError("**uh-oh!**\nplease select a prefab from the dropdown!");
 
   prefab = await getPrefab(prefabId);
 
-  if (!prefab) {
-    return interaction.createMessage({
-      embeds: [new ErrorEmbed("please select a prefab from the dropdown!")],
-    });
-  }
+  if (!prefab)
+    throw new BotError("**uh-oh!**\nplease select a prefab from the dropdown!");
 
   isEdit = { prefabId: prefab.id };
 
@@ -52,13 +47,10 @@ const run: Run = async ({ interaction, options, user }) => {
   if (strCharacterId) {
     const characterId = parseInt(strCharacterId, 10);
 
-    if (isNaN(characterId)) {
-      return interaction.createMessage({
-        embeds: [
-          new ErrorEmbed("please select a character from the dropdown!"),
-        ],
-      });
-    }
+    if (isNaN(characterId))
+      throw new BotError(
+        "**uh-oh!**\nplease select a character from the dropdown!"
+      );
 
     character = await getCharacter(characterId);
   }
@@ -68,11 +60,10 @@ const run: Run = async ({ interaction, options, user }) => {
   if (strSubgroupId) {
     const subgroupId = parseInt(strSubgroupId, 10);
 
-    if (isNaN(subgroupId)) {
-      return interaction.createMessage({
-        embeds: [new ErrorEmbed("please select a subgroup from the dropdown!")],
-      });
-    }
+    if (isNaN(subgroupId))
+      throw new BotError(
+        "**uh-oh!**\nplease select a subgroup from the dropdown!"
+      );
 
     subgroup = await getSubgroup(subgroupId);
   }
@@ -82,11 +73,10 @@ const run: Run = async ({ interaction, options, user }) => {
   if (strGroupId) {
     const groupId = parseInt(strGroupId, 10);
 
-    if (isNaN(groupId)) {
-      return interaction.createMessage({
-        embeds: [new ErrorEmbed("please select a group from the dropdown!")],
-      });
-    }
+    if (isNaN(groupId))
+      throw new BotError(
+        "**uh-oh!**\nplease select a group from the dropdown!"
+      );
 
     group = await getGroup(groupId);
   }
@@ -153,7 +143,7 @@ const run: Run = async ({ interaction, options, user }) => {
     card = Buffer.from(data.card, "base64");
   }
 
-  await interaction.createFollowup(
+  await courier.send(
     {
       embeds: [embed],
     },

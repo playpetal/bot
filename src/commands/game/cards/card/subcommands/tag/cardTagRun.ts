@@ -6,7 +6,7 @@ import { formatCard } from "../../../../../../lib/util/formatting/format";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
-const run: Run = async ({ interaction, user, options }) => {
+const run: Run = async ({ courier, user, options }) => {
   const strCardId = options.getOption<string>("card")!;
   const tagName = options.getOption<string>("tag")!;
 
@@ -29,7 +29,7 @@ const run: Run = async ({ interaction, user, options }) => {
     `**success!**\nthe tag for ${formatCard(_card)} has been updated.`
   );
 
-  return interaction.createFollowup({ embeds: [embed] });
+  return courier.send({ embeds: [embed] });
 };
 
 export default run;

@@ -1,7 +1,7 @@
-import { Autocomplete } from "petal";
+import { Run } from "petal";
 import { searchGroups } from "../../../../../lib/graphql/query/SEARCH_GROUPS";
 
-const autocomplete: Autocomplete = async ({ interaction, options }) => {
+const autocomplete: Run = async ({ courier, options }) => {
   const focused = options.getFocused()!;
 
   const groups = await searchGroups(focused.value as string);
@@ -13,7 +13,7 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
     return { name: `${g.name} (${creation})`, value: g.id.toString() };
   });
 
-  await interaction.acknowledge(choices);
+  await courier.send(choices);
   return;
 };
 

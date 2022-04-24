@@ -7,7 +7,7 @@ import { strong } from "../../../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
-const run: Run = async ({ interaction, user, options }) => {
+const run: Run = async ({ courier, user, options }) => {
   const strCardId = options.getOption<string>("card")!;
 
   const cardId = parseInt(strCardId, 16);
@@ -38,7 +38,7 @@ const run: Run = async ({ interaction, user, options }) => {
     )
     .setThumbnail(`attachment://${card.id.toString(16)}.png`);
 
-  return interaction.createFollowup(
+  return courier.send(
     { embeds: [embed] },
     image ? [{ file: image, name: `${card.id.toString(16)}.png` }] : undefined
   );

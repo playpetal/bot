@@ -6,7 +6,7 @@ import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { strong } from "../../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../../struct/embed";
 
-const run: Run = async ({ interaction, user, options }) => {
+const run: Run = async ({ courier, user, options }) => {
   const titleName = options
     .getOption<string>("title")!
     .replace("<username>", "");
@@ -24,7 +24,7 @@ const run: Run = async ({ interaction, user, options }) => {
       `\n\n${title.description || "this title has no description!"}`
   );
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
   return;
 };
 

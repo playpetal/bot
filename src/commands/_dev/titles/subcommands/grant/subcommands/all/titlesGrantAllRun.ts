@@ -5,7 +5,7 @@ import { displayName } from "../../../../../../../lib/util/displayName";
 import { Embed } from "../../../../../../../struct/embed";
 import { BotError } from "../../../../../../../struct/error";
 
-const run: Run = async function run({ interaction, user, options }) {
+const run: Run = async function run({ courier, user, options }) {
   const titleIdStr = options.getOption<string>("title")!;
 
   const titleId = parseInt(titleIdStr, 10);
@@ -26,7 +26,7 @@ const run: Run = async function run({ interaction, user, options }) {
     )} has been given to all (${amount}) users!`
   );
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
   return;
 };
 

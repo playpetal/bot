@@ -5,7 +5,7 @@ import { getUserTags } from "../../../../../../lib/graphql/query/GET_USER_TAGS";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
-const run: Run = async ({ interaction, user, options }) => {
+const run: Run = async ({ courier, user, options }) => {
   const name = options.getOption<string>("name")!;
   const emoji = options.getOption<string>("emoji")!;
 
@@ -46,7 +46,7 @@ const run: Run = async ({ interaction, user, options }) => {
     `**success!**\nthe tag ${tag.emoji} \`${tag.tag}\` has been created!`
   );
 
-  return interaction.createFollowup({ embeds: [embed] });
+  return courier.send({ embeds: [embed] });
 };
 
 export default run;

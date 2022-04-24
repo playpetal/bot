@@ -1,8 +1,8 @@
-import { Autocomplete } from "petal";
+import { Run } from "petal";
 import { searchTitles } from "../../../../lib/graphql/query/SEARCH_TITLES";
 
-const autocomplete: Autocomplete = async function autocomplete({
-  interaction,
+const autocomplete: Run = async function autocomplete({
+  courier,
   user,
   options,
 }) {
@@ -18,7 +18,8 @@ const autocomplete: Autocomplete = async function autocomplete({
     }
   });
 
-  return interaction.acknowledge(choices);
+  await courier.send(choices);
+  return;
 };
 
 export default autocomplete;

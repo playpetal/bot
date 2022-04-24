@@ -153,20 +153,12 @@ declare module "petal" {
     options,
   }: {
     courier: import("../src/struct/courier").Courier;
-    interaction: import("eris").CommandInteraction;
+    interaction:
+      | import("eris").CommandInteraction
+      | import("eris").AutocompleteInteraction;
     user: PartialUser;
     options: import("../src/struct/options").InteractionOptions;
-  }) => Promise<unknown> | unknown;
-
-  export type Autocomplete = ({
-    interaction,
-    user,
-    options,
-  }: {
-    interaction: import("eris").AutocompleteInteraction;
-    user: PartialUser;
-    options: import("../src/struct/options").InteractionOptions;
-  }) => Promise<unknown> | unknown;
+  }) => unknown;
 
   export type SlashCommandSubcommand = {
     type: 1;
@@ -201,7 +193,7 @@ declare module "petal" {
     min_value?: number;
     max_value?: number;
 
-    runAutocomplete?: Autocomplete;
+    runAutocomplete?: Run;
   };
 
   export type SlashCommandOptionString = {
@@ -214,7 +206,7 @@ declare module "petal" {
     autocomplete?: boolean;
     choices?: { name: string; value: string }[];
 
-    runAutocomplete?: Autocomplete;
+    runAutocomplete?: Run;
   };
 
   export type SlashCommandOption = {

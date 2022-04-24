@@ -1,24 +1,23 @@
 import { Run } from "petal";
 import { getCharacter } from "../../../../../../lib/graphql/query/categorization/character/getCharacter";
-import { ErrorEmbed, Embed } from "../../../../../../struct/embed";
+import { Embed } from "../../../../../../struct/embed";
+import { BotError } from "../../../../../../struct/error";
 
-const run: Run = async ({ interaction, options }) => {
+const run: Run = async ({ courier, options }) => {
   const strCharacterId = options.getOption<string>("character")!;
   const characterId = parseInt(strCharacterId, 10);
 
-  if (isNaN(characterId)) {
-    return await interaction.createMessage({
-      embeds: [new ErrorEmbed("please select a character from the dropdown!")],
-    });
-  }
+  if (isNaN(characterId))
+    throw new BotError(
+      "**uh-oh!**\nplease select a character from the dropdown!"
+    );
 
   const character = await getCharacter(characterId);
 
-  if (!character) {
-    return await interaction.createMessage({
-      embeds: [new ErrorEmbed("please select a character from the dropdown!")],
-    });
-  }
+  if (!character)
+    throw new BotError(
+      "**uh-oh!**\nplease select a character from the dropdown!"
+    );
 
   const birthday = character.birthday
     ? new Date(character.birthday).toLocaleString("en-us", {
@@ -37,7 +36,7 @@ const run: Run = async ({ interaction, options }) => {
     }**\nID: **${character.id}**`
   );
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
   return;
 };
 

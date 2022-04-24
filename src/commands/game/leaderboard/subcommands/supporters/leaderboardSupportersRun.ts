@@ -5,7 +5,7 @@ import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { renderLeaderboard } from "../../../../../lib/util/formatting/leaderboard";
 import { Embed } from "../../../../../struct/embed";
 
-const run: Run = async function run({ interaction }) {
+const run: Run = async function run({ courier }) {
   let header = `**leaderboard - top supporters**\n${emoji.song} `;
   let body: string = `*there's nothing here...?!*`;
 
@@ -19,7 +19,7 @@ const run: Run = async function run({ interaction }) {
   body = renderLeaderboard(formatted);
 
   const embed = new Embed().setDescription(`${header}\n\n${body}`);
-  return await interaction.createMessage({ embeds: [embed] });
+  return await courier.send({ embeds: [embed] });
 };
 
 export default run;

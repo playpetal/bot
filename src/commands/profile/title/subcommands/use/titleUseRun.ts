@@ -5,7 +5,7 @@ import { getUserTitles } from "../../../../../lib/graphql/query/GET_USER_TITLES"
 import { displayName } from "../../../../../lib/util/displayName";
 import { Embed } from "../../../../../struct/embed";
 
-const run: Run = async ({ interaction, user, options }) => {
+const run: Run = async ({ courier, user, options }) => {
   const titleName = options
     .getOption<string>("title")!
     .replace("<username>", "");
@@ -16,7 +16,7 @@ const run: Run = async ({ interaction, user, options }) => {
 
   const _user = await setUserTitle(user.discordId, title.id);
 
-  await interaction.createMessage({
+  await courier.send({
     embeds: [
       new Embed().setDescription(
         `**title updated!**\nyour title has been set to ${displayName(_user)}!`

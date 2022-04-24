@@ -9,7 +9,7 @@ import { strong } from "../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../struct/embed";
 import { BotError } from "../../../../struct/error";
 
-const run: Run = async function ({ interaction, user, options }) {
+const run: Run = async function ({ courier, user, options }) {
   let amount = options.getOption<number>("amount");
 
   if (!amount) amount = 1;
@@ -31,7 +31,7 @@ const run: Run = async function ({ interaction, user, options }) {
     );
   }
 
-  await interaction.createMessage({
+  await courier.send({
     embeds: [
       new Embed().setDescription(
         `${emoji.dice} **rolling your dice...** good luck!`
@@ -66,11 +66,11 @@ const run: Run = async function ({ interaction, user, options }) {
   const timeout = Math.max(0, 3000 - (Date.now() - now));
 
   setTimeout(async () => {
-    await interaction.editOriginalMessage({
+    await courier.edit({
       embeds: [embed],
     });
 
-    await interaction.editOriginalMessage(
+    await courier.edit(
       {
         embeds: [embed.setImage("attachment://collage.png")],
       },

@@ -1,7 +1,7 @@
-import { Autocomplete } from "petal";
+import { Run } from "petal";
 import { searchCards } from "../../../../../lib/graphql/query/SEARCH_CARDS";
 
-const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
+const autocomplete: Run = async ({ courier, user, options }) => {
   const focused = options.getFocused()!;
 
   const cards = await searchCards(focused.value as string, user);
@@ -15,7 +15,7 @@ const autocomplete: Autocomplete = async ({ interaction, user, options }) => {
     value: c.id.toString(16),
   }));
 
-  await interaction.acknowledge(choices);
+  await courier.send(choices);
   return;
 };
 

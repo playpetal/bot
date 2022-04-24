@@ -1,24 +1,19 @@
 import { Run } from "petal";
 import { getSubgroup } from "../../../../../../lib/graphql/query/GET_SUBGROUP";
-import { ErrorEmbed, Embed } from "../../../../../../struct/embed";
+import { Embed } from "../../../../../../struct/embed";
+import { BotError } from "../../../../../../struct/error";
 
-const run: Run = async ({ interaction, options }) => {
+const run: Run = async ({ courier, options }) => {
   const strSubgroupId = options.getOption<string>("subgroup")!;
   const subgroupId = parseInt(strSubgroupId, 10);
 
-  if (isNaN(subgroupId)) {
-    return await interaction.createMessage({
-      embeds: [new ErrorEmbed("please select a subgroup from the dropdown!")],
-    });
-  }
+  if (isNaN(subgroupId))
+    throw new BotError("**uh-oh!**please select a subgroup from the dropdown!");
 
   const subgroup = await getSubgroup(subgroupId);
 
-  if (!subgroup) {
-    return await interaction.createMessage({
-      embeds: [new ErrorEmbed("please select a subgroup from the dropdown!")],
-    });
-  }
+  if (!subgroup)
+    throw new BotError("**uh-oh!**please select a subgroup from the dropdown!");
 
   const creation = subgroup.creation
     ? new Date(subgroup.creation).toLocaleString("en-us", {
@@ -33,7 +28,7 @@ const run: Run = async ({ interaction, options }) => {
     `**Subgroup Info**\nName: **${subgroup.name}**\nCreation: **${creation}**\nID: **${subgroup.id}**`
   );
 
-  return interaction.createMessage({ embeds: [embed] });
+  return courier.send({ embeds: [embed] });
 };
 
 export default run;

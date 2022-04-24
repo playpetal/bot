@@ -6,7 +6,7 @@ import { FLAGS, hasFlag } from "../../../lib/util/flags";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
 
-export const flagRun: Run = async ({ interaction, user, options }) => {
+export const flagRun: Run = async ({ courier, user, options }) => {
   const target = options.getOption<string>("user")!;
   const flag = options.getOption<string>("flag")! as keyof typeof FLAGS;
 
@@ -28,5 +28,5 @@ export const flagRun: Run = async ({ interaction, user, options }) => {
     }\` for ${displayName(account)}.`
   );
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
 };

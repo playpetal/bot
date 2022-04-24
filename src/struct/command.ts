@@ -110,6 +110,8 @@ export class SlashCommand {
     const group = options.getSubcommandGroup();
     const subcommand = options.getSubcommand();
 
+    const courier = new Courier(interaction);
+
     if (group) {
       const targetGroup = this.options.find(
         (g) => g.name === group.name
@@ -123,7 +125,12 @@ export class SlashCommand {
         (o) => o.name === focused.name
       )! as SlashCommandOptionString | SlashCommandOptionNumeric;
 
-      await targetOption.runAutocomplete!({ interaction, user, options });
+      await targetOption.runAutocomplete!({
+        interaction,
+        courier,
+        user,
+        options,
+      });
       return;
     }
 
@@ -136,13 +143,13 @@ export class SlashCommand {
         | SlashCommandOptionString
         | SlashCommandOptionNumeric;
 
-      await option.runAutocomplete!({ interaction, user, options });
+      await option.runAutocomplete!({ interaction, courier, user, options });
     } else {
       const option = this.options.find((o) => o.name === focused.name) as
         | SlashCommandOptionString
         | SlashCommandOptionNumeric;
 
-      await option.runAutocomplete!({ interaction, user, options });
+      await option.runAutocomplete!({ interaction, courier, user, options });
     }
 
     return;

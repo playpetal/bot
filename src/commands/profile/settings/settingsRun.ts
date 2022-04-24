@@ -3,7 +3,7 @@ import { togglePublicSupporter } from "../../../lib/graphql/mutation/settings/TO
 import { FLAGS } from "../../../lib/util/flags";
 import { Embed } from "../../../struct/embed";
 
-const run: Run = async function ({ interaction, user, options }) {
+const run: Run = async function ({ courier, user, options }) {
   const group = options.getSubcommandGroup()!;
   const subcommand = options.getSubcommand()!;
 
@@ -17,7 +17,7 @@ const run: Run = async function ({ interaction, user, options }) {
         } being a public supporter!`
       );
 
-      await interaction.createMessage({ embeds: [embed] });
+      await courier.send({ embeds: [embed] });
       return;
     }
   }

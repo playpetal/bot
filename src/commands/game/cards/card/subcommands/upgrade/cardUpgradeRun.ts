@@ -6,7 +6,7 @@ import { formatCard } from "../../../../../../lib/util/formatting/format";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
-export const cardUpgradeRun: Run = async ({ interaction, options, user }) => {
+export const cardUpgradeRun: Run = async ({ courier, options, user }) => {
   const strCardId = options.getOption<string>("card")?.split("-")[0].trim();
   const strFodderCardId = options
     .getOption<string>("fodder")
@@ -78,7 +78,7 @@ export const cardUpgradeRun: Run = async ({ interaction, options, user }) => {
     )
     .setThumbnail(`attachment://${_card.id.toString(16)}.png`);
 
-  await interaction.createFollowup({ embeds: [embed] }, [
+  await courier.send({ embeds: [embed] }, [
     {
       file: image,
       name: `${_card.id.toString(16)}.png`,

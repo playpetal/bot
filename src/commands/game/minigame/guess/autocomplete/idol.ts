@@ -1,9 +1,9 @@
-import { Autocomplete, Gender } from "petal";
+import { Gender, Run } from "petal";
 import { searchCharacters } from "../../../../../lib/graphql/query/categorization/character/searchCharacters";
 import { getMinigame } from "../../../../../lib/minigame";
 
-export const minigameGuessAutocompleteIdol: Autocomplete = async ({
-  interaction,
+export const minigameGuessAutocompleteIdol: Run = async ({
+  courier,
   options,
   user,
 }) => {
@@ -75,5 +75,5 @@ export const minigameGuessAutocompleteIdol: Autocomplete = async ({
     return { name: str, value: str };
   });
 
-  return interaction.acknowledge(choices);
+  return courier.send(choices);
 };

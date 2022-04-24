@@ -1,3 +1,4 @@
+import { CommandInteraction } from "eris";
 import { Run } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
 import { canClaimRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
@@ -48,7 +49,7 @@ export const songPlayRun: Run = async function run({
       "**uh-oh!**\nthere are no available songs 😔 try again later!"
     );
 
-    await interaction.editOriginalMessage({ embeds: [embed] });
+    await courier.edit({ embeds: [embed] });
     return;
   }
 
@@ -70,7 +71,7 @@ export const songPlayRun: Run = async function run({
         } this hour!`
       );
 
-    const message = await interaction.editOriginalMessage(
+    const message = await courier.edit(
       {
         embeds: [embed],
         components: [
@@ -126,7 +127,7 @@ export const songPlayRun: Run = async function run({
         startedAt <= Date.now() - GTS_MAX_MS
       ) {
         clearInterval(interval);
-        return await handleGTSEnd(interaction, game);
+        return await handleGTSEnd(interaction as CommandInteraction, game);
       }
     }, 500);
   } catch (e) {

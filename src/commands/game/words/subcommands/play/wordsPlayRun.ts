@@ -7,7 +7,7 @@ import { getWordsEmbed } from "../../../../../lib/minigame/words";
 import { dd } from "../../../../../lib/statsd";
 import { row, button } from "../../../../../lib/util/component";
 
-const run: Run = async function run({ interaction, user }) {
+const run: Run = async function run({ courier, user }) {
   const minigame = await getMinigame(user);
 
   if (minigame) {
@@ -27,9 +27,9 @@ const run: Run = async function run({ interaction, user }) {
     startedAt: Date.now(),
   };
 
-  const rewardsRemaining = await canClaimRewards(interaction.member!.id);
+  const rewardsRemaining = await canClaimRewards(user.discordId);
 
-  const message = await interaction.editOriginalMessage({
+  const message = await courier.edit({
     embeds: [getWordsEmbed(data, user, rewardsRemaining)],
     components: [
       row(
@@ -45,7 +45,7 @@ const run: Run = async function run({ interaction, user }) {
   await setMinigame<"WORDS">(user, data, {
     message: message.id,
     channel: message.channel.id,
-    guild: interaction.guildID!,
+    guild: courier.interaction!.guildID!,
   });
 
   dd.increment(`petal.minigame.words.started`);

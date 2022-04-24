@@ -4,7 +4,7 @@ import { displayName } from "../../../../../lib/util/displayName";
 import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../../struct/embed";
 
-const run: Run = async ({ interaction, user }) => {
+const run: Run = async ({ courier, user }) => {
   const titles = await getUserTitles(user.id);
 
   const formatted = titles.map(
@@ -22,7 +22,7 @@ const run: Run = async ({ interaction, user }) => {
         : formatted.join("\n"))
   );
 
-  await interaction.createMessage({ embeds: [embed] });
+  await courier.send({ embeds: [embed] });
   return;
 };
 

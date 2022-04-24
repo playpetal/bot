@@ -1,9 +1,9 @@
-import { Autocomplete, Card } from "petal";
+import { Card, Run } from "petal";
 import { getCard } from "../../../../../lib/graphql/query/GET_CARD";
 import { searchCards } from "../../../../../lib/graphql/query/SEARCH_CARDS";
 
-export const cardUpgradeAutocomplete: Autocomplete = async ({
-  interaction,
+export const cardUpgradeAutocomplete: Run = async ({
+  courier,
   user,
   options,
 }) => {
@@ -34,6 +34,6 @@ export const cardUpgradeAutocomplete: Autocomplete = async ({
     value: c.id.toString(16),
   }));
 
-  await interaction.acknowledge(choices);
+  await courier.send(choices);
   return;
 };

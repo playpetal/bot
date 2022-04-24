@@ -2,7 +2,7 @@ import { Run } from "petal";
 import { createSubgroup } from "../../../../../../lib/graphql/mutation/CREATE_SUBGROUP";
 import { Embed } from "../../../../../../struct/embed";
 
-const run: Run = async ({ interaction, user, options }) => {
+const run: Run = async ({ courier, user, options }) => {
   const name = options.getOption<string>("name")!;
   const creation = options.getOption<string>("creation");
 
@@ -16,7 +16,7 @@ const run: Run = async ({ interaction, user, options }) => {
     `the subgroup **${subgroup.name}** has been created!`
   );
 
-  return interaction.createMessage({ embeds: [embed] });
+  return courier.send({ embeds: [embed] });
 };
 
 export default run;

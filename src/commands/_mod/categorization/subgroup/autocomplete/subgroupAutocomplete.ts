@@ -1,7 +1,7 @@
-import { Autocomplete } from "petal";
+import { Run } from "petal";
 import { searchSubgroups } from "../../../../../lib/graphql/query/SEARCH_SUBGROUPS";
 
-const autocomplete: Autocomplete = async ({ interaction, options }) => {
+const autocomplete: Run = async ({ courier, options }) => {
   const focused = options.getFocused()!;
   let choices: { name: string; value: string }[] = [];
   const nested = focused.options!.find((o) => o.focused)!;
@@ -17,7 +17,7 @@ const autocomplete: Autocomplete = async ({ interaction, options }) => {
     });
   }
 
-  return interaction.acknowledge(choices);
+  return courier.send(choices);
 };
 
 export default autocomplete;
