@@ -1,6 +1,89 @@
 declare module "petal" {
   export type Maybe<T> = T | null;
 
+  export type DiscordLocale =
+    | "da"
+    | "de"
+    | "en-GB"
+    | "en-US"
+    | "es-ES"
+    | "fr"
+    | "hr"
+    | "it"
+    | "lt"
+    | "hu"
+    | "nl"
+    | "no"
+    | "pl"
+    | "pt-BR"
+    | "ro"
+    | "fi"
+    | "sv-SE"
+    | "vi"
+    | "tr"
+    | "cs"
+    | "el"
+    | "bg"
+    | "ru"
+    | "uk"
+    | "hi"
+    | "th"
+    | "zh-CN"
+    | "ja"
+    | "zh-TW"
+    | "ko";
+
+  export type DiscordLocalization = { [key in DiscordLocale]: string };
+
+  export type DiscordChannelType =
+    | 0
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | 13
+    | 14
+    | 15;
+
+  export type DiscordCreateApplicationCommand = {
+    name: string;
+    name_localizations?: DiscordLocalization[];
+    description: string;
+    description_localizations?: DiscordLocalization[];
+    options?: DiscordCreateApplicationCommandOption<SlashCommandOptionType>[];
+    default_permission?: boolean;
+    type: 1 | 2 | 3;
+  };
+
+  export type DiscordCreateApplicationCommandOption<
+    T extends SlashCommandOptionType
+  > = {
+    type: T extends 1
+      ? SlashCommandOptionTypeWithoutSubcommand
+      : T extends 2
+      ? 1
+      : SlashCommandOptionType;
+    name: string;
+    name_localizations?: DiscordLocalization[];
+    description: string;
+    description_localizations?: DiscordLocalization[];
+    required?: boolean;
+    choices?: { name: string; value: string | number }[];
+    options?: DiscordCreateApplicationCommandOption<SlashCommandOptionType>[];
+    channel_types?: DiscordChannelType[];
+    min_value?: number;
+    max_value?: number;
+    autocomplete?: boolean;
+  };
+
   type Emoji = {
     id: string | null;
   };
@@ -30,6 +113,7 @@ declare module "petal" {
     max_values?: number;
     disabled?: boolean;
   };
+
   type SelectOption = {
     label: string;
     value: string;
@@ -62,14 +146,6 @@ declare module "petal" {
     | 10 // number
     | 11;
 
-  export type DiscordSlashCommandOption<T> = {
-    type: T;
-    name: string;
-    description: string;
-    required?: boolean;
-    options?: any[];
-  };
-
   export type Run = ({
     courier,
     interaction,
@@ -95,7 +171,9 @@ declare module "petal" {
   export type SlashCommandSubcommand = {
     type: 1;
     name: string;
+    name_localizations?: DiscordLocalization[];
     description: string;
+    description_localizations?: DiscordLocalization[];
     options?: SlashCommandOption[];
 
     ephemeral?: boolean;
@@ -105,14 +183,18 @@ declare module "petal" {
   export type SlashCommandSubcommandGroup = {
     type: 2;
     name: string;
+    name_localizations?: DiscordLocalization[];
     description: string;
+    description_localizations?: DiscordLocalization[];
     options?: SlashCommandSubcommand[];
   };
 
   export type SlashCommandOptionNumeric = {
     type: 4 | 10;
     name: string;
+    name_localizations?: DiscordLocalization[];
     description: string;
+    description_localizations?: DiscordLocalization[];
     required?: boolean;
     autocomplete?: boolean;
     choices?: { name: string; value: number }[];
@@ -125,7 +207,9 @@ declare module "petal" {
   export type SlashCommandOptionString = {
     type: 3;
     name: string;
+    name_localizations?: DiscordLocalization[];
     description: string;
+    description_localizations?: DiscordLocalization[];
     required?: boolean;
     autocomplete?: boolean;
     choices?: { name: string; value: string }[];
@@ -136,7 +220,9 @@ declare module "petal" {
   export type SlashCommandOption = {
     type: SlashCommandOptionTypeWithoutSubcommand;
     name: string;
+    name_localizations?: DiscordLocalization[];
     description: string;
+    description_localizations?: DiscordLocalization[];
     required?: boolean;
     autocomplete?: boolean;
     choices?: { name: string; value: string | number }[];

@@ -32,7 +32,7 @@ export class SlashCommand {
     return this;
   }
 
-  public option(option: AnySlashCommandOption) {
+  public option<T extends AnySlashCommandOption>(option: T) {
     this.options.push(option);
     return this;
   }

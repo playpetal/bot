@@ -7,8 +7,8 @@ import {
   SlashCommandOptionNumeric,
   SlashCommandOptionString,
   SlashCommandSubcommand,
-  SlashCommandSubcommandGroup,
 } from "petal";
+import { isSubcommand, isSubcommandGroup } from "../command";
 
 type Command = SlashCommand | ApplicationCommand;
 
@@ -60,18 +60,6 @@ function parseOptions(
   }
 
   return parsed;
-}
-
-function isSubcommand(
-  option: AnySlashCommandOption
-): option is SlashCommandSubcommand {
-  return option.type === 1;
-}
-
-function isSubcommandGroup(
-  option: AnySlashCommandOption
-): option is SlashCommandSubcommandGroup {
-  return option.type === 2;
 }
 
 function isAutocompletable(
