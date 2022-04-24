@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation Gift(
     $recipientId: Int!
     $petals: Int
@@ -31,13 +31,11 @@ export async function gift({
   cards?: number[];
   lilies?: number;
 }) {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ gift: boolean }>({
+    operation,
     variables: { recipientId, petals, cards, lilies },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    gift: boolean;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.gift;
 }

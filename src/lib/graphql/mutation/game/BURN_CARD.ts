@@ -1,21 +1,19 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { mutate } from "../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation BurnCard($cardId: Int!) {
     burnCard(cardId: $cardId)
   }
 `;
 
 export async function burnCard(cardId: number, discordId: string) {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ burnCard: number }>({
+    operation,
     variables: { cardId },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    burnCard: number;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.burnCard;
 }

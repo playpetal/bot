@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Tag } from "petal";
-import { graphql, GraphQLResponse } from "../../../..";
 import { tokenize } from "../../../../crypto";
+import { mutate } from "../../../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation EditTag($tag: String!, $name: String, $emoji: String) {
     editTag(tag: $tag, name: $name, emoji: $emoji) {
       id
@@ -21,13 +21,11 @@ export async function editTag(
   tag: string,
   tagData: { name?: string; emoji?: string }
 ): Promise<Tag> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ editTag: Tag }>({
+    operation,
     variables: { tag, ...tagData },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    editTag: Tag;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.editTag;
 }

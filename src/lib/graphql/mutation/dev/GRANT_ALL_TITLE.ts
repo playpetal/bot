@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { mutate } from "../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation GrantAllTitle($titleId: Int!) {
     grantAllTitle(titleId: $titleId)
   }
@@ -15,13 +15,11 @@ export async function grantAllTitle({
   discordId: string;
   titleId: number;
 }): Promise<number> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ grantAllTitle: number }>({
+    operation,
     variables: { titleId },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    grantAllTitle: number;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.grantAllTitle;
 }

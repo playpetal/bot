@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Card } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation SetFrame($cardId: Int!) {
     setFrame(cardId: $cardId) {
       id
@@ -39,13 +39,11 @@ export async function setFrame(
   discordId: string,
   cardId: number
 ): Promise<Card> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ setFrame: Card }>({
+    operation,
     variables: { cardId },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    setFrame: Card;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.setFrame;
 }

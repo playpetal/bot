@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Payment, Product } from "petal";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { mutate } from "../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation NewTransaction($productId: Int!) {
     newTransaction(productId: $productId) {
       id
@@ -21,13 +21,11 @@ export async function newTransaction(
   discordId: string,
   product: Product
 ): Promise<Payment> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ newTransaction: Payment }>({
+    operation,
     variables: { productId: product.id },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    newTransaction: Payment;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.newTransaction;
 }

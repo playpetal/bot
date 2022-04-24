@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
 import { MinigameType } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
 const operation = gql`
   mutation CompleteMinigame(
@@ -26,13 +26,11 @@ export async function completeMinigame(
   time: number,
   reward: "CARD" | "PETAL" | "LILY"
 ) {
-  const { data } = (await graphql.mutate({
-    mutation: operation,
+  const data = await mutate<{ completeIdols: boolean }>({
+    operation,
     variables: { type, guesses, time, reward },
-    context: { headers: { Authorization: tokenize(senderDiscordId) } },
-  })) as GraphQLResponse<{
-    completeIdols: boolean;
-  }>;
+    authorization: tokenize(senderDiscordId),
+  });
 
   return data.completeIdols;
 }

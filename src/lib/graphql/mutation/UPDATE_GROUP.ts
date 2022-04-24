@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
+import { Group } from "petal";
 import { tokenize } from "../crypto";
+import { mutate } from "../request";
 
-const UPDATE_GROUP = gql`
+const operation = gql`
   mutation UpdateGroup(
     $id: Int!
     $name: String
@@ -25,18 +26,11 @@ export async function updateGroup(
   creation?: Date | null,
   gender?: "MALE" | "FEMALE" | "COED" | null
 ) {
-  const mutation = (await graphql.mutate({
-    mutation: UPDATE_GROUP,
+  const data = await mutate<{ updateGroup: Group }>({
+    operation,
     variables: { id, name, creation, gender },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    updateGroup: {
-      id: number;
-      name: string;
-      creation: Date | null;
-      gender: "MALE" | "FEMALE" | "COED" | null;
-    };
-  }>;
+    authorization: tokenize(discordId),
+  });
 
-  return mutation.data.updateGroup;
+  return data.updateGroup;
 }

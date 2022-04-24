@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
+import { Character } from "petal";
 import { tokenize } from "../crypto";
+import { mutate } from "../request";
 
-const UPDATE_CHARACTER = gql`
+const operation = gql`
   mutation UpdateCharacter(
     $id: Int!
     $name: String
@@ -30,18 +31,11 @@ export async function updateCharacter(
   birthday?: Date | null,
   gender?: "MALE" | "FEMALE" | "NONBINARY" | null
 ) {
-  const mutation = (await graphql.mutate({
-    mutation: UPDATE_CHARACTER,
+  const data = await mutate<{ updateCharacter: Character }>({
+    operation,
     variables: { id, name, birthday, gender },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    updateCharacter: {
-      id: number;
-      name: string;
-      birthday: Date | null;
-      gender: "MALE" | "FEMALE" | "NONBINARY" | null;
-    };
-  }>;
+    authorization: tokenize(discordId),
+  });
 
-  return mutation.data.updateCharacter;
+  return data.updateCharacter;
 }

@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client/core";
 import { Account } from "petal";
-import { graphql, GraphQLResponse } from "../..";
 import { FLAGS } from "../../../util/flags";
 import { tokenize } from "../../crypto";
+import { mutate } from "../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation ToggleFlag($accountId: Int!, $flag: Flag!) {
     toggleFlag(accountId: $accountId, flag: $flag) {
       id
@@ -31,13 +31,11 @@ export async function toggleFlag(
   accountId: number,
   flag: keyof typeof FLAGS
 ): Promise<Account> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ toggleFlag: Account }>({
+    operation,
     variables: { accountId, flag },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    toggleFlag: Account;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.toggleFlag;
 }

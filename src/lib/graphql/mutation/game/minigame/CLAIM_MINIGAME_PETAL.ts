@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
-const CLAIM_MINIGAME_PETAL_REWARD = gql`
+const operation = gql`
   mutation ClaimMinigamePetalReward {
     claimMinigamePetalReward {
       currency
@@ -11,12 +11,9 @@ const CLAIM_MINIGAME_PETAL_REWARD = gql`
 `;
 
 export async function claimMinigamePetalReward(senderDiscordId: string) {
-  const mutation = (await graphql.mutate({
-    mutation: CLAIM_MINIGAME_PETAL_REWARD,
-    context: { headers: { Authorization: tokenize(senderDiscordId) } },
-  })) as GraphQLResponse<{
-    claimMinigamePetalReward: { currency: number };
-  }>;
+  const data = await mutate<{ claimMinigamePetalReward: { currency: number } }>(
+    { operation, authorization: tokenize(senderDiscordId) }
+  );
 
-  return mutation.data.claimMinigamePetalReward.currency;
+  return data.claimMinigamePetalReward.currency;
 }

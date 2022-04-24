@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
+import { Subgroup } from "petal";
 import { tokenize } from "../crypto";
+import { mutate } from "../request";
 
-const UPDATE_SUBGROUP = gql`
+const operation = gql`
   mutation UpdateSubgroup($id: Int!, $name: String, $creation: DateTime) {
     updateSubgroup(id: $id, name: $name, creation: $creation) {
       id
@@ -18,17 +19,11 @@ export async function updateSubgroup(
   name?: String,
   creation?: Date | null
 ) {
-  const mutation = (await graphql.mutate({
-    mutation: UPDATE_SUBGROUP,
+  const data = await mutate<{ updateSubgroup: Subgroup }>({
+    operation,
     variables: { id, name, creation },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    updateSubgroup: {
-      id: number;
-      name: string;
-      creation: Date | null;
-    };
-  }>;
+    authorization: tokenize(discordId),
+  });
 
-  return mutation.data.updateSubgroup;
+  return data.updateSubgroup;
 }

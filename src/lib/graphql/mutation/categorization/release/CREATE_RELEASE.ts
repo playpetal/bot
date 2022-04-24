@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { PartialUser, Release } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation CreateRelease {
     createRelease {
       id
@@ -13,12 +13,10 @@ const mutation = gql`
 `;
 
 export async function createRelease(user: PartialUser): Promise<Release> {
-  const { data } = (await graphql.mutate({
-    mutation: mutation,
-    context: { headers: { Authorization: tokenize(user.discordId) } },
-  })) as GraphQLResponse<{
-    createRelease: Release;
-  }>;
+  const data = await mutate<{ createRelease: Release }>({
+    operation,
+    authorization: tokenize(user.discordId),
+  });
 
   return data.createRelease;
 }
