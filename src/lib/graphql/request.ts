@@ -1,7 +1,12 @@
+import { ApolloQueryResult, FetchResult } from "@apollo/client";
 import { DocumentNode } from "graphql";
 import { graphql } from ".";
 import { BotError, UnexpectedError } from "../../struct/error";
 import { logger } from "../logger";
+
+type QueryVariables = {
+  [key: string]: string | number | Date | undefined | null;
+};
 
 export async function query<T>({
   query,
@@ -9,15 +14,43 @@ export async function query<T>({
   authorization,
 }: {
   query: DocumentNode;
-  variables?: { [key: string]: string | number | Date | undefined | null };
+  variables?: QueryVariables;
   authorization?: string;
-}) {
+}): Promise<T> {
   const result = await graphql.query({
     query,
     variables,
     context: { headers: { authorization } },
   });
 
+  handleGraphQLErrors(result);
+
+  return result.data as T;
+}
+
+export async function mutate<T>({
+  operation,
+  variables,
+  authorization,
+}: {
+  operation: DocumentNode;
+  variables: QueryVariables;
+  authorization?: string;
+}): Promise<T> {
+  const result = await graphql.mutate({
+    mutation: operation,
+    variables,
+    context: { headers: { authorization } },
+  });
+
+  handleGraphQLErrors(result);
+
+  return result.data as T;
+}
+
+function handleGraphQLErrors(
+  result: ApolloQueryResult<any> | FetchResult
+): void {
   if (result.errors) {
     const exception = result.errors[0].extensions.exception as {
       isUserFacing: boolean | undefined;
@@ -32,5 +65,5 @@ export async function query<T>({
     throw new UnexpectedError();
   }
 
-  return result.data as T;
+  return;
 }
