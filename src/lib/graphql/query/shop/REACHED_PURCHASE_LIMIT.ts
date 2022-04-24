@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { query } from "../../request";
 
-const query = gql`
+const operation = gql`
   query ReachedPurchaseLimit($productId: Int!) {
     reachedPurchaseLimit(productId: $productId)
   }
@@ -12,13 +12,11 @@ export async function reachedPurchaseLimit(
   discordId: string,
   productId: number
 ): Promise<boolean> {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ reachedPurchaseLimit: boolean }>({
+    query: operation,
     variables: { productId },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    reachedPurchaseLimit: boolean;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.reachedPurchaseLimit;
 }

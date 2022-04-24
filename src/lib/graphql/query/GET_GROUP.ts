@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Group, Maybe } from "petal";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query GetGroup($id: Int!) {
     getGroup(id: $id) {
       id
@@ -17,12 +17,10 @@ const query = gql`
 `;
 
 export async function getGroup(id: number) {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ getGroup: Maybe<Group> }>({
+    query: operation,
     variables: { id },
-  })) as GraphQLResponse<{
-    getGroup: Maybe<Group>;
-  }>;
+  });
 
   return data.getGroup;
 }

@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Card, PartialUser, Quality } from "petal";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query SearchCards(
     $search: String!
     $ownerId: Int!
@@ -45,12 +45,10 @@ export async function searchCards(
     exclude?: number;
   }
 ) {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ searchCards: Card[] }>({
+    query: operation,
     variables: { ownerId: owner.id, search, ...options },
-  })) as GraphQLResponse<{
-    searchCards: Card[];
-  }>;
+  });
 
   return data.searchCards;
 }

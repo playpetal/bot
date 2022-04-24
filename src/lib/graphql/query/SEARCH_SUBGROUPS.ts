@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const SEARCH_SUBGROUPS = gql`
+const operation = gql`
   query SearchSubgroups($search: String!) {
     searchSubgroups(search: $search) {
       id
@@ -12,16 +12,13 @@ const SEARCH_SUBGROUPS = gql`
 `;
 
 export async function searchSubgroups(search: string) {
-  const query = (await graphql.query({
-    query: SEARCH_SUBGROUPS,
-    variables: { search },
-  })) as GraphQLResponse<{
+  const data = await query<{
     searchSubgroups: {
       id: number;
       name: string;
       creation: Date;
     }[];
-  }>;
+  }>({ query: operation, variables: { search } });
 
-  return query.data.searchSubgroups;
+  return data.searchSubgroups;
 }

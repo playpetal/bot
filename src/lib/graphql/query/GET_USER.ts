@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client/core";
-import { Account } from "petal";
-import { Maybe } from "..";
+import { Account, Maybe } from "petal";
 import { query } from "../request";
 
 const GET_USER = gql`

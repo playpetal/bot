@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Maybe, Subgroup } from "petal";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query GetSubgroup($id: Int!) {
     getSubgroup(id: $id) {
       id
@@ -13,12 +13,9 @@ const query = gql`
 `;
 
 export async function getSubgroup(id: number) {
-  const { data } = (await graphql.query({
-    query,
-    variables: { id },
-  })) as GraphQLResponse<{
+  const data = await query<{
     getSubgroup: Maybe<Subgroup>;
-  }>;
+  }>({ query: operation, variables: { id } });
 
   return data.getSubgroup;
 }

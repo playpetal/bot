@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Product } from "petal";
-import { graphql, GraphQLResponse } from "../..";
+import { query } from "../../request";
 
-const query = gql`
+const operation = gql`
   query GetProducts {
     products {
       id
@@ -14,11 +14,7 @@ const query = gql`
 `;
 
 export async function getProducts(): Promise<Product[]> {
-  const { data } = (await graphql.query({
-    query,
-  })) as GraphQLResponse<{
-    products: Product[];
-  }>;
+  const data = await query<{ products: Product[] }>({ query: operation });
 
   return data.products;
 }

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
-import { GameSong } from "petal";
-import { graphql, GraphQLResponse, Maybe } from "..";
+import { GameSong, Maybe } from "petal";
 import { tokenize } from "../crypto";
+import { query } from "../request";
 
-const GET_RANDOM_SONG = gql`
+const operation = gql`
   query ($gender: GroupGender) {
     getRandomSong(gender: $gender) {
       id
@@ -18,11 +18,11 @@ export async function getRandomSong(
   discordId: string,
   gender?: "MALE" | "FEMALE" | "COED"
 ): Promise<Maybe<GameSong>> {
-  const query = (await graphql.query({
-    query: GET_RANDOM_SONG,
+  const data = await query<{ getRandomSong: Maybe<GameSong> }>({
+    query: operation,
     variables: { gender },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{ getRandomSong: Maybe<GameSong> }>;
+    authorization: tokenize(discordId),
+  });
 
-  return query.data.getRandomSong;
+  return data.getRandomSong;
 }

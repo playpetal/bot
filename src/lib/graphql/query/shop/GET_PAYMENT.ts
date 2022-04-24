@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Payment } from "petal";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { query } from "../../request";
 
-const query = gql`
+const operation = gql`
   query GetPayment($paymentId: String!) {
     payment(paymentId: $paymentId) {
       id
@@ -21,13 +21,11 @@ export async function getPayment(
   discordId: string,
   paymentId: string
 ): Promise<Payment> {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ payment: Payment }>({
+    query: operation,
     variables: { paymentId },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    payment: Payment;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.payment;
 }

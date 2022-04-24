@@ -13,5 +13,4 @@ export const graphql = new ApolloClient({
   },
 });
 
-export type Maybe<T> = T | null;
 export type GraphQLResponse<Result> = { data: Result };

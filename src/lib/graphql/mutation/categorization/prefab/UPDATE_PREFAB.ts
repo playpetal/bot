@@ -3,7 +3,7 @@ import { Prefab } from "petal";
 import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
 
-const query = gql`
+const mutation = gql`
   mutation UpdatePrefab(
     $prefabId: Int!
     $releaseId: Int
@@ -61,8 +61,8 @@ export async function updatePrefab({
   maxCards?: number;
   releaseId?: number;
 }): Promise<Prefab> {
-  const { data } = (await graphql.query({
-    query: query,
+  const { data } = (await graphql.mutate({
+    mutation: mutation,
     variables: {
       prefabId: id,
       characterId,

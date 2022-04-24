@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { query } from "../../request";
 
-const query = gql`
+const operation = gql`
   query CanClaimPremiumRewards {
     canClaimPremiumRewards
   }
@@ -11,12 +11,10 @@ const query = gql`
 export async function canClaimPremiumRewards(
   discordId: string
 ): Promise<number> {
-  const { data } = (await graphql.query({
-    query,
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    canClaimPremiumRewards: number;
-  }>;
+  const data = await query<{ canClaimPremiumRewards: number }>({
+    query: operation,
+    authorization: tokenize(discordId),
+  });
 
   return data.canClaimPremiumRewards;
 }

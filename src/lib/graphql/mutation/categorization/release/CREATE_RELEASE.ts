@@ -3,7 +3,7 @@ import { PartialUser, Release } from "petal";
 import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
 
-const query = gql`
+const mutation = gql`
   mutation CreateRelease {
     createRelease {
       id
@@ -13,8 +13,8 @@ const query = gql`
 `;
 
 export async function createRelease(user: PartialUser): Promise<Release> {
-  const { data } = (await graphql.query({
-    query: query,
+  const { data } = (await graphql.mutate({
+    mutation: mutation,
     context: { headers: { Authorization: tokenize(user.discordId) } },
   })) as GraphQLResponse<{
     createRelease: Release;

@@ -3,7 +3,7 @@ import { PartialUser, Release } from "petal";
 import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
 
-const query = gql`
+const mutation = gql`
   mutation UpdateRelease($id: Int!, $droppable: Boolean) {
     updateRelease(id: $id, droppable: $droppable) {
       id
@@ -17,8 +17,8 @@ export async function updateRelease(
   id: number,
   droppable?: boolean
 ): Promise<Release> {
-  const { data } = (await graphql.query({
-    query: query,
+  const { data } = (await graphql.mutate({
+    mutation: mutation,
     variables: {
       id,
       droppable,

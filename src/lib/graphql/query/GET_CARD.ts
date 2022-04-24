@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Card, Maybe } from "petal";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query GetCard($id: Int!) {
     getCard(id: $id) {
       id
@@ -40,12 +40,10 @@ const query = gql`
 `;
 
 export async function getCard(id: number) {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ getCard: Maybe<Card> }>({
+    query: operation,
     variables: { id },
-  })) as GraphQLResponse<{
-    getCard: Maybe<Card>;
-  }>;
+  });
 
   return data.getCard;
 }

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const SEARCH_PREFABS = gql`
+const operation = gql`
   query SearchPrefabs($search: String!) {
     searchPrefabs(search: $search) {
       id
@@ -21,10 +21,7 @@ const SEARCH_PREFABS = gql`
 `;
 
 export async function searchPrefabs(search: string) {
-  const query = (await graphql.query({
-    query: SEARCH_PREFABS,
-    variables: { search },
-  })) as GraphQLResponse<{
+  const data = await query<{
     searchPrefabs: {
       id: number;
       character: { name: string };
@@ -33,7 +30,7 @@ export async function searchPrefabs(search: string) {
       maxCards: number;
       rarity: number;
     }[];
-  }>;
+  }>({ query: operation, variables: { search } });
 
-  return query.data.searchPrefabs;
+  return data.searchPrefabs;
 }
