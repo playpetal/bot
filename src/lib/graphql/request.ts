@@ -4,9 +4,7 @@ import { graphql } from ".";
 import { BotError, UnexpectedError } from "../../struct/error";
 import { logger } from "../logger";
 
-type QueryVariables = {
-  [key: string]: string | number | Date | undefined | null;
-};
+type QueryVariables = Record<string, any>;
 
 export async function query<T>({
   query,
@@ -34,7 +32,7 @@ export async function mutate<T>({
   authorization,
 }: {
   operation: DocumentNode;
-  variables: QueryVariables;
+  variables?: QueryVariables;
   authorization?: string;
 }): Promise<T> {
   const result = await graphql.mutate({
