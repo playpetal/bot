@@ -1,14 +1,9 @@
 import { Components, Run } from "petal";
 import { claimMinigamePetalReward } from "../../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
-import { completeMinigame } from "../../../../lib/graphql/mutation/game/minigame/completeMinigame";
 import { searchCharacters } from "../../../../lib/graphql/query/categorization/character/searchCharacters";
 import { canClaimPremiumRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
-import {
-  destroyMinigame,
-  getMinigame,
-  setMinigame,
-} from "../../../../lib/minigame";
+import { getMinigame, setMinigame } from "../../../../lib/minigame";
 import { getMinigameRewardComponents } from "../../../../lib/util/component/minigame";
 import { emoji } from "../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../struct/embed";
@@ -91,16 +86,6 @@ export const minigameGuessRun: Run = async ({ courier, user, options }) => {
 
       if (rewardsRemaining === 0) {
         desc += `\nyou were rewarded ${emoji.petals} **1** for playing.`;
-
-        await destroyMinigame(user);
-
-        await completeMinigame(
-          "GUESS_CHARACTER",
-          user.discordId,
-          data.guesses.length,
-          data.elapsed,
-          "PETAL"
-        );
 
         await claimMinigamePetalReward(user.discordId);
       } else {
