@@ -375,52 +375,36 @@ declare module "petal" {
   type Reward = "PETAL" | "LILY" | "CARD";
   type MinigameType = "GTS" | "WORDS" | "GUESS_CHARACTER";
 
-  export type UnknownMinigame = {
-    playerId: number;
-    message: string;
-    channel: string;
-    guild: string;
-    data: GTSData | WordsData | CharacterGuessData;
+  export type MinigameState =
+    | "PLAYING"
+    | "CANCELLED"
+    | "FAILED"
+    | "PENDING"
+    | "COMPLETED";
+
+  export type MinigameSong = {
+    title: string;
+    group: Maybe<string>;
+    soloist: Maybe<string>;
   };
 
-  export type Minigame<T extends MinigameType | never> = {
-    playerId: number;
-    message: string;
-    channel: string;
-    guild: string;
-    data: T extends "GTS"
-      ? GTSData
-      : T extends "GUESS_CHARACTER"
-      ? CharacterGuessData
-      : T extends "WORDS"
-      ? WordsData
-      : never;
-  };
+  export type Minigame<T> = GuessTheSong;
 
-  export type GTSData = {
+  export type GuessTheSong = {
     type: "GTS";
-    song: GameSong;
-    guesses: number;
-    correct: boolean;
-    elapsed?: number;
+    accountId: number;
+    video: Maybe<string>;
+    state: MinigameState;
+    song: Maybe<MinigameSong>;
+    attempts: MinigameSong[];
+    maxAttempts: number;
+    timeLimit: number;
     startedAt: number;
-  };
+    elapsed: Maybe<number>;
 
-  export type WordsData = {
-    type: "WORDS";
-    answer: string;
-    guesses: string[];
-    elapsed?: number;
-    startedAt: number;
-  };
-
-  export type CharacterGuessData = {
-    type: "GUESS_CHARACTER";
-    answer: Character;
-    isGendered: boolean;
-    guesses: Character[];
-    elapsed?: number;
-    startedAt: number;
+    messageId: string;
+    channelId: string;
+    guildId: string;
   };
 
   export type Product = {

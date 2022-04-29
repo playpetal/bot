@@ -1,6 +1,6 @@
 import { Gender, Run } from "petal";
 import { searchCharacters } from "../../../../../lib/graphql/query/categorization/character/searchCharacters";
-import { getMinigame } from "../../../../../lib/minigame";
+import { getMinigame } from "../../../../../lib/graphql/query/game/minigame/GET_MINIGAME";
 
 export const minigameGuessAutocompleteIdol: Run = async ({
   courier,
@@ -18,12 +18,12 @@ export const minigameGuessAutocompleteIdol: Run = async ({
     maxLetters: number | undefined;
 
   if (minigame && minigame.data.type === "GUESS_CHARACTER") {
-    if (minigame.data.guesses.length > 0) {
-      const birthdays = minigame.data.guesses
+    if (minigame.data.attempts.count > 0) {
+      const birthdays = (minigame.data.attempts.characters || [])
         .map((c) => c.birthday)
         .filter((d) => d !== null) as Date[];
 
-      const answer = minigame.data.answer.birthday;
+      const answer = minigame.data.solution?.character?.birthday;
 
       if (answer) {
         for (let birthday of birthdays) {

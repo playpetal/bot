@@ -1,14 +1,10 @@
 import { CommandInteraction } from "eris";
 import { Run } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
+import { startGuessTheSong } from "../../../../../lib/graphql/mutation/game/minigame/guess-the-song/startGuessTheSong";
 import { canClaimRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
-import { getRandomSong } from "../../../../../lib/graphql/query/GET_RANDOM_SONG";
+import { getGuessTheSong } from "../../../../../lib/graphql/query/game/minigame/guess-the-song/getGuessTheSong";
 import { logger } from "../../../../../lib/logger";
-import { getMinigame, setMinigame } from "../../../../../lib/minigame";
-import {
-  GTS_MAX_MS,
-  GTS_MAX_GUESSES,
-} from "../../../../../lib/minigame/constants";
 import { handleGTSEnd } from "../../../../../lib/minigame/gts";
 import { dd } from "../../../../../lib/statsd";
 import { row, button } from "../../../../../lib/util/component";
@@ -16,42 +12,31 @@ import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { strong } from "../../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../../struct/embed";
 
-export const songPlayRun: Run = async function run({
-  courier,
-  interaction,
-  user,
-  options,
-}) {
-  const minigame = await getMinigame(user);
+export const songPlayRun: Run = async function run({ courier, user, options }) {
+  const _minigame = await getGuessTheSong(user);
 
-  if (minigame) {
-    if (minigame.data.type === "GTS") throw MinigameError.AlreadyPlayingGTS;
-
-    if (minigame.data.type === "GUESS_CHARACTER")
-      throw MinigameError.AlreadyPlayingIdols;
-
-    if (minigame.data.type === "WORDS")
-      throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
+  if (_minigame && _minigame.state === "PENDING") {
+    throw MinigameError.RewardsPendingClaim;
+  } else if (_minigame && _minigame.type !== "GTS") {
+    throw MinigameError.AlreadyPlayingMinigame;
+  } else if (_minigame && _minigame.state === "PLAYING") {
+    throw MinigameError.AlreadyPlayingGTS;
   }
 
   const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
-  await courier.send({ embeds: [loading] });
+  const loadingMessage = await courier.send({ embeds: [loading] });
 
   const gender = options.getOption<"male" | "female">("gender");
 
-  const song = await getRandomSong(
+  const minigame = await startGuessTheSong(
     user.discordId,
-    gender?.toUpperCase() as "MALE" | "FEMALE" | undefined
+    {
+      messageId: loadingMessage?.id!,
+      channelId: loadingMessage?.channel.id!,
+      guildId: loadingMessage?.guildID!,
+    },
+    { gender: gender?.toUpperCase() as "MALE" | "FEMALE" | undefined }
   );
-
-  if (!song) {
-    const embed = new Embed().setDescription(
-      "**uh-oh!**\nthere are no available songs 😔 try again later!"
-    );
-
-    await courier.edit({ embeds: [embed] });
-    return;
-  }
 
   const canClaim = await canClaimRewards(user.discordId);
 
@@ -59,8 +44,8 @@ export const songPlayRun: Run = async function run({
     const embed = new Embed()
       .setDescription(
         `${emoji.song} **Guess the song by using \`/song guess\`!**` +
-          `\nTime limit: ${strong(GTS_MAX_MS / 1000)} seconds` +
-          `\nMaximum guesses: ${strong(GTS_MAX_GUESSES)}`
+          `\nTime limit: ${strong(minigame.timeLimit / 1000)} seconds` +
+          `\nMaximum guesses: ${strong(minigame.maxAttempts)}`
       )
       .setImage("https://cdn.playpetal.com/banners/default.png");
 
@@ -84,50 +69,33 @@ export const songPlayRun: Run = async function run({
           ),
         ],
       },
-      { file: Buffer.from(song.video!, "base64"), name: "song.mp4" }
-    );
-
-    await setMinigame<"GTS">(
-      user,
-      {
-        type: "GTS",
-        startedAt: Date.now(),
-        song: { ...song, video: undefined },
-        guesses: 0,
-        correct: false,
-      },
-      {
-        message: message.id,
-        channel: message.channel.id,
-        guild: message.guildID!,
-      }
+      { file: Buffer.from(minigame.video!, "base64"), name: "song.mp4" }
     );
 
     dd.increment(`petal.minigame.gts.started`);
 
     const interval = setInterval(async () => {
-      const game = await getMinigame<"GTS">(user);
+      const game = await getGuessTheSong(user);
 
       if (!game) {
         clearInterval(interval);
         return;
       }
 
-      if (game.message !== message.id) {
+      if (game.messageId !== message.id) {
         await message.delete();
         clearInterval(interval);
         return;
       }
 
-      const { correct, guesses, startedAt } = game.data;
+      const { state } = game;
 
-      if (
-        correct ||
-        guesses >= GTS_MAX_GUESSES ||
-        startedAt <= Date.now() - GTS_MAX_MS
-      ) {
+      if (state !== "PLAYING") {
         clearInterval(interval);
-        return await handleGTSEnd(interaction as CommandInteraction, game);
+        return await handleGTSEnd(
+          courier.interaction as CommandInteraction,
+          game
+        );
       }
     }, 500);
   } catch (e) {

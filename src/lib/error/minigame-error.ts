@@ -55,6 +55,9 @@ export const MinigameError = {
   NotPlayingWords: new BotError(
     "**you're not playing!**\nuse **`/petle play`** to start a game."
   ),
+  RewardsPendingClaim: new BotError(
+    `**you have unclaimed rewards!**\nplease claim them to start a new minigame.`
+  ),
   WordAlreadyGuessed: new BotError(
     "**you've already used that word!**\nit wouldn't make much sense to use it again..."
   ),

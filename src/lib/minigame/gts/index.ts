@@ -1,38 +1,35 @@
 import { CommandInteraction } from "eris";
 import { Minigame } from "petal";
-import { destroyMinigame } from "..";
 import { Embed } from "../../../struct/embed";
-import { claimMinigamePetalReward } from "../../graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
-import { completeMinigame } from "../../graphql/mutation/game/minigame/completeMinigame";
 import { canClaimPremiumRewards } from "../../graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../graphql/query/game/CAN_CLAIM_REWARDS";
 import { dd } from "../../statsd";
 import { getMinigameRewardComponents } from "../../util/component/minigame";
 import { emoji } from "../../util/formatting/emoji";
-import { GTS_MAX_GUESSES } from "../constants";
 
 export async function handleGTSEnd(
   interaction: CommandInteraction,
   minigame: Minigame<"GTS">
 ) {
-  const {
-    playerId,
-    data: { correct, guesses, song, elapsed },
-  } = minigame;
+  const { accountId, state, attempts, maxAttempts, elapsed } = minigame;
 
-  if (!correct) {
-    await destroyMinigame(playerId);
+  if (state === "CANCELLED") return;
 
-    return interaction.editOriginalMessage({
+  if (state === "FAILED") {
+    return interaction.editMessage(minigame.messageId, {
       embeds: [
         new Embed()
           .setDescription(
             "**Better luck next time!**\n" +
-              (guesses >= GTS_MAX_GUESSES
+              (attempts.length >= maxAttempts
                 ? "You ran out of guesses!"
                 : "You ran out of time!") +
-              `\n\nYou just heard || ${emoji.song} **${song.title}** by ${
-                song.group || song.soloist || "an unknown artist"
+              `\n\nYou just heard || ${emoji.song} **${
+                minigame.song?.title || "An Unknown Song"
+              }** by ${
+                minigame.song?.group ||
+                minigame.song?.soloist ||
+                "an unknown artist"
               }||!`
           )
           .setColor("#F04747"),
@@ -41,28 +38,17 @@ export async function handleGTSEnd(
     });
   }
 
-  dd.increment(`petal.minigame.${minigame.data.type.toLowerCase()}.completed`);
+  dd.increment(`petal.minigame.guess-the-song.completed`);
 
   const embed = new Embed().setColor("#3BA55D");
 
-  const description = `${emoji.song} **You got it in ${guesses} guess${
-    guesses !== 1 ? "es" : ""
+  const description = `${emoji.song} **You got it in ${attempts.length} guess${
+    attempts.length !== 1 ? "es" : ""
   } (${(elapsed! / 1000).toFixed(2)}s)!**`;
 
   const rewardsRemaining = await canClaimRewards(interaction.member!.id);
 
   if (rewardsRemaining === 0) {
-    await destroyMinigame(playerId);
-
-    await completeMinigame(
-      "GTS",
-      interaction.member!.id,
-      guesses,
-      elapsed!,
-      "PETAL"
-    );
-    await claimMinigamePetalReward(interaction.member!.id);
-
     embed.setDescription(
       description + `\nYou earned ${emoji.petals} **1** for playing.`
     );
@@ -73,13 +59,14 @@ export async function handleGTSEnd(
   }
 
   try {
-    return interaction.editOriginalMessage({
+    return interaction.editMessage(minigame.messageId, {
       embeds: [embed],
       components:
         rewardsRemaining > 0
           ? await getMinigameRewardComponents(
-              playerId,
-              (await canClaimPremiumRewards(interaction.member!.id)) > 0
+              accountId,
+              (await canClaimPremiumRewards(interaction.member!.id)) > 0,
+              "GTS"
             )
           : [],
     });

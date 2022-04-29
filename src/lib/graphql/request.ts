@@ -1,4 +1,4 @@
-import { ApolloQueryResult, FetchResult } from "@apollo/client";
+import { ApolloError } from "@apollo/client/core";
 import { DocumentNode } from "graphql";
 import { graphql } from ".";
 import { BotError, UnexpectedError } from "../../struct/error";
@@ -15,15 +15,17 @@ export async function query<T>({
   variables?: QueryVariables;
   authorization?: string;
 }): Promise<T> {
-  const result = await graphql.query({
-    query,
-    variables,
-    context: { headers: { authorization } },
-  });
+  try {
+    const result = await graphql.query({
+      query,
+      variables,
+      context: { headers: { authorization } },
+    });
 
-  handleGraphQLErrors(result);
-
-  return result.data as T;
+    return result.data as T;
+  } catch (e) {
+    throw handle(e);
+  }
 }
 
 export async function mutate<T>({
@@ -35,33 +37,35 @@ export async function mutate<T>({
   variables?: QueryVariables;
   authorization?: string;
 }): Promise<T> {
-  const result = await graphql.mutate({
-    mutation: operation,
-    variables,
-    context: { headers: { authorization } },
-  });
+  try {
+    const result = await graphql.mutate({
+      mutation: operation,
+      variables,
+      context: { headers: { authorization } },
+    });
 
-  handleGraphQLErrors(result);
-
-  return result.data as T;
+    return result.data as T;
+  } catch (e) {
+    throw handle(e);
+  }
 }
 
-function handleGraphQLErrors(
-  result: ApolloQueryResult<any> | FetchResult
-): void {
-  if (result.errors) {
-    const exception = result.errors[0].extensions.exception as {
+function handle(error: unknown): Error {
+  if (error instanceof ApolloError && error.graphQLErrors[0]) {
+    const exception = error.graphQLErrors[0].extensions.exception as {
       isUserFacing: boolean | undefined;
       name: string;
     };
+
     const isUserFacing = exception.isUserFacing || false;
 
     if (isUserFacing)
-      throw new BotError(`**uh-oh!**\n${result.errors[0].message}`);
+      return new BotError(`**uh-oh!**\n${error.graphQLErrors[0].message}`);
 
-    logger.error(result.errors);
-    throw new UnexpectedError();
+    logger.error(error);
+    return new UnexpectedError();
+  } else {
+    logger.error(error);
+    return new UnexpectedError();
   }
-
-  return;
 }

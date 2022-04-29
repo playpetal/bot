@@ -1,8 +1,9 @@
 import { MinigameError } from "../../../../lib/error/minigame-error";
+import { updateMinigameMessage } from "../../../../lib/graphql/mutation/game/minigame/updateMinigameMessage";
 import { canClaimPremiumRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
+import { getMinigame } from "../../../../lib/graphql/query/game/minigame/GET_MINIGAME";
 import { getUser } from "../../../../lib/graphql/query/GET_USER";
-import { getMinigame, setMinigame } from "../../../../lib/minigame";
 import { getWordsEmbed } from "../../../../lib/minigame/words";
 import { button, row } from "../../../../lib/util/component";
 import { getMinigameRewardComponents } from "../../../../lib/util/component/minigame";
@@ -26,10 +27,10 @@ const run: RunComponent = async function ({ interaction, user }) {
   const { data } = minigame;
 
   try {
-    await interaction.deleteMessage(minigame.message);
+    await interaction.deleteMessage(minigame.messageId);
   } catch {}
 
-  const correct = data.guesses.find((g) => g === data.answer.toLowerCase());
+  const correct = data.correct;
   const rewardsRemaining = await canClaimRewards(interaction.member!.id);
   const embed = getWordsEmbed(data, user, rewardsRemaining);
 
@@ -39,9 +40,10 @@ const run: RunComponent = async function ({ interaction, user }) {
       correct && rewardsRemaining > 0
         ? await getMinigameRewardComponents(
             user.id,
-            (await canClaimPremiumRewards(interaction.member!.id)) > 0
+            (await canClaimPremiumRewards(interaction.member!.id)) > 0,
+            "WORDS"
           )
-        : data.guesses.length < 6
+        : data.attempts.count < 6
         ? [
             row(
               button({
@@ -54,11 +56,12 @@ const run: RunComponent = async function ({ interaction, user }) {
         : [],
   });
 
-  await setMinigame(account, minigame.data, {
-    message: message.id,
-    channel: interaction.channel.id,
-    guild: interaction.guildID!,
+  await updateMinigameMessage(user, {
+    messageId: message.id,
+    channelId: interaction.channel.id,
+    guildId: interaction.guildID!,
   });
+
   return;
 };
 

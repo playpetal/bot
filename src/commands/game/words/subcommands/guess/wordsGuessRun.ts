@@ -1,17 +1,11 @@
-import { CommandInteraction } from "eris";
+/*import { CommandInteraction } from "eris";
 import { Run, WordsData } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
 import { claimMinigamePetalReward } from "../../../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
-import { completeMinigame } from "../../../../../lib/graphql/mutation/game/minigame/completeMinigame";
 import { canClaimPremiumRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { isWordValid } from "../../../../../lib/graphql/query/game/minigame/words/IS_WORD_VALID";
 import { logMissingWord } from "../../../../../lib/logger/minigame";
-import {
-  destroyMinigame,
-  getMinigame,
-  setMinigame,
-} from "../../../../../lib/minigame";
 import { getWordsEmbed } from "../../../../../lib/minigame/words";
 import { dd } from "../../../../../lib/statsd";
 import { row, button } from "../../../../../lib/util/component";
@@ -63,13 +57,13 @@ const run: Run = async function run({ courier, user, options }) {
   if (isFinished && correct && rewardsRemaining <= 0) {
     await destroyMinigame(user);
 
-    await completeMinigame(
+    /*await completeMinigame(
       "WORDS",
       user.discordId,
       data.guesses.length,
       data.elapsed!,
       "PETAL"
-    );
+    );* /
     await claimMinigamePetalReward(user.discordId);
 
     embed.setColor("#3BA55D");
@@ -103,3 +97,4 @@ const run: Run = async function run({ courier, user, options }) {
 };
 
 export default run;
+*/
