@@ -33,19 +33,19 @@ export const minigameGuessAutocompleteIdol: Run = async ({
       }
 
       if (attempt.nameLength === "EQUAL") {
-        minLetters = attempt.name.length + 1;
+        minLetters = attempt.name.length;
         maxLetters = attempt.name.length;
       }
 
       if (
         attempt.birthDate === "GREATER" &&
-        (!birthdayAfter || attempt.birthday! < birthdayAfter)
+        (!birthdayAfter || attempt.birthday! > birthdayAfter)
       )
         birthdayAfter = attempt.birthday!;
 
       if (
         attempt.birthDate === "LESS" &&
-        (!birthdayBefore || attempt.birthday! > birthdayBefore)
+        (!birthdayBefore || attempt.birthday! < birthdayBefore)
       )
         birthdayBefore = attempt.birthday!;
 
