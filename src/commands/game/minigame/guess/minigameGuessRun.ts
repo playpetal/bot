@@ -1,29 +1,21 @@
 import { Components, Run } from "petal";
-import { claimMinigamePetalReward } from "../../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
-import { searchCharacters } from "../../../../lib/graphql/query/categorization/character/searchCharacters";
+import { MinigameError } from "../../../../lib/error/minigame-error";
+import { answerGuessTheIdol } from "../../../../lib/graphql/mutation/game/minigame/guess-the-idol/answerGuessTheIdol";
 import { canClaimPremiumRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
-import { getMinigame, setMinigame } from "../../../../lib/minigame";
+import { getGuessTheIdol } from "../../../../lib/graphql/query/game/minigame/guess-the-idol/getGuessTheIdol";
+import { isInactive } from "../../../../lib/minigame/util/isInactive";
 import { getMinigameRewardComponents } from "../../../../lib/util/component/minigame";
 import { emoji } from "../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../struct/embed";
 
 export const minigameGuessRun: Run = async ({ courier, user, options }) => {
-  const activeMinigame = await getMinigame(user);
+  const minigame = await getGuessTheIdol(user);
 
-  if (!activeMinigame) {
-    const embed = new Embed().setDescription(
-      "**woah there!**\nyou're not playing a minigame."
-    );
+  if (!minigame || isInactive(minigame)) throw MinigameError.NotPlayingMinigame;
+  if (minigame.state === "PENDING") throw MinigameError.RewardsPendingClaim;
 
-    await courier.send({ embeds: [embed] });
-
-    return;
-  }
-
-  const { data } = activeMinigame;
-
-  if (data.type === "GUESS_CHARACTER") {
+  if (minigame.type === "GUESS_THE_IDOL") {
     const guess = options.getOption<string>("idol");
 
     if (!guess) {
@@ -36,63 +28,26 @@ export const minigameGuessRun: Run = async ({ courier, user, options }) => {
       return;
     }
 
-    const name = guess.replace(/\(\d{4}(-\d{2}){2}\)/gi, "").trim();
-    const birthday = guess.match(/\d{4}(-\d{2}){2}/gi)?.[0];
+    const _minigame = await answerGuessTheIdol(user.discordId, guess);
 
-    const matches = await searchCharacters({
-      search: name,
-      birthday: birthday ? new Date(birthday) : undefined,
-    });
-
-    if (matches.length === 0) {
-      const embed = new Embed().setDescription(
-        "**uh-oh!**\ni couldn't find any idols by that name.\nplease use the autocomplete options to make your choice!"
-      );
-
-      await courier.send({ embeds: [embed] });
-      return;
-    }
-
-    if (matches.length > 1) {
-      const embed = new Embed().setDescription(
-        `**uh-oh!**\nthere are ${matches.length} idol${
-          matches.length === 1 ? "" : "s"
-        } matching that name!\nplease use the autocomplete options to make your choice!`
-      );
-
-      await courier.send({ embeds: [embed] });
-      return;
-    }
-
-    const character = matches[0];
-    data.guesses.push(character);
-
-    const isCorrect = character.id === data.answer.id;
-    if (isCorrect) data.elapsed = Date.now() - data.startedAt;
-
-    await setMinigame(user, data, activeMinigame);
-
-    if (isCorrect) {
-      data.elapsed = Date.now() - data.startedAt;
-
+    if (_minigame.state === "PENDING" || _minigame.state === "COMPLETED") {
       let embed = new Embed();
       let components: Components = [];
 
-      let desc = `**you got \`${data.answer.name}\` in ${
-        data.guesses.length
-      } guess${data.guesses.length === 1 ? "" : "es"}!**`;
+      let desc = `**you got \`${_minigame.character!.name}\` in ${
+        _minigame.attempts.length
+      } guess${_minigame.attempts.length === 1 ? "" : "es"}!**`;
 
       const rewardsRemaining = await canClaimRewards(user.discordId);
 
       if (rewardsRemaining === 0) {
         desc += `\nyou were rewarded ${emoji.petals} **1** for playing.`;
-
-        await claimMinigamePetalReward(user.discordId);
       } else {
         desc += `\nchoose your reward from the options below!`;
         components = await getMinigameRewardComponents(
           user.id,
-          (await canClaimPremiumRewards(user.discordId)) > 0
+          (await canClaimPremiumRewards(user.discordId)) > 0,
+          _minigame.type
         );
       }
 
@@ -103,45 +58,34 @@ export const minigameGuessRun: Run = async ({ courier, user, options }) => {
     }
 
     let birthdayStr, genderStr, lettersStr;
+    const attempt = _minigame.attempts[_minigame.attempts.length - 1];
 
-    if (!data.answer.birthday) {
-      birthdayStr = `${
-        character.birthday ? "❌" : "✅"
-      } The idol has **no birthday**.`;
-    } else if (character.birthday) {
-      const date = new Date(character.birthday).toISOString().split("T")[0];
+    const date = new Date(attempt.birthday!).toISOString().split("T")[0];
 
-      if (data.answer.birthday === character.birthday) {
-        birthdayStr = `✅ the idol was born **on ${date}**.`;
-      } else {
-        birthdayStr = `❌ the idol was born **${
-          character.birthday > data.answer.birthday ? "before" : "after"
-        } ${date}**.`;
-      }
+    if (attempt.birthDate === "EQUAL") {
+      birthdayStr = `✅ the idol was born **on ${date}**.`;
     } else {
-      birthdayStr = "❌ the idol has **a birthday**.";
+      birthdayStr = `❌ the idol was born **${
+        attempt.birthDate === "LESS" ? "before" : "after"
+      } ${date}**.`;
     }
 
-    if (!data.answer.gender) {
-      genderStr = `${
-        character.gender ? "❌" : "✅"
-      } the idol **has no gender**.`;
-    } else if (!character.gender) {
-      genderStr = "❌ the idol **has a gender**.";
+    if (attempt.isGender) {
+      genderStr = `✅ the idol **is ${
+        attempt.gender?.toLowerCase() || "ungendered"
+      }**.`;
     } else {
-      if (data.answer.gender === character.gender) {
-        genderStr = `✅ the idol **is ${data.answer.gender.toLowerCase()}**.`;
-      } else {
-        genderStr = `❌ the idol **is not ${character.gender.toLowerCase()}**.`;
-      }
+      genderStr = `❌ the idol **is not ${
+        attempt.gender?.toLowerCase() || "ungendered"
+      }**.`;
     }
 
-    if (character.name.length > data.answer.name.length) {
-      lettersStr = `❌ the idol has **less letters** in their name than \`${character.name}\`.`;
-    } else if (character.name.length < data.answer.name.length) {
-      lettersStr = `❌ the idol has **more letters** in their name than \`${character.name}\`.`;
+    if (attempt.nameLength === "LESS") {
+      lettersStr = `❌ the idol has **less letters** in their name than \`${attempt.name}\`.`;
+    } else if (attempt.nameLength === "GREATER") {
+      lettersStr = `❌ the idol has **more letters** in their name than \`${attempt.name}\`.`;
     } else {
-      lettersStr = `✅ the idol has **the same amount of letters** in their name as \`${character.name}\`.`;
+      lettersStr = `✅ the idol has **the same amount of letters** in their name as \`${attempt.name}\`.`;
     }
 
     const embed = new Embed().setDescription(
@@ -149,8 +93,6 @@ export const minigameGuessRun: Run = async ({ courier, user, options }) => {
     );
 
     await courier.send({ embeds: [embed] });
-
-    await setMinigame(user, data, activeMinigame);
     return;
   }
 

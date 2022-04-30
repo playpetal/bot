@@ -5,7 +5,7 @@ import { emoji } from "../../../util/formatting/emoji";
 import { strong } from "../../../util/formatting/strong";
 
 export function getIdolsStatsEmbed(
-  stats: Maybe<MinigameStats<"GUESS_CHARACTER">>,
+  stats: Maybe<MinigameStats<"GUESS_THE_IDOL">>,
   user: PartialUser
 ): Embed {
   const embed = new Embed()

@@ -9,7 +9,7 @@ import { emoji } from "../../util/formatting/emoji";
 
 export async function handleGTSEnd(
   interaction: CommandInteraction,
-  minigame: Minigame<"GTS">
+  minigame: Minigame<"GUESS_THE_SONG">
 ) {
   const { accountId, state, attempts, maxAttempts, elapsed } = minigame;
 
@@ -66,7 +66,7 @@ export async function handleGTSEnd(
           ? await getMinigameRewardComponents(
               accountId,
               (await canClaimPremiumRewards(interaction.member!.id)) > 0,
-              "GTS"
+              "GUESS_THE_SONG"
             )
           : [],
     });

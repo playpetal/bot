@@ -373,7 +373,7 @@ declare module "petal" {
   };
 
   type Reward = "PETAL" | "LILY" | "CARD";
-  type MinigameType = "GTS" | "WORDS" | "GUESS_CHARACTER";
+  type MinigameType = "GUESS_THE_SONG" | "GUESS_THE_IDOL" | "GUESS_THE_GROUP";
 
   export type MinigameState =
     | "PLAYING"
@@ -388,15 +388,43 @@ declare module "petal" {
     soloist: Maybe<string>;
   };
 
-  export type Minigame<T> = GuessTheSong;
+  export type Minigame<T extends MinigameType> = T extends "GUESS_THE_SONG"
+    ? GuessTheSong
+    : T extends "GUESS_THE_IDOL"
+    ? GuessTheIdol
+    : GuessTheSong | GuessTheIdol;
+
+  export type MinigameComparison = "GREATER" | "LESS" | "EQUAL";
 
   export type GuessTheSong = {
-    type: "GTS";
+    type: "GUESS_THE_SONG";
     accountId: number;
     video: Maybe<string>;
     state: MinigameState;
     song: Maybe<MinigameSong>;
     attempts: MinigameSong[];
+    maxAttempts: number;
+    timeLimit: number;
+    startedAt: number;
+    elapsed: Maybe<number>;
+
+    messageId: string;
+    channelId: string;
+    guildId: string;
+  };
+
+  export type GuessTheIdolCharacter = Character & {
+    nameLength: MinigameComparison;
+    birthDate: MinigameComparison;
+    isGender: boolean;
+  };
+
+  export type GuessTheIdol = {
+    type: "GUESS_THE_IDOL";
+    accountId: number;
+    state: MinigameState;
+    character: Maybe<Character>;
+    attempts: GuessTheIdolCharacter[];
     maxAttempts: number;
     timeLimit: number;
     startedAt: number;

@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client/core";
 import { Card, Maybe, Reward } from "petal";
-import { tokenize } from "../../../../crypto";
-import { mutate } from "../../../../request";
+import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
 const operation = gql`
-  mutation CompleteGuessTheSong($reward: Reward!) {
-    completeGuessTheSong(reward: $reward) {
+  mutation CompleteMinigame($reward: Reward!) {
+    completeMinigame(reward: $reward) {
       account {
         currency
         premiumCurrency
@@ -43,7 +43,7 @@ const operation = gql`
   }
 `;
 
-export async function completeGuessTheSong(
+export async function completeMinigame(
   discordId: string,
   reward: Reward
 ): Promise<{
@@ -51,7 +51,7 @@ export async function completeGuessTheSong(
   card: Maybe<Card>;
 }> {
   const data = await mutate<{
-    completeGuessTheSong: {
+    completeMinigamea: {
       account: { currency: number; premiumCurrency: number };
       card: Maybe<Card>;
     };
@@ -61,5 +61,5 @@ export async function completeGuessTheSong(
     authorization: tokenize(discordId),
   });
 
-  return data.completeGuessTheSong;
+  return data.completeMinigamea;
 }

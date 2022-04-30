@@ -49,6 +49,9 @@ export const MinigameError = {
   NotOwnerOfMinigame: new BotError(
     `**that game isn't yours!**\nyou can't claim rewards for someone else's minigame.`
   ),
+  NotPlayingMinigame: new BotError(
+    "**you're not playing a minigame!**\nuse **`/minigame play`** to start a game."
+  ),
   NotPlayingGTS: new BotError(
     "**you're not playing!**\nuse **`/song`** to start a game."
   ),

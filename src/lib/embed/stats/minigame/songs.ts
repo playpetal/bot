@@ -5,7 +5,7 @@ import { emoji } from "../../../util/formatting/emoji";
 import { strong } from "../../../util/formatting/strong";
 
 export function getSongsStatsEmbed(
-  stats: Maybe<MinigameStats<"GTS">>,
+  stats: Maybe<MinigameStats<"GUESS_THE_SONG">>,
   user: PartialUser
 ): Embed {
   const embed = new Embed()

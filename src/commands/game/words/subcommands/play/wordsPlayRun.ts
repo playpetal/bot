@@ -1,4 +1,4 @@
-import { Run, WordsData } from "petal";
+/*import { Run, WordsData } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
 import { canClaimRewards } from "../../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
 import { getWord } from "../../../../../lib/graphql/query/game/GET_WORD";
@@ -54,3 +54,4 @@ const run: Run = async function run({ courier, user }) {
 };
 
 export default run;
+*/

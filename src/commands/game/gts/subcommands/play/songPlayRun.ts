@@ -17,7 +17,7 @@ export const songPlayRun: Run = async function run({ courier, user, options }) {
 
   if (_minigame && _minigame.state === "PENDING") {
     throw MinigameError.RewardsPendingClaim;
-  } else if (_minigame && _minigame.type !== "GTS") {
+  } else if (_minigame && _minigame.type !== "GUESS_THE_SONG") {
     throw MinigameError.AlreadyPlayingMinigame;
   } else if (_minigame && _minigame.state === "PLAYING") {
     throw MinigameError.AlreadyPlayingGTS;

@@ -6,6 +6,7 @@ import { mutate } from "../../../../request";
 const operation = gql`
   mutation AnswerGuessTheSong($answer: String!) {
     answerGuessTheSong(answer: $answer) {
+      type
       accountId
       state
       song {

@@ -1,4 +1,4 @@
-import { cancelMinigame } from "../../../../lib/graphql/mutation/game/minigame/cancelMinigame";
+/*import { cancelMinigame } from "../../../../lib/graphql/mutation/game/minigame/cancelMinigame";
 import { getUser } from "../../../../lib/graphql/query/GET_USER";
 import { Component, RunComponent } from "../../../../struct/component";
 import { Embed } from "../../../../struct/embed";
@@ -34,3 +34,4 @@ const run: RunComponent = async function ({ interaction, user }) {
 const command = new Component("cancel-words").run(run).autoack();
 
 export default command;
+*/

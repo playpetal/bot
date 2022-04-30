@@ -1,4 +1,4 @@
-import { MinigameError } from "../../../../lib/error/minigame-error";
+/*import { MinigameError } from "../../../../lib/error/minigame-error";
 import { updateMinigameMessage } from "../../../../lib/graphql/mutation/game/minigame/updateMinigameMessage";
 import { canClaimPremiumRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_PREMIUM_REWARDS";
 import { canClaimRewards } from "../../../../lib/graphql/query/game/CAN_CLAIM_REWARDS";
@@ -68,3 +68,4 @@ const run: RunComponent = async function ({ interaction, user }) {
 const command = new Component("bump-words").run(run).autoack();
 
 export default command;
+*/
