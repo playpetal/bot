@@ -22,9 +22,9 @@ export function getIdolsStatsEmbed(
   } else {
     desc +=
       `\n\n${strong(stats.totalGames)} games played` +
-      `\n${strong(stats.totalAttempts)} guesses made (**${
+      `\n${strong(stats.totalAttempts)} guesses made (**${(
         stats.totalAttempts / stats.totalGames
-      }** per game)` +
+      ).toFixed(1)}** per game)` +
       `\n**${(stats.totalTime / 1000).toFixed(2)}s** spent guessing (**${(
         stats.totalTime /
         stats.totalGames /

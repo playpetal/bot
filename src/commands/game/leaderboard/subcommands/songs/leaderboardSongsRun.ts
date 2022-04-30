@@ -15,7 +15,7 @@ const run: Run = async function run({ courier, options }) {
   if (board === "time") {
     header += `top 10 fastest guessers (average)`;
 
-    const users = await getLeaderboard("GTS_TIME");
+    const users = await getLeaderboard("GUESS_THE_SONGxTIME");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [**${(u.value / 1000).toFixed(2)}s**]`
     );
@@ -24,7 +24,7 @@ const run: Run = async function run({ courier, options }) {
   } else if (board === "petals") {
     header += `top 10 earners (petals)`;
 
-    const users = await getLeaderboard("GTS_PETAL");
+    const users = await getLeaderboard("GUESS_THE_SONGxPETAL");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.petals} ${strong(u.value)}]`
     );
@@ -33,7 +33,7 @@ const run: Run = async function run({ courier, options }) {
   } else if (board === "lilies") {
     header += `top 10 earners (lilies)`;
 
-    const users = await getLeaderboard("GTS_LILY");
+    const users = await getLeaderboard("GUESS_THE_SONGxLILY");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.lily} ${strong(u.value)}]`
     );
@@ -42,7 +42,7 @@ const run: Run = async function run({ courier, options }) {
   } else if (board === "cards") {
     header += `top 10 earners (cards)`;
 
-    const users = await getLeaderboard("GTS_CARD");
+    const users = await getLeaderboard("GUESS_THE_SONGxCARD");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.cards} ${strong(u.value)}]`
     );

@@ -484,10 +484,14 @@ declare module "petal" {
 
   export type LeaderboardType =
     | "PUBLIC_SUPPORTER"
-    | "GTS_PETAL"
-    | "GTS_CARD"
-    | "GTS_LILY"
-    | "GTS_TIME"
+    | "GUESS_THE_SONGxPETAL"
+    | "GUESS_THE_SONGxCARD"
+    | "GUESS_THE_SONGxLILY"
+    | "GUESS_THE_SONGxTIME"
+    | "GUESS_THE_IDOLxPETAL"
+    | "GUESS_THE_IDOLxCARD"
+    | "GUESS_THE_IDOLxLILY"
+    | "GUESS_THE_IDOLxTIME"
     | "WORDS_PETAL"
     | "WORDS_CARD"
     | "WORDS_LILY"
