@@ -1,5 +1,6 @@
-import { SlashCommandSubcommand } from "petal";
+import { SlashCommandOption, SlashCommandSubcommand } from "petal";
 import { CONSTANTS } from "../../../../lib/constants";
+import { autocompleteGroup } from "../../cards/inventory/autocomplete/group";
 import { minigamePlayRun } from "./minigamePlayRun";
 
 export const MinigamePlay: SlashCommandSubcommand = {
@@ -29,7 +30,9 @@ export const MinigamePlay: SlashCommandSubcommand = {
       name: "group",
       description:
         "restricts minigames to only give idols from a certain group as answers",
-    },
+      autocomplete: true,
+      runAutocomplete: autocompleteGroup,
+    } as SlashCommandOption,
   ],
   run: minigamePlayRun,
 };

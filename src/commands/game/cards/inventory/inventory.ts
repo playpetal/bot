@@ -3,7 +3,7 @@ import { CONSTANTS } from "../../../../lib/constants";
 import run from "./inventoryRun";
 import { default as autocompleteCharacter } from "./autocomplete/character";
 import { default as autocompleteSubgroup } from "./autocomplete/subgroup";
-import { default as autocompleteGroup } from "./autocomplete/group";
+import { autocompleteGroup } from "./autocomplete/group";
 import { default as autocompleteTag } from "./autocomplete/tag";
 
 export default slashCommand("inventory")
