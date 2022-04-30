@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query GetUserTitles($accountId: Int!, $search: String) {
     userTitles(accountId: $accountId, search: $search) {
       id
@@ -15,19 +15,13 @@ const query = gql`
 `;
 
 export async function getUserTitles(accountId: number, search?: string) {
-  const { data } = (await graphql.query({
-    query,
-    variables: { accountId, search },
-  })) as GraphQLResponse<{
+  const data = await query<{
     userTitles: {
       id: number;
-      title: {
-        title: string;
-        description: string | null;
-      };
+      title: { title: string; description: string | null };
       accountId: number;
     }[];
-  }>;
+  }>({ query: operation, variables: { accountId, search } });
 
   return data.userTitles;
 }

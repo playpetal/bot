@@ -49,11 +49,17 @@ export const MinigameError = {
   NotOwnerOfMinigame: new BotError(
     `**that game isn't yours!**\nyou can't claim rewards for someone else's minigame.`
   ),
+  NotPlayingMinigame: new BotError(
+    "**you're not playing a minigame!**\nuse **`/minigame play`** to start a game."
+  ),
   NotPlayingGTS: new BotError(
     "**you're not playing!**\nuse **`/song`** to start a game."
   ),
   NotPlayingWords: new BotError(
     "**you're not playing!**\nuse **`/petle play`** to start a game."
+  ),
+  RewardsPendingClaim: new BotError(
+    `**you have unclaimed rewards!**\nplease claim them to start a new minigame.`
   ),
   WordAlreadyGuessed: new BotError(
     "**you've already used that word!**\nit wouldn't make much sense to use it again..."

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Tag } from "petal";
-import { graphql, GraphQLResponse } from "../../../..";
 import { tokenize } from "../../../../crypto";
+import { mutate } from "../../../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation DeleteTag($tag: String!) {
     deleteTag(tag: $tag) {
       id
@@ -17,13 +17,11 @@ const mutation = gql`
 `;
 
 export async function deleteTag(discordId: string, tag: string): Promise<Tag> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ deleteTag: Tag }>({
+    operation,
     variables: { tag },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    deleteTag: Tag;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.deleteTag;
 }

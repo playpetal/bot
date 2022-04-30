@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Card, InventoryOrder, InventorySort } from "petal";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query Inventory(
     $userId: Int!
     $page: Int!
@@ -75,12 +75,10 @@ export async function inventory(
     tag?: string;
   }
 ) {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ inventory: Card[] }>({
+    query: operation,
     variables: { userId, page, character, subgroup, group, sort, order, tag },
-  })) as GraphQLResponse<{
-    inventory: Card[];
-  }>;
+  });
 
   return data.inventory;
 }

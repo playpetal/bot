@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Maybe, Release } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
+import { query } from "../../../request";
 
-const query = gql`
+const operation = gql`
   query GetLastRelease {
     lastRelease {
       id
@@ -12,11 +12,9 @@ const query = gql`
 `;
 
 export async function getLastRelease(): Promise<Maybe<Release>> {
-  const { data } = (await graphql.query({
-    query,
-  })) as GraphQLResponse<{
-    lastRelease: Maybe<Release>;
-  }>;
+  const data = await query<{ lastRelease: Maybe<Release> }>({
+    query: operation,
+  });
 
   return data.lastRelease;
 }

@@ -1,20 +1,18 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { query } from "../../request";
 
-const query = gql`
+const operation = gql`
   query GetWord {
     word
   }
 `;
 
 export async function getWord(discordId: string) {
-  const { data } = (await graphql.query({
-    query,
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    word: string;
-  }>;
+  const data = await query<{ word: string }>({
+    query: operation,
+    authorization: tokenize(discordId),
+  });
 
   return data.word;
 }

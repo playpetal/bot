@@ -1,4 +1,4 @@
-import { SlashCommandSubcommand } from "petal";
+/*import { SlashCommandSubcommand } from "petal";
 import { CONSTANTS } from "../../../../../lib/constants";
 import run from "./wordsPlayRun";
 
@@ -8,3 +8,4 @@ export const PetlePlay: SlashCommandSubcommand = {
   description: "play petle",
   run,
 };
+*/

@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Tag } from "petal";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query GetUserTags($id: Int) {
     user(id: $id) {
       id
@@ -16,12 +16,10 @@ const query = gql`
 `;
 
 export async function getUserTags(id: number) {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ user: { tags: Tag[] } }>({
+    query: operation,
     variables: { id },
-  })) as GraphQLResponse<{
-    user: { tags: Tag[] };
-  }>;
+  });
 
   return data.user.tags;
 }

@@ -1,10 +1,10 @@
-import { PartialUser, WordsData } from "petal";
+import { PartialUser } from "petal";
 import { Embed } from "../../../struct/embed";
 import { displayName } from "../../util/displayName";
 import { emoji } from "../../util/formatting/emoji";
 
 export function getWordsEmbed(
-  data: WordsData,
+  data: any,
   user: PartialUser,
   rewards: number
 ): Embed {
@@ -12,7 +12,9 @@ export function getWordsEmbed(
   let prefix: string;
   let suffix: string | undefined;
 
-  const correct = data.guesses.find((g) => g === data.answer.toLowerCase());
+  const correct = data.guesses.find(
+    (g: any) => g === data.answer.toLowerCase()
+  );
 
   if (data.guesses.length === 0) {
     prefix = `${emoji.bloom} **welcome to petle!**\n**petle** is a k-pop version of the word game [Wordle](https://www.nytimes.com/games/wordle/index.html).\nyou can guess a word by using **\`/petle guess\`**! good luck!\n\n`;
@@ -52,7 +54,7 @@ export function getWordsEmbed(
   return embed;
 }
 
-export function generateWords(data: WordsData): string {
+export function generateWords(data: any): string {
   const answer = data.answer.toLowerCase();
 
   let rows = [

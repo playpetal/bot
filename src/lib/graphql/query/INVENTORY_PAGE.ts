@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query InventoryPage(
     $userId: Int!
     $group: String
@@ -36,12 +36,10 @@ export async function inventoryPage(
     tag?: string;
   }
 ) {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ inventoryPage: { max: number; cards: number } }>({
+    query: operation,
     variables: { userId, character, subgroup, group, tag },
-  })) as GraphQLResponse<{
-    inventoryPage: { max: number; cards: number };
-  }>;
+  });
 
   return data.inventoryPage;
 }

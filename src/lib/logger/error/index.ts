@@ -12,6 +12,7 @@ export function logCommandError(
   error: unknown
 ): void {
   dd.increment(`petal.error.command`);
+
   logger.error({
     command: command.name,
     options: interaction.data.options,

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Maybe, Release } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
+import { query } from "../../../request";
 
-const query = gql`
+const operation = gql`
   query GetRelease($id: Int!) {
     release(id: $id) {
       id
@@ -16,13 +16,11 @@ export async function getRelease(
   id: number,
   discordId: string
 ): Promise<Maybe<Release>> {
-  const { data } = (await graphql.query({
-    query,
-    context: { headers: { Authorization: tokenize(discordId) } },
+  const data = await query<{ release: Maybe<Release> }>({
+    query: operation,
     variables: { id },
-  })) as GraphQLResponse<{
-    release: Maybe<Release>;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.release;
 }

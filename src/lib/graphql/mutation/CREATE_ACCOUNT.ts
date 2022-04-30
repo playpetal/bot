@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
 import { tokenize } from "../crypto";
+import { mutate } from "../request";
 
-const CREATE_ACCOUNT = gql`
+const operation = gql`
   mutation CreateAccount($username: String!) {
     createAccount(username: $username) {
       id
@@ -12,13 +12,13 @@ const CREATE_ACCOUNT = gql`
 `;
 
 export async function createAccount(discordId: string, username: string) {
-  const mutation = (await graphql.mutate({
-    mutation: CREATE_ACCOUNT,
-    variables: { username },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
+  const data = await mutate<{
     createAccount: { id: number; username: string };
-  }>;
+  }>({
+    operation,
+    variables: { username },
+    authorization: tokenize(discordId),
+  });
 
-  return mutation.data.createAccount;
+  return data.createAccount;
 }

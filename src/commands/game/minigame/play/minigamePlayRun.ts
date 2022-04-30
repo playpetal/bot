@@ -1,20 +1,23 @@
-import { CharacterGuessData, Run } from "petal";
+import { Run } from "petal";
 import { MinigameError } from "../../../../lib/error/minigame-error";
-import { getRandomCharacter } from "../../../../lib/graphql/query/categorization/character/getRandomCharacter";
-import { getMinigame, setMinigame } from "../../../../lib/minigame";
+import { startGuessTheIdol } from "../../../../lib/graphql/mutation/game/minigame/guess-the-idol/startGuessTheIdol";
+import { getGuessTheIdol } from "../../../../lib/graphql/query/game/minigame/guess-the-idol/getGuessTheIdol";
+import { emoji } from "../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../struct/embed";
 
 export const minigamePlayRun: Run = async ({ courier, options, user }) => {
-  const activeMinigame = await getMinigame(user);
+  const _minigame = await getGuessTheIdol(user);
 
-  if (activeMinigame) {
-    const type = activeMinigame.data.type;
-
-    if (type === "GTS") throw MinigameError.AlreadyPlayingGTS;
-    if (type === "GUESS_CHARACTER") throw MinigameError.AlreadyPlayingIdols;
-    if (type === "WORDS")
-      throw MinigameError.AlreadyPlayingWords({ ...activeMinigame, user });
+  if (_minigame && _minigame.state === "PENDING") {
+    throw MinigameError.RewardsPendingClaim;
+  } else if (_minigame && _minigame.type !== "GUESS_THE_IDOL") {
+    throw MinigameError.AlreadyPlayingMinigame;
+  } else if (_minigame && _minigame.state === "PLAYING") {
+    throw MinigameError.AlreadyPlayingIdols;
   }
+
+  const loading = new Embed().setDescription(`**Loading...** ${emoji.song}`);
+  const loadingMessage = await courier.send({ embeds: [loading] });
 
   const minigameType = options.getOption<"idols">("minigame")!;
 
@@ -23,7 +26,17 @@ export const minigamePlayRun: Run = async ({ courier, options, user }) => {
       .getOption<"male" | "female">("gender")
       ?.toUpperCase() as "MALE" | "FEMALE";
 
-    const character = await getRandomCharacter(gender);
+    const group = options.getOption<string>("group");
+
+    await startGuessTheIdol(
+      user.discordId,
+      {
+        messageId: loadingMessage!.id,
+        channelId: loadingMessage!.channel.id,
+        guildId: loadingMessage!.guildID!,
+      },
+      { gender, group }
+    );
 
     const embed = new Embed().setDescription(
       `**i'm thinking of a${
@@ -32,22 +45,7 @@ export const minigamePlayRun: Run = async ({ courier, options, user }) => {
         `\nuse **/minigame guess \`idol: idol name\`** to guess!`
     );
 
-    const msg = await courier.send({ embeds: [embed] });
-
-    const data: CharacterGuessData = {
-      type: "GUESS_CHARACTER",
-      answer: character,
-      guesses: [],
-      startedAt: Date.now(),
-      isGendered: gender !== undefined,
-    };
-
-    await setMinigame(user, data, {
-      guild: courier.interaction!.guildID!,
-      channel: courier.interaction!.channel.id,
-      message: msg!.id,
-    });
-
+    await courier.edit({ embeds: [embed] });
     return;
   } else {
     // OMGWTFBBQ

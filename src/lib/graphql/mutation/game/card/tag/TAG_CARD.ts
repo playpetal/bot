@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Card } from "petal";
-import { graphql, GraphQLResponse } from "../../../..";
 import { tokenize } from "../../../../crypto";
+import { mutate } from "../../../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation TagCard($cardId: Int!, $tag: String!) {
     tagCard(cardId: $cardId, tag: $tag) {
       id
@@ -44,13 +44,11 @@ export async function tagCard(
   cardId: number,
   tag: string
 ): Promise<Card> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ tagCard: Card }>({
+    operation,
     variables: { cardId, tag },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    tagCard: Card;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.tagCard;
 }

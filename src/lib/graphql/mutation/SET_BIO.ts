@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
 import { tokenize } from "../crypto";
+import { mutate } from "../request";
 
-const SET_BIO = gql`
+const operation = gql`
   mutation SetBio($bio: String) {
     setBio(bio: $bio) {
       bio
@@ -11,13 +11,11 @@ const SET_BIO = gql`
 `;
 
 export async function setBio(discordId: string, bio: string) {
-  const mutation = (await graphql.mutate({
-    mutation: SET_BIO,
+  const data = await mutate<{ setBio: { bio: string | null } }>({
+    operation,
     variables: { bio: bio || null },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    setBio: { bio: string | null };
-  }>;
+    authorization: tokenize(discordId),
+  });
 
-  return mutation.data.setBio;
+  return data.setBio;
 }

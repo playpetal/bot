@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Prefab } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
-const query = gql`
+const operation = gql`
   mutation UpdatePrefab(
     $prefabId: Int!
     $releaseId: Int
@@ -61,8 +61,10 @@ export async function updatePrefab({
   maxCards?: number;
   releaseId?: number;
 }): Promise<Prefab> {
-  const { data } = (await graphql.query({
-    query: query,
+  const data = await mutate<{
+    updatePrefab: Prefab;
+  }>({
+    operation,
     variables: {
       prefabId: id,
       characterId,
@@ -72,10 +74,8 @@ export async function updatePrefab({
       maxCards,
       releaseId,
     },
-    context: { headers: { Authorization: tokenize(senderId) } },
-  })) as GraphQLResponse<{
-    updatePrefab: Prefab;
-  }>;
+    authorization: tokenize(senderId),
+  });
 
   return data.updatePrefab;
 }

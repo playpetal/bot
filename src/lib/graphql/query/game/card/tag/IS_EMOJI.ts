@@ -1,19 +1,17 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../../../..";
+import { query } from "../../../../request";
 
-const query = gql`
+const operation = gql`
   query IsEmoji($emoji: String!) {
     isEmoji(emoji: $emoji)
   }
 `;
 
 export async function isEmoji(emoji: string): Promise<boolean> {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ isEmoji: boolean }>({
+    query: operation,
     variables: { emoji },
-  })) as GraphQLResponse<{
-    isEmoji: boolean;
-  }>;
+  });
 
   return data.isEmoji;
 }

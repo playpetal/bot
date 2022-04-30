@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client/core";
 import { Maybe, Prefab } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
+import { query } from "../../../request";
 
-const query = gql`
+const operation = gql`
   query GetPrefab($id: Int!) {
     prefab(id: $id) {
       id
@@ -29,12 +29,10 @@ const query = gql`
 `;
 
 export async function getPrefab(id: number): Promise<Maybe<Prefab>> {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ prefab: Maybe<Prefab> }>({
+    query: operation,
     variables: { id },
-  })) as GraphQLResponse<{
-    prefab: Maybe<Prefab>;
-  }>;
+  });
 
   return data.prefab;
 }

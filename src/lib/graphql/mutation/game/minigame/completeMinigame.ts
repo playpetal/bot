@@ -1,38 +1,65 @@
 import { gql } from "@apollo/client/core";
-import { MinigameType } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
+import { Card, Maybe, Reward } from "petal";
 import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
 const operation = gql`
-  mutation CompleteMinigame(
-    $type: MinigameType!
-    $guesses: Int!
-    $time: Int!
-    $reward: Reward!
-  ) {
-    completeMinigame(
-      type: $type
-      guesses: $guesses
-      time: $time
-      reward: $reward
-    )
+  mutation CompleteMinigame($reward: Reward!) {
+    completeMinigame(reward: $reward) {
+      account {
+        currency
+        premiumCurrency
+      }
+      card {
+        id
+        tag {
+          emoji
+          tag
+        }
+        owner {
+          username
+          title {
+            title
+          }
+        }
+        issue
+        quality
+        tint
+        hasFrame
+        prefab {
+          id
+          character {
+            name
+          }
+          group {
+            name
+          }
+          subgroup {
+            name
+          }
+        }
+      }
+    }
   }
 `;
 
 export async function completeMinigame(
-  type: MinigameType,
-  senderDiscordId: string,
-  guesses: number,
-  time: number,
-  reward: "CARD" | "PETAL" | "LILY"
-) {
-  const { data } = (await graphql.mutate({
-    mutation: operation,
-    variables: { type, guesses, time, reward },
-    context: { headers: { Authorization: tokenize(senderDiscordId) } },
-  })) as GraphQLResponse<{
-    completeIdols: boolean;
-  }>;
+  discordId: string,
+  reward: Reward
+): Promise<{
+  account: { currency: number; premiumCurrency: number };
+  card: Maybe<Card>;
+}> {
+  const data = await mutate<{
+    completeMinigamea: {
+      account: { currency: number; premiumCurrency: number };
+      card: Maybe<Card>;
+    };
+  }>({
+    operation,
+    variables: { reward },
+    authorization: tokenize(discordId),
+  });
 
-  return data.completeIdols;
+  return data.completeMinigamea;
 }

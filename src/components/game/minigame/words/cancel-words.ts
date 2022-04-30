@@ -1,6 +1,5 @@
-import { bot } from "../../../..";
+/*import { cancelMinigame } from "../../../../lib/graphql/mutation/game/minigame/cancelMinigame";
 import { getUser } from "../../../../lib/graphql/query/GET_USER";
-import { destroyMinigame, getMinigame } from "../../../../lib/minigame";
 import { Component, RunComponent } from "../../../../struct/component";
 import { Embed } from "../../../../struct/embed";
 import { BotError } from "../../../../struct/error";
@@ -15,18 +14,14 @@ const run: RunComponent = async function ({ interaction, user }) {
   if (!account || user.id !== account.id)
     throw new BotError("that's not your game!");
 
-  const game = await getMinigame<"WORDS">(user);
-
-  if (!game) throw new BotError("this game doesn't exist!");
-
-  await destroyMinigame(user);
+  await cancelMinigame(user);
 
   const embed = new Embed()
     .setColor("#F04747")
     .setDescription("**better luck next time!**\nyou cancelled this game.");
 
   try {
-    await bot.editMessage(game.channel, game.message, {
+    await interaction.editOriginalMessage({
       embeds: [embed],
       components: [],
     });
@@ -39,3 +34,4 @@ const run: RunComponent = async function ({ interaction, user }) {
 const command = new Component("cancel-words").run(run).autoack();
 
 export default command;
+*/

@@ -24,6 +24,12 @@ export const MinigamePlay: SlashCommandSubcommand = {
         { name: "female", value: "female" },
       ],
     },
+    {
+      type: CONSTANTS.OPTION_TYPE.STRING,
+      name: "group",
+      description:
+        "restricts minigames to only give idols from a certain group as answers",
+    },
   ],
   run: minigamePlayRun,
 };

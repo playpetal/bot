@@ -373,54 +373,66 @@ declare module "petal" {
   };
 
   type Reward = "PETAL" | "LILY" | "CARD";
-  type MinigameType = "GTS" | "WORDS" | "GUESS_CHARACTER";
+  type MinigameType = "GUESS_THE_SONG" | "GUESS_THE_IDOL" | "GUESS_THE_GROUP";
 
-  export type UnknownMinigame = {
-    playerId: number;
-    message: string;
-    channel: string;
-    guild: string;
-    data: GTSData | WordsData | CharacterGuessData;
+  export type MinigameState =
+    | "PLAYING"
+    | "CANCELLED"
+    | "FAILED"
+    | "PENDING"
+    | "COMPLETED";
+
+  export type MinigameSong = {
+    title: string;
+    group: Maybe<string>;
+    soloist: Maybe<string>;
   };
 
-  export type Minigame<T extends MinigameType | never> = {
-    playerId: number;
-    message: string;
-    channel: string;
-    guild: string;
-    data: T extends "GTS"
-      ? GTSData
-      : T extends "GUESS_CHARACTER"
-      ? CharacterGuessData
-      : T extends "WORDS"
-      ? WordsData
-      : never;
-  };
+  export type Minigame<T extends MinigameType> = T extends "GUESS_THE_SONG"
+    ? GuessTheSong
+    : T extends "GUESS_THE_IDOL"
+    ? GuessTheIdol
+    : GuessTheSong | GuessTheIdol;
 
-  export type GTSData = {
-    type: "GTS";
-    song: GameSong;
-    guesses: number;
-    correct: boolean;
-    elapsed?: number;
+  export type MinigameComparison = "GREATER" | "LESS" | "EQUAL";
+
+  export type GuessTheSong = {
+    type: "GUESS_THE_SONG";
+    accountId: number;
+    video: Maybe<string>;
+    state: MinigameState;
+    song: Maybe<MinigameSong>;
+    attempts: MinigameSong[];
+    maxAttempts: number;
+    timeLimit: number;
     startedAt: number;
+    elapsed: Maybe<number>;
+
+    messageId: string;
+    channelId: string;
+    guildId: string;
   };
 
-  export type WordsData = {
-    type: "WORDS";
-    answer: string;
-    guesses: string[];
-    elapsed?: number;
-    startedAt: number;
+  export type GuessTheIdolCharacter = Character & {
+    nameLength: MinigameComparison;
+    birthDate: MinigameComparison;
+    isGender: boolean;
   };
 
-  export type CharacterGuessData = {
-    type: "GUESS_CHARACTER";
-    answer: Character;
-    isGendered: boolean;
-    guesses: Character[];
-    elapsed?: number;
+  export type GuessTheIdol = {
+    type: "GUESS_THE_IDOL";
+    accountId: number;
+    state: MinigameState;
+    character: Maybe<Character>;
+    attempts: GuessTheIdolCharacter[];
+    maxAttempts: number;
+    timeLimit: number;
     startedAt: number;
+    elapsed: Maybe<number>;
+
+    messageId: string;
+    channelId: string;
+    guildId: string;
   };
 
   export type Product = {

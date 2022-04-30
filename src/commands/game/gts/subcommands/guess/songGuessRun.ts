@@ -1,91 +1,50 @@
-import { Run, UnknownMinigame } from "petal";
-import { findBestMatch } from "string-similarity";
-import { bot } from "../../../../..";
+import { CommandInteraction } from "eris";
+import { Run } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
-import { logger } from "../../../../../lib/logger";
-import {
-  getMinigame,
-  destroyMinigame,
-  setMinigame,
-} from "../../../../../lib/minigame";
-import {
-  GTS_MAX_MS,
-  GTS_MAX_GUESSES,
-} from "../../../../../lib/minigame/constants";
+import { answerGuessTheSong } from "../../../../../lib/graphql/mutation/game/minigame/guess-the-song/answerGuessTheSong";
+import { getGuessTheSong } from "../../../../../lib/graphql/query/game/minigame/guess-the-song/getGuessTheSong";
+import { handleGTSEnd } from "../../../../../lib/minigame/gts";
 import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../../struct/embed";
 
 export const songGuessRun: Run = async function ({ courier, user, options }) {
-  const minigame = await getMinigame(user);
+  const _minigame = await getGuessTheSong(user);
 
-  if (!minigame) throw MinigameError.NotPlayingGTS;
-
-  const data = (minigame as UnknownMinigame).data;
-
-  if (data.type === "WORDS")
-    throw MinigameError.AlreadyPlayingWords({ ...minigame, user });
-
-  if (data.type === "GUESS_CHARACTER") throw MinigameError.AlreadyPlayingGTS;
-
-  if (data.startedAt < Date.now() - GTS_MAX_MS) {
-    await destroyMinigame(user);
-
-    try {
-      const originalMessage = await bot.getMessage(
-        minigame.channel,
-        minigame.message
-      );
-
-      const embed = new Embed()
-        .setColor("#F04747")
-        .setDescription("**Better luck next time!**\nYou ran out of time!");
-
-      await originalMessage.edit({ embeds: [embed] });
-    } catch {}
-
+  if (_minigame && _minigame.state === "PENDING") {
+    throw MinigameError.RewardsPendingClaim;
+  } else if (_minigame && _minigame.type !== "GUESS_THE_SONG") {
     throw MinigameError.NotPlayingGTS;
+  } else if (_minigame && _minigame.state === "PLAYING") {
+    throw MinigameError.AlreadyPlayingGTS;
   }
-
-  data.guesses += 1;
 
   const answer = options.getOption<string>("guess")!;
 
-  const title = data.song.title.toLowerCase().replace(/[^a-zA-Z0-9]|and/gm, "");
-  const groupTitle = `${data.song.group || ""}${data.song.title}`
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9]|and/gm, "");
+  const minigame = await answerGuessTheSong(user.discordId, answer);
 
-  const match = findBestMatch(
-    answer.toLowerCase().replace(/[^a-zA-Z0-9]/gm, ""),
-    [title, groupTitle]
-  );
-
-  logger.info(JSON.stringify(match));
-
-  const correct = match.bestMatch.rating >= 0.75;
+  const correct =
+    minigame.state === "PENDING" || minigame.state === "COMPLETED";
 
   const embed = new Embed();
 
   if (correct) {
-    data.correct = true;
-    data.elapsed = courier.interaction!.createdAt - data.startedAt;
-
-    await setMinigame<"GTS">(user, data, minigame);
-
     embed
       .setColor("#3BA55D")
       .setDescription(`${emoji.song} **${answer}** was correct!`);
 
     await courier.send({ embeds: [embed], flags: 64 });
-  } else {
-    await setMinigame<"GTS">(user, data, minigame);
 
+    await handleGTSEnd(courier.interaction! as CommandInteraction, minigame);
+  } else {
+    const remaining = minigame.maxAttempts - minigame.attempts.length;
     embed
       .setColor("#F04747")
       .setDescription(
-        `${emoji.song} **${answer}** was incorrect! You have **${
-          GTS_MAX_GUESSES - data.guesses
-        }** guesses remaining!`
+        `${
+          emoji.song
+        } **${answer}** was incorrect! You have **${remaining}** guess${
+          remaining !== 1 ? "es" : ""
+        } remaining!`
       );
     await courier.send({ embeds: [embed], flags: 64 });
   }

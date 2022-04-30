@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { PartialUser, Release } from "petal";
-import { graphql, GraphQLResponse } from "../../..";
 import { tokenize } from "../../../crypto";
+import { mutate } from "../../../request";
 
-const query = gql`
+const operation = gql`
   mutation UpdateRelease($id: Int!, $droppable: Boolean) {
     updateRelease(id: $id, droppable: $droppable) {
       id
@@ -17,16 +17,11 @@ export async function updateRelease(
   id: number,
   droppable?: boolean
 ): Promise<Release> {
-  const { data } = (await graphql.query({
-    query: query,
-    variables: {
-      id,
-      droppable,
-    },
-    context: { headers: { Authorization: tokenize(user.discordId) } },
-  })) as GraphQLResponse<{
-    updateRelease: Release;
-  }>;
+  const data = await mutate<{ updateRelease: Release }>({
+    operation,
+    variables: { id, droppable },
+    authorization: tokenize(user.discordId),
+  });
 
   return data.updateRelease;
 }

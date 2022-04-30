@@ -1,19 +1,17 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "../../../..";
+import { query } from "../../../../request";
 
-const query = gql`
+const operation = gql`
   query isWordValid($word: String!) {
     isWordValid(word: $word)
   }
 `;
 
 export async function isWordValid(word: string) {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ isWordValid: boolean }>({
+    query: operation,
     variables: { word },
-  })) as GraphQLResponse<{
-    isWordValid: boolean;
-  }>;
+  });
 
   return data.isWordValid;
 }

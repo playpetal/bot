@@ -1,4 +1,4 @@
-import { SlashCommandSubcommand } from "petal";
+/*import { SlashCommandSubcommand } from "petal";
 import { CONSTANTS } from "../../../../../lib/constants";
 import run from "./wordsGuessRun";
 
@@ -17,3 +17,4 @@ export const PetleGuess: SlashCommandSubcommand = {
   ephemeral: true,
   run,
 };
+*/

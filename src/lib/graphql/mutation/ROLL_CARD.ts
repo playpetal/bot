@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Card } from "petal";
-import { graphql, GraphQLResponse } from "..";
 import { tokenize } from "../crypto";
+import { mutate } from "../request";
 
-const ROLL_CARD = gql`
+const operation = gql`
   mutation RollCards($gender: Gender, $amount: Int!) {
     rollCards(gender: $gender, amount: $amount) {
       id
@@ -40,13 +40,11 @@ export async function rollCards(
   amount: number,
   gender?: "MALE" | "FEMALE" | "NONBINARY"
 ) {
-  const mutation = (await graphql.mutate({
-    mutation: ROLL_CARD,
+  const data = await mutate<{ rollCards: Card[] }>({
+    operation,
     variables: { gender, amount },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    rollCards: Card[];
-  }>;
+    authorization: tokenize(discordId),
+  });
 
-  return mutation.data.rollCards;
+  return data.rollCards;
 }

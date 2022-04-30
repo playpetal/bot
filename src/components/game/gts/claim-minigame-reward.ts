@@ -1,12 +1,9 @@
+import { Maybe, Minigame, MinigameType } from "petal";
 import { MinigameError } from "../../../lib/error/minigame-error";
-import { claimMinigameCardReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_CARD";
-import { claimMinigameLilyReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_LILY";
-import { claimMinigamePetalReward } from "../../../lib/graphql/mutation/game/minigame/CLAIM_MINIGAME_PETAL";
 import { completeMinigame } from "../../../lib/graphql/mutation/game/minigame/completeMinigame";
+import { getGuessTheIdol } from "../../../lib/graphql/query/game/minigame/guess-the-idol/getGuessTheIdol";
+import { getGuessTheSong } from "../../../lib/graphql/query/game/minigame/guess-the-song/getGuessTheSong";
 import { getCardImage } from "../../../lib/img";
-import { logMinigame } from "../../../lib/logger/minigame";
-import { destroyMinigame, getMinigame } from "../../../lib/minigame";
-import { generateWords } from "../../../lib/minigame/words";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
 import { Component, RunComponent } from "../../../struct/component";
@@ -16,32 +13,22 @@ const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, options] = interaction.data.custom_id.split("?");
   if (!options) return;
 
-  const [_accountId, reward] = options.split("&");
+  const [_accountId, reward, _type] = options.split("&");
   const accountId = parseInt(_accountId, 10);
+  const type = _type as MinigameType;
 
   if (accountId !== user.id) throw MinigameError.NotOwnerOfMinigame;
 
-  const minigame = await getMinigame(user);
+  let minigame: Maybe<Minigame<typeof type>> = null;
 
-  if (!minigame) throw MinigameError.InvalidMinigame;
-
-  const data = minigame.data;
-  let isCorrect = false;
-
-  if (data.type === "GTS") {
-    const { correct } = data;
-    isCorrect = correct;
-  } else if (data.type === "WORDS") {
-    const { guesses, answer } = data;
-    isCorrect = !!guesses.find((g) => g === answer.toLowerCase());
-  } else if (data.type === "GUESS_CHARACTER") {
-    const { guesses, answer } = data;
-    isCorrect = !!guesses.find((g) => g.id === answer.id);
+  if (type === "GUESS_THE_SONG") {
+    minigame = await getGuessTheSong(user);
+  } else if (type === "GUESS_THE_IDOL") {
+    minigame = await getGuessTheIdol(user);
   }
 
-  await destroyMinigame(accountId);
-
-  logMinigame(minigame);
+  if (!minigame) throw MinigameError.InvalidMinigame;
+  let isCorrect = minigame.state === "PENDING";
 
   if (!isCorrect) throw MinigameError.InvalidMinigame;
 
@@ -50,54 +37,37 @@ const run: RunComponent = async function ({ interaction, user }) {
 
   let desc: string = "";
 
-  const rewardSelection = reward.toUpperCase() as "CARD" | "PETAL" | "LILY";
+  // const rewardSelection = reward.toUpperCase() as "CARD" | "PETAL" | "LILY";
 
-  let guesses: number = 0;
-  let elapsed: number = 0;
+  let guesses = minigame.attempts.length;
+  let elapsed = minigame.elapsed!;
 
-  if (data.type === "GTS") {
-    guesses = data.guesses;
-    elapsed = data.elapsed!;
-
+  if (minigame.type === "GUESS_THE_SONG") {
     desc = `${emoji.song} **You got it in ${guesses} guess${
       guesses !== 1 ? "es" : ""
     } (${(elapsed! / 1000).toFixed(2)}s)!**`;
-  } else if (data.type === "WORDS") {
-    guesses = data.guesses.length;
-    elapsed = data.elapsed!;
-
-    desc = `${emoji.bloom} **petle ${guesses}/6**\n\n${generateWords(
-      data
-    )}\n\n${emoji.bloom} **you got it in ${guesses} guess${
-      guesses !== 1 ? "es" : ""
-    } (${(elapsed / 1000).toFixed(2)}s)!**`;
-  } else if (data.type === "GUESS_CHARACTER") {
-    guesses = data.guesses.length;
-    elapsed = data.elapsed!;
-
-    desc = `${emoji.bloom} **you got \`${data.answer.name}\` in ${guesses} guesses!**`;
+  } else if (minigame.type === "GUESS_THE_IDOL") {
+    desc = `${emoji.bloom} **you got \`${
+      minigame.character!.name
+    }\` in ${guesses} guesses!**`;
   }
 
-  await completeMinigame(
-    data.type,
-    user.discordId,
-    guesses,
-    elapsed,
-    rewardSelection
-  );
-
   if (reward === "petal") {
-    await claimMinigamePetalReward(user.discordId);
+    await completeMinigame(user.discordId, "PETAL");
 
     desc += `\nyou were rewarded ${emoji.petals} **5**!`;
   } else if (reward === "card") {
-    const [card] = await claimMinigameCardReward(user.discordId);
+    const { card } = await completeMinigame(user.discordId, "CARD");
 
-    desc += `\nyou received ${formatCard(card)}!`;
-    image = await getCardImage(card);
+    desc += `\nyou received ${formatCard(card!)}!`;
+
+    try {
+      image = await getCardImage(card!);
+    } catch {}
+
     embed.setThumbnail(`attachment://card.png`);
   } else if (reward === "lily") {
-    await claimMinigameLilyReward(user.discordId);
+    await completeMinigame(user.discordId, "LILY");
 
     desc += `\nyou were rewarded ${emoji.lily} **1**!`;
   }

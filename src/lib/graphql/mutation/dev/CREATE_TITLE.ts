@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Title } from "petal";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { mutate } from "../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation CreateTitle($title: String!, $description: String) {
     createTitle(title: $title, description: $description) {
       id
@@ -19,13 +19,11 @@ export async function createTitle(
   title: string,
   description?: string
 ): Promise<Title> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ createTitle: Title }>({
+    operation,
     variables: { title, description },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    createTitle: Title;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.createTitle;
 }

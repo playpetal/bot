@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Song } from "petal";
-import { graphql, GraphQLResponse } from "../../../..";
 import { tokenize } from "../../../../crypto";
+import { mutate } from "../../../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation CreateSong(
     $title: String!
     $url: String!
@@ -49,13 +49,11 @@ export async function createSong(
     releaseId?: number;
   }
 ): Promise<Song> {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ createSong: Song }>({
+    operation,
     variables: { title, url, groupId, soloistId, releaseId },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    createSong: Song;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.createSong;
 }

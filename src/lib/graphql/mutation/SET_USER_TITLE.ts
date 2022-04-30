@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { PartialUser } from "petal";
-import { graphql, GraphQLResponse } from "..";
 import { tokenize } from "../crypto";
+import { mutate } from "../request";
 
-const mutation = gql`
+const operation = gql`
   mutation SetUserTitle($id: Int!) {
     setUserTitle(id: $id) {
       id
@@ -17,13 +17,11 @@ const mutation = gql`
 `;
 
 export async function setUserTitle(discordId: string, id: number) {
-  const { data } = (await graphql.mutate({
-    mutation,
+  const data = await mutate<{ setUserTitle: PartialUser }>({
+    operation,
     variables: { id },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    setUserTitle: PartialUser;
-  }>;
+    authorization: tokenize(discordId),
+  });
 
   return data.setUserTitle;
 }

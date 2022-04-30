@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client/core";
 import { Account } from "petal";
-import { graphql, GraphQLResponse } from "../..";
 import { tokenize } from "../../crypto";
+import { mutate } from "../../request";
 
-const mutation = gql`
+const operation = gql`
   mutation TogglePublicSupporter {
     togglePublicSupporter {
       id
@@ -28,12 +28,10 @@ const mutation = gql`
 export async function togglePublicSupporter(
   discordId: string
 ): Promise<Account> {
-  const { data } = (await graphql.mutate({
-    mutation,
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    togglePublicSupporter: Account;
-  }>;
+  const data = await mutate<{ togglePublicSupporter: Account }>({
+    operation,
+    authorization: tokenize(discordId),
+  });
 
   return data.togglePublicSupporter;
 }

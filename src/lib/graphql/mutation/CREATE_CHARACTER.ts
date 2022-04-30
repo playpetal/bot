@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse } from "..";
+import { Character } from "petal";
 import { tokenize } from "../crypto";
+import { mutate } from "../request";
 
-const CREATE_CHARACTER = gql`
+const operation = gql`
   mutation CreateCharacter(
     $name: String!
     $birthday: DateTime
@@ -23,18 +24,11 @@ export async function createCharacter(
   birthday?: Date,
   gender?: "MALE" | "FEMALE" | "NONBINARY"
 ) {
-  const mutation = (await graphql.mutate({
-    mutation: CREATE_CHARACTER,
+  const data = await mutate<{ createCharacter: Character }>({
+    operation,
     variables: { name, birthday, gender },
-    context: { headers: { Authorization: tokenize(discordId) } },
-  })) as GraphQLResponse<{
-    createCharacter: {
-      id: number;
-      name: string;
-      birthday: Date | null;
-      gender: "MALE" | "FEMALE" | "NONBINARY" | null;
-    };
-  }>;
+    authorization: tokenize(discordId),
+  });
 
-  return mutation.data.createCharacter;
+  return data.createCharacter;
 }

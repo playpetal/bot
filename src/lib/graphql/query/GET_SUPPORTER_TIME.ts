@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client/core";
-import { graphql, GraphQLResponse, Maybe } from "..";
+import { Maybe } from "petal";
+import { query } from "../request";
 
-const query = gql`
+const operation = gql`
   query GetUser($id: Int) {
     user(id: $id) {
       supporterTime
@@ -14,12 +15,10 @@ export async function getSupporterTime({
 }: {
   id?: number;
 }): Promise<Maybe<number>> {
-  const { data } = (await graphql.query({
-    query,
+  const data = await query<{ user: Maybe<{ supporterTime: Maybe<number> }> }>({
+    query: operation,
     variables: { id },
-  })) as GraphQLResponse<{
-    user: Maybe<{ supporterTime: Maybe<number> }>;
-  }>;
+  });
 
   return data.user?.supporterTime || null;
 }
