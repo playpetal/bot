@@ -51,7 +51,7 @@ export async function completeMinigame(
   card: Maybe<Card>;
 }> {
   const data = await mutate<{
-    completeMinigamea: {
+    completeMinigame: {
       account: { currency: number; premiumCurrency: number };
       card: Maybe<Card>;
     };
@@ -61,5 +61,5 @@ export async function completeMinigame(
     authorization: tokenize(discordId),
   });
 
-  return data.completeMinigamea;
+  return data.completeMinigame;
 }
