@@ -26,6 +26,7 @@ const operation = gql`
       timeLimit
       startedAt
       elapsed
+      group
     }
   }
 `;

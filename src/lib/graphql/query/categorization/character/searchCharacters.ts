@@ -40,6 +40,7 @@ export async function searchCharacters({
   gender,
   minLetters,
   maxLetters,
+  group,
 }: {
   search: string;
   birthday?: Date;
@@ -49,6 +50,7 @@ export async function searchCharacters({
   gender?: Gender | null;
   minLetters?: number;
   maxLetters?: number;
+  group?: string;
 }): Promise<Character[]> {
   const data = await query<{
     searchCharacters: Character[];
@@ -63,6 +65,7 @@ export async function searchCharacters({
       gender,
       minLetters,
       maxLetters,
+      group,
     },
   });
 

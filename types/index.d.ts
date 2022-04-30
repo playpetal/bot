@@ -429,6 +429,7 @@ declare module "petal" {
     timeLimit: number;
     startedAt: number;
     elapsed: Maybe<number>;
+    group?: string;
 
     messageId: string;
     channelId: string;

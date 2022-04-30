@@ -60,6 +60,7 @@ export const minigameGuessAutocompleteIdol: Run = async ({
     gender: gender,
     minLetters,
     maxLetters,
+    group: minigame?.group,
   });
 
   choices = characters.map((c) => {

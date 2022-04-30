@@ -29,6 +29,7 @@ const operation = gql`
       messageId
       channelId
       guildId
+      group
     }
   }
 `;
