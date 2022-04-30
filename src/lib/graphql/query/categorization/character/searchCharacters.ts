@@ -12,6 +12,7 @@ const operation = gql`
     $gender: Gender
     $minLetters: Int
     $maxLetters: Int
+    $group: String
   ) {
     searchCharacters(
       search: $search
@@ -22,6 +23,7 @@ const operation = gql`
       page: $page
       minLetters: $minLetters
       maxLetters: $maxLetters
+      group: $group
     ) {
       id
       name
