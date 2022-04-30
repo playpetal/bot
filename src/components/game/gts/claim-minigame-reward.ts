@@ -49,7 +49,7 @@ const run: RunComponent = async function ({ interaction, user }) {
   } else if (minigame.type === "GUESS_THE_IDOL") {
     desc = `${emoji.bloom} **you got \`${
       minigame.character!.name
-    }\` in ${guesses} guesses!**`;
+    }\` in ${guesses} guess${guesses === 1 ? "" : "es"}!**`;
   }
 
   if (reward === "petal") {
