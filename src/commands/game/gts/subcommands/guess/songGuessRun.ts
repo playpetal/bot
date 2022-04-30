@@ -4,19 +4,16 @@ import { MinigameError } from "../../../../../lib/error/minigame-error";
 import { answerGuessTheSong } from "../../../../../lib/graphql/mutation/game/minigame/guess-the-song/answerGuessTheSong";
 import { getGuessTheSong } from "../../../../../lib/graphql/query/game/minigame/guess-the-song/getGuessTheSong";
 import { handleGTSEnd } from "../../../../../lib/minigame/gts";
+import { isInactive } from "../../../../../lib/minigame/util/isInactive";
 import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { Embed } from "../../../../../struct/embed";
 
 export const songGuessRun: Run = async function ({ courier, user, options }) {
   const _minigame = await getGuessTheSong(user);
 
-  if (_minigame && _minigame.state === "PENDING") {
-    throw MinigameError.RewardsPendingClaim;
-  } else if (_minigame && _minigame.type !== "GUESS_THE_SONG") {
-    throw MinigameError.NotPlayingGTS;
-  } else if (_minigame && _minigame.state === "PLAYING") {
-    throw MinigameError.AlreadyPlayingGTS;
-  }
+  if (!_minigame || isInactive(_minigame))
+    throw MinigameError.NotPlayingMinigame;
+  if (_minigame.state === "PENDING") throw MinigameError.RewardsPendingClaim;
 
   const answer = options.getOption<string>("guess")!;
 
