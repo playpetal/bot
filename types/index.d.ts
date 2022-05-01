@@ -507,4 +507,20 @@ declare module "petal" {
     announcement: string;
     createdAt: number;
   };
+
+  export type Bias = {
+    account: {
+      id: number;
+      username: string;
+      discordId: string;
+      title: Maybe<{ title: string }>;
+    };
+    group: {
+      id: number;
+      name: string;
+      creation?: Date;
+      gender?: "MALE" | "FEMALE" | "COED" | null;
+      aliases: { alias: string }[];
+    };
+  };
 }

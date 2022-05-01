@@ -12,4 +12,5 @@ export const emoji = {
   burn: "<:burn:941818533619322910>",
   cards: "<:cards:941818546026061885>",
   lily: "<:lily:953532258957017108>",
+  check: "<:check:970144425709830154>",
 } as const;
