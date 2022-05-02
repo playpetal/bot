@@ -15,6 +15,13 @@ export default slashCommand("settings")
         description: "toggle your supporter statistics being shown publicly",
         run,
       },
+      {
+        type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
+        name: "minigames-use-bias-list",
+        description:
+          "toggles whether or not minigames should be based on your bias list",
+        run,
+      },
     ],
   })
   .run(run);
