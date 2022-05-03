@@ -38,7 +38,7 @@ const operation = gql`
 export async function startTrivia(
   discordId: string,
   message: { messageId: string; channelId: string; guildId: string },
-  options?: { gender?: GroupGender; group?: number }
+  options?: { gender?: GroupGender; group?: string }
 ): Promise<Trivia> {
   const data = await mutate<{ startTrivia: Trivia }>({
     operation,

@@ -2,11 +2,11 @@ import { Button, Run } from "petal";
 import { MinigameError } from "../../../../../lib/error/minigame-error";
 import { startTrivia } from "../../../../../lib/graphql/mutation/game/minigame/trivia/startTrivia";
 import { getTrivia } from "../../../../../lib/graphql/query/game/minigame/trivia/getTrivia";
-import { logger } from "../../../../../lib/logger";
 import { button, row } from "../../../../../lib/util/component";
 import { emoji } from "../../../../../lib/util/formatting/emoji";
 import { shuffleArray } from "../../../../../lib/util/shuffleArray";
-import { Embed } from "../../../../../struct/embed";
+import { Embed, ErrorEmbed } from "../../../../../struct/embed";
+import { BotError } from "../../../../../struct/error";
 
 export const triviaPlayRun: Run = async function run({
   courier,
@@ -27,18 +27,19 @@ export const triviaPlayRun: Run = async function run({
   const loadingMessage = await courier.send({ embeds: [loading] });
 
   const gender = options.getOption<"male" | "female">("gender");
-
-  const minigame = await startTrivia(
-    user.discordId,
-    {
-      messageId: loadingMessage?.id!,
-      channelId: loadingMessage?.channel.id!,
-      guildId: loadingMessage?.guildID!,
-    },
-    { gender: gender?.toUpperCase() as "MALE" | "FEMALE" | undefined }
-  );
+  const group = options.getOption<string>("group");
 
   try {
+    const minigame = await startTrivia(
+      user.discordId,
+      {
+        messageId: loadingMessage?.id!,
+        channelId: loadingMessage?.channel.id!,
+        guildId: loadingMessage?.guildID!,
+      },
+      { gender: gender?.toUpperCase() as "MALE" | "FEMALE" | undefined, group }
+    );
+
     const embed = new Embed().setDescription(
       `${emoji.user} **${minigame.question}**\nmake your answer by clicking one of the buttons!`
     );
@@ -83,7 +84,13 @@ export const triviaPlayRun: Run = async function run({
       }
     }, 500);
   } catch (e) {
-    logger.error(e);
+    if (e instanceof BotError) {
+      await courier.edit({
+        embeds: [new ErrorEmbed(e.message)],
+      });
+      return;
+    }
+
     throw e;
   }
 };
