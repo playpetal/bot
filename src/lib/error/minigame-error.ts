@@ -12,6 +12,9 @@ export const MinigameError = {
   AlreadyPlayingIdols: new BotError(
     "**you're currently guessing idols!**\nplease use **/minigame guess `idol: idol name`** to guess!"
   ),
+  AlreadyPlayingTrivia: new BotError(
+    "**you're already playing trivia!**\nmake your guess by clicking one of the buttons!"
+  ),
   AlreadyPlayingWords: ({
     message,
     channel,

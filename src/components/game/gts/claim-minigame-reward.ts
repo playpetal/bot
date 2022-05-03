@@ -3,6 +3,7 @@ import { MinigameError } from "../../../lib/error/minigame-error";
 import { completeMinigame } from "../../../lib/graphql/mutation/game/minigame/completeMinigame";
 import { getGuessTheIdol } from "../../../lib/graphql/query/game/minigame/guess-the-idol/getGuessTheIdol";
 import { getGuessTheSong } from "../../../lib/graphql/query/game/minigame/guess-the-song/getGuessTheSong";
+import { getTrivia } from "../../../lib/graphql/query/game/minigame/trivia/getTrivia";
 import { getCardImage } from "../../../lib/img";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { formatCard } from "../../../lib/util/formatting/format";
@@ -25,6 +26,8 @@ const run: RunComponent = async function ({ interaction, user }) {
     minigame = await getGuessTheSong(user);
   } else if (type === "GUESS_THE_IDOL") {
     minigame = await getGuessTheIdol(user);
+  } else if (type === "TRIVIA") {
+    minigame = await getTrivia(user);
   }
 
   if (!minigame) throw MinigameError.InvalidMinigame;
@@ -36,20 +39,24 @@ const run: RunComponent = async function ({ interaction, user }) {
   let image: Buffer | undefined;
 
   let desc: string = "";
-
-  // const rewardSelection = reward.toUpperCase() as "CARD" | "PETAL" | "LILY";
-
-  let guesses = minigame.attempts.length;
   let elapsed = minigame.elapsed!;
 
-  if (minigame.type === "GUESS_THE_SONG") {
-    desc = `${emoji.song} **You got it in ${guesses} guess${
-      guesses !== 1 ? "es" : ""
-    } (${(elapsed! / 1000).toFixed(2)}s)!**`;
-  } else if (minigame.type === "GUESS_THE_IDOL") {
-    desc = `${emoji.bloom} **you got \`${
-      minigame.character!.name
-    }\` in ${guesses} guess${guesses === 1 ? "" : "es"}!**`;
+  if (minigame.type === "TRIVIA") {
+    desc = `${emoji.user} **${minigame.question}**\nyou correctly answered **${
+      minigame.answer
+    }** in **${(elapsed! / 1000).toFixed(2)}s!**\n`;
+  } else {
+    let guesses = minigame.attempts.length;
+
+    if (minigame.type === "GUESS_THE_SONG") {
+      desc = `${emoji.song} **You got it in ${guesses} guess${
+        guesses !== 1 ? "es" : ""
+      } (${(elapsed! / 1000).toFixed(2)}s)!**`;
+    } else if (minigame.type === "GUESS_THE_IDOL") {
+      desc = `${emoji.bloom} **you got \`${
+        minigame.character!.name
+      }\` in ${guesses} guess${guesses === 1 ? "" : "es"}!**`;
+    }
   }
 
   if (reward === "petal") {

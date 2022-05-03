@@ -25,7 +25,7 @@ const run: Run = async ({ courier, user, options }) => {
       "**woah there!**\n`emoji` must be a valid Emoji 13.1 or Discord custom emoji."
     );
 
-  const tags = await getUserTags(user.id);
+  const tags = await getUserTags({ id: user.id });
   if (tags.length > 5)
     throw new BotError(
       "**woah there!**\nyou've reached the maximum number of tags... for now!"

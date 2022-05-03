@@ -373,7 +373,11 @@ declare module "petal" {
   };
 
   type Reward = "PETAL" | "LILY" | "CARD";
-  type MinigameType = "GUESS_THE_SONG" | "GUESS_THE_IDOL" | "GUESS_THE_GROUP";
+  type MinigameType =
+    | "GUESS_THE_SONG"
+    | "GUESS_THE_IDOL"
+    | "GUESS_THE_GROUP"
+    | "TRIVIA";
 
   export type MinigameState =
     | "PLAYING"
@@ -392,7 +396,9 @@ declare module "petal" {
     ? GuessTheSong
     : T extends "GUESS_THE_IDOL"
     ? GuessTheIdol
-    : GuessTheSong | GuessTheIdol;
+    : T extends "TRIVIA"
+    ? Trivia
+    : GuessTheSong | GuessTheIdol | Trivia;
 
   export type MinigameComparison = "GREATER" | "LESS" | "EQUAL";
 
@@ -429,6 +435,24 @@ declare module "petal" {
     timeLimit: number;
     startedAt: number;
     elapsed: Maybe<number>;
+    group?: string;
+
+    messageId: string;
+    channelId: string;
+    guildId: string;
+  };
+
+  export type Trivia = {
+    type: "TRIVIA";
+    accountId: number;
+    state: MinigameState;
+    question: string;
+    answer: string | null;
+    options: string[];
+    maxAttempts: number;
+    timeLimit: number;
+    startedAt: number;
+    elapsed: number | null;
     group?: string;
 
     messageId: string;
