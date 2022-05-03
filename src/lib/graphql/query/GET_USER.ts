@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client/core";
-import { Account, Maybe } from "petal";
+import { Account, AccountInput, Maybe } from "petal";
 import { query } from "../request";
 
 const GET_USER = gql`
-  query GetUser($id: Int, $username: String, $discordId: String) {
-    user(id: $id, username: $username, discordId: $discordId) {
+  query GetUser($account: AccountInput!) {
+    user(account: $account) {
       id
       discordId
       username
@@ -24,18 +24,10 @@ const GET_USER = gql`
   }
 `;
 
-export async function getUser({
-  id,
-  discordId,
-  username,
-}: {
-  id?: number;
-  discordId?: string;
-  username?: string;
-}): Promise<Maybe<Account>> {
+export async function getUser(account: AccountInput): Promise<Maybe<Account>> {
   const data = await query<{ user: Maybe<Account> }>({
     query: GET_USER,
-    variables: { discordId, id, username },
+    variables: { account },
   });
 
   return data.user;

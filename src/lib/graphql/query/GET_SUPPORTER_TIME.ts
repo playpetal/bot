@@ -1,23 +1,21 @@
 import { gql } from "@apollo/client/core";
-import { Maybe } from "petal";
+import { AccountInput, Maybe } from "petal";
 import { query } from "../request";
 
 const operation = gql`
-  query GetUser($id: Int) {
-    user(id: $id) {
+  query GetUser($account: AccountInput!) {
+    user(account: $account) {
       supporterTime
     }
   }
 `;
 
-export async function getSupporterTime({
-  id,
-}: {
-  id?: number;
-}): Promise<Maybe<number>> {
+export async function getSupporterTime(
+  account: AccountInput
+): Promise<Maybe<number>> {
   const data = await query<{ user: Maybe<{ supporterTime: Maybe<number> }> }>({
     query: operation,
-    variables: { id },
+    variables: { account },
   });
 
   return data.user?.supporterTime || null;

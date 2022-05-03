@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client/core";
-import { Maybe, PartialUser } from "petal";
+import { AccountInput, Maybe, PartialUser } from "petal";
 import { query } from "../request";
 
 const operation = gql`
-  query GetUserPartial($id: Int, $username: String, $discordId: String) {
-    user(id: $id, username: $username, discordId: $discordId) {
+  query GetUserPartial($account: AccountInput!) {
+    user(account: $account) {
       id
       discordId
       username
@@ -16,18 +16,10 @@ const operation = gql`
   }
 `;
 
-export async function getUserPartial({
-  discordId,
-  id,
-  username,
-}: {
-  discordId?: string;
-  id?: number;
-  username?: string;
-}) {
+export async function getUserPartial(account: AccountInput) {
   const data = await query<{ user: Maybe<PartialUser> }>({
     query: operation,
-    variables: { discordId, id, username },
+    variables: { account },
   });
 
   return data.user;

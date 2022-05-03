@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client/core";
-import { Tag } from "petal";
+import { AccountInput, Tag } from "petal";
 import { query } from "../request";
 
 const operation = gql`
-  query GetUserTags($id: Int) {
-    user(id: $id) {
+  query GetUserTags($account: AccountInput!) {
+    user(account: $account) {
       id
       tags {
         id
@@ -15,10 +15,10 @@ const operation = gql`
   }
 `;
 
-export async function getUserTags(id: number) {
+export async function getUserTags(account: AccountInput) {
   const data = await query<{ user: { tags: Tag[] } }>({
     query: operation,
-    variables: { id },
+    variables: { account },
   });
 
   return data.user.tags;

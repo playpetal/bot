@@ -17,7 +17,7 @@ export async function getAccountStatsEmbed(account: Account) {
   if (rollCount > 0) desc += `\n${emoji.dice} ${strong(rollCount)} rolls`;
 
   if (hasFlag("PUBLIC_SUPPORTER", account.flags)) {
-    const supporterTime = await getSupporterTime(account);
+    const supporterTime = await getSupporterTime({ id: account.id });
 
     if (supporterTime)
       desc += `\n${emoji.bloom} paid for **${supporterTime}h** of server time`;

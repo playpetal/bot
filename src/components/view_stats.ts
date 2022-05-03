@@ -33,14 +33,14 @@ const run: RunComponent = async function ({ interaction, user }) {
       embed = await getAccountStatsEmbed(account);
     } else if (statisticsType === "idols") {
       const stats = await getMinigameStats<"GUESS_THE_IDOL">(
-        account.id,
+        { id: account.id },
         "GUESS_THE_IDOL"
       );
 
       embed = getIdolsStatsEmbed(stats, account);
     } else if (statisticsType === "songs") {
       const stats = await getMinigameStats<"GUESS_THE_SONG">(
-        account.id,
+        { id: account.id },
         "GUESS_THE_SONG"
       );
 

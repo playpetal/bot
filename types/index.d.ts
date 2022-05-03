@@ -523,4 +523,10 @@ declare module "petal" {
       aliases: { alias: string }[];
     };
   };
+
+  export type AccountInput = {
+    id?: number;
+    discordId?: string;
+    username?: string;
+  };
 }
