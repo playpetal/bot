@@ -8,7 +8,9 @@ const run = async function () {
   const isProduction = process.env.ENVIRONMENT === "PRODUCTION";
 
   const commands = bot.commands;
-  const globalCommands = commands.filter((c) => !c.isModOnly());
+  const globalCommands = commands.filter(
+    (c) => !c.isModOnly() && !c.isMainOnly()
+  );
   const modCommands = commands.filter((c) => c.isModOnly());
   const mainCommands = commands.filter((c) => c.isMainOnly());
 
