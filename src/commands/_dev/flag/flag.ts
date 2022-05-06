@@ -19,6 +19,7 @@ export default slashCommand("flag")
       { name: "RELEASE_MANAGER", value: "RELEASE_MANAGER" },
       { name: "PUBLIC_SUPPORTER", value: "PUBLIC_SUPPORTER" },
       { name: "MINIGAMES_USE_BIAS_LIST", value: "MINIGAMES_USE_BIAS_LIST" },
+      { name: "GAME_DESIGNER", value: "GAME_DESIGNER" },
     ],
     required: true,
   })
