@@ -13,4 +13,5 @@ export const emoji = {
   cards: "<:cards:941818546026061885>",
   lily: "<:lily:953532258957017108>",
   check: "<:check:970144425709830154>",
+  cross: "<:crossmark:972000993925529640>",
 } as const;

@@ -63,29 +63,29 @@ export const minigameGuessRun: Run = async ({ courier, user, options }) => {
     const date = new Date(attempt.birthday!).toISOString().split("T")[0];
 
     if (attempt.birthDate === "EQUAL") {
-      birthdayStr = `✅ the idol was born **on ${date}**.`;
+      birthdayStr = `${emoji.check} the idol was born **on ${date}**.`;
     } else {
-      birthdayStr = `❌ the idol was born **${
+      birthdayStr = `${emoji.cross} the idol was born **${
         attempt.birthDate === "LESS" ? "before" : "after"
       } ${date}**.`;
     }
 
     if (attempt.isGender) {
-      genderStr = `✅ the idol **is ${
+      genderStr = `${emoji.check} the idol **is ${
         attempt.gender?.toLowerCase() || "ungendered"
       }**.`;
     } else {
-      genderStr = `❌ the idol **is not ${
+      genderStr = `${emoji.cross} the idol **is not ${
         attempt.gender?.toLowerCase() || "ungendered"
       }**.`;
     }
 
     if (attempt.nameLength === "LESS") {
-      lettersStr = `❌ the idol has **less letters** in their name than \`${attempt.name}\`.`;
+      lettersStr = `${emoji.cross} the idol has **less letters** in their name than \`${attempt.name}\`.`;
     } else if (attempt.nameLength === "GREATER") {
-      lettersStr = `❌ the idol has **more letters** in their name than \`${attempt.name}\`.`;
+      lettersStr = `${emoji.cross} the idol has **more letters** in their name than \`${attempt.name}\`.`;
     } else {
-      lettersStr = `✅ the idol has **the same amount of letters** in their name as \`${attempt.name}\`.`;
+      lettersStr = `${emoji.check} the idol has **the same amount of letters** in their name as \`${attempt.name}\`.`;
     }
 
     const embed = new Embed().setDescription(
