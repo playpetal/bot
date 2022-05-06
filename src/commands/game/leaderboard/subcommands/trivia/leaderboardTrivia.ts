@@ -1,11 +1,11 @@
 import { SlashCommandSubcommand } from "petal";
 import { CONSTANTS } from "../../../../../lib/constants";
-import run from "./leaderboardPetleRun";
+import { leaderboardTriviaRun } from "./leaderboardTriviaRun";
 
-export const LeaderboardPetle: SlashCommandSubcommand = {
+export const LeaderboardTrivia: SlashCommandSubcommand = {
   type: CONSTANTS.OPTION_TYPE.SUBCOMMAND,
-  name: "petle",
-  description: "show leaderboards for 'petle'",
+  name: "trivia",
+  description: "show leaderboards for 'trivia'",
   options: [
     {
       type: CONSTANTS.OPTION_TYPE.STRING,
@@ -20,5 +20,5 @@ export const LeaderboardPetle: SlashCommandSubcommand = {
       required: true,
     },
   ],
-  run,
+  run: leaderboardTriviaRun,
 };

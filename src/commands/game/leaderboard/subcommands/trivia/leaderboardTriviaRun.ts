@@ -6,16 +6,19 @@ import { renderLeaderboard } from "../../../../../lib/util/formatting/leaderboar
 import { strong } from "../../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../../struct/embed";
 
-const run: Run = async function run({ courier, options }) {
+export const leaderboardTriviaRun: Run = async function run({
+  courier,
+  options,
+}) {
   const board = options.getOption<string>("board")!;
 
-  let header = `**leaderboard - petle**\n${emoji.bloom}`;
+  let header = `**leaderboard - trivia**\n${emoji.user} `;
   let body: string = `*there's nothing here...?!*`;
 
   if (board === "time") {
     header += `top 10 fastest guessers (average)`;
 
-    const users = await getLeaderboard("WORDS_TIME");
+    const users = await getLeaderboard("TRIVIAxTIME");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [**${(u.value / 1000).toFixed(2)}s**]`
     );
@@ -24,7 +27,7 @@ const run: Run = async function run({ courier, options }) {
   } else if (board === "petals") {
     header += `top 10 earners (petals)`;
 
-    const users = await getLeaderboard("WORDS_PETAL");
+    const users = await getLeaderboard("TRIVIAxPETAL");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.petals} ${strong(u.value)}]`
     );
@@ -33,7 +36,7 @@ const run: Run = async function run({ courier, options }) {
   } else if (board === "lilies") {
     header += `top 10 earners (lilies)`;
 
-    const users = await getLeaderboard("WORDS_LILY");
+    const users = await getLeaderboard("TRIVIAxLILY");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.lily} ${strong(u.value)}]`
     );
@@ -42,7 +45,7 @@ const run: Run = async function run({ courier, options }) {
   } else if (board === "cards") {
     header += `top 10 earners (cards)`;
 
-    const users = await getLeaderboard("WORDS_CARD");
+    const users = await getLeaderboard("TRIVIAxCARD");
     const formatted = users.map(
       (u) => `${displayName(u.account)} [${emoji.cards} ${strong(u.value)}]`
     );
@@ -53,5 +56,3 @@ const run: Run = async function run({ courier, options }) {
   const embed = new Embed().setDescription(`${header}\n\n${body}`);
   return await courier.send({ embeds: [embed] });
 };
-
-export default run;

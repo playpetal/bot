@@ -516,10 +516,10 @@ declare module "petal" {
     | "GUESS_THE_IDOLxCARD"
     | "GUESS_THE_IDOLxLILY"
     | "GUESS_THE_IDOLxTIME"
-    | "WORDS_PETAL"
-    | "WORDS_CARD"
-    | "WORDS_LILY"
-    | "WORDS_TIME";
+    | "TRIVIAxTIME"
+    | "TRIVIAxPETAL"
+    | "TRIVIAxCARD"
+    | "TRIVIAxLILY";
 
   export type Leaderboard = {
     account: PartialUser;
