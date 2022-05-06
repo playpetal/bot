@@ -1,9 +1,9 @@
 import { CardSuggestion } from "petal";
 import { bot } from "../..";
+import { getCardSuggestionEmbed } from "../../lib/embed/meta/getCardSuggestionEmbed";
 import { createCardSuggestion } from "../../lib/graphql/mutation/meta/card-suggestion/createCardSuggestion";
 import { getCardSuggestion } from "../../lib/graphql/query/meta/card-suggestion/getCardSuggestion";
 import { button, row } from "../../lib/util/component";
-import { displayName } from "../../lib/util/displayName";
 import { emoji } from "../../lib/util/formatting/emoji";
 import { Embed } from "../../struct/embed";
 import { BotError } from "../../struct/error";
@@ -23,22 +23,26 @@ const a: RunModal = async ({ interaction, user }) => {
     );
   }
 
-  const embed = new Embed()
-    .setDescription(
-      `${emoji.user} ${displayName(
-        user
-      )} suggested **${groupName} *${subgroupName}***!`
-    )
-    .setFooter(`votes: 1`);
+  const mockSuggestion: CardSuggestion = {
+    id: 0,
+    groupName,
+    subgroupName,
+    suggestedBy: user,
+    fulfilledBy: null,
+    fulfilled: false,
+    votes: [{ account: user, id: 0 }],
+    publicMessageId: "",
+    privateMessageId: "",
+  };
 
   const publicMessage = await bot.createMessage(
     process.env.PUBLIC_SUGGESTION_CHANNEL!,
-    { embeds: [embed] }
+    { embeds: [getCardSuggestionEmbed(mockSuggestion)] }
   );
 
   const privateMessage = await bot.createMessage(
     process.env.PRIVATE_SUGGESTION_CHANNEL!,
-    { embeds: [embed] }
+    { embeds: [getCardSuggestionEmbed(mockSuggestion, true)] }
   );
 
   let suggestion: CardSuggestion;
@@ -66,25 +70,25 @@ const a: RunModal = async ({ interaction, user }) => {
   }
 
   await publicMessage.edit({
-    embeds: [embed],
+    embeds: [getCardSuggestionEmbed(suggestion)],
     components: [
       row(
         button({
           customId: `vote-card-suggestion?${suggestion.id}`,
           style: "blue",
-          label: "vote this suggestion up!",
+          label: "vote up",
         })
       ),
     ],
   });
 
   await privateMessage.edit({
-    embeds: [embed],
+    embeds: [getCardSuggestionEmbed(suggestion, true)],
     components: [
       row(
         button({
           customId: `claim-card-suggestion?${suggestion.id}`,
-          style: "green",
+          style: "blue",
           label: "claim",
         }),
         button({

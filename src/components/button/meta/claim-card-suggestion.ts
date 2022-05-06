@@ -1,8 +1,8 @@
 import { bot } from "../../..";
+import { getCardSuggestionEmbed } from "../../../lib/embed/meta/getCardSuggestionEmbed";
 import { claimCardSuggestion } from "../../../lib/graphql/mutation/meta/card-suggestion/claimCardSuggestion";
 import { getCardSuggestion } from "../../../lib/graphql/query/meta/card-suggestion/getCardSuggestion";
 import { button, row } from "../../../lib/util/component";
-import { displayName } from "../../../lib/util/displayName";
 import { emoji } from "../../../lib/util/formatting/emoji";
 import { Component, RunComponent } from "../../../struct/component";
 import { Embed } from "../../../struct/embed";
@@ -22,40 +22,26 @@ const run: RunComponent = async ({ interaction, user }) => {
 
   const _suggestion = await claimCardSuggestion(user.discordId, suggestion.id);
 
-  const embed = new Embed()
-    .setDescription(
-      `${emoji.user} ${displayName(suggestion.suggestedBy)} suggested **${
-        suggestion.groupName
-      } *${suggestion.subgroupName}***!`
-    )
-    .setFooter(`Votes: ${_suggestion.votes.length}`);
-
   const privateMessage = await bot.getMessage(
     process.env.PRIVATE_SUGGESTION_CHANNEL!,
     suggestion.privateMessageId
   );
 
   await privateMessage.edit({
-    embeds: [embed],
+    embeds: [getCardSuggestionEmbed(_suggestion, true)],
     components: [
       row(
-        button({
-          customId: `claim-card-suggestion?${_suggestion.id}`,
-          style: "green",
-          label: "claimed!",
-          disabled: true,
-        }),
-        button({
-          customId: `delete-card-suggestion?${_suggestion.id}`,
-          style: "red",
-          label: "delete",
-        }),
         button({
           customId: `fulfill-card-suggestion?${_suggestion.id}&${
             _suggestion.fulfilledBy!.id
           }`,
           style: "blue",
           label: "complete",
+        }),
+        button({
+          customId: `unclaim-card-suggestion?${_suggestion.id}`,
+          style: "red",
+          label: "unclaim",
         })
       ),
     ],
