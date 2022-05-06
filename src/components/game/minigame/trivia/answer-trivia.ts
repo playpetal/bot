@@ -10,7 +10,9 @@ import { BotError } from "../../../../struct/error";
 
 const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, data] = interaction.data.custom_id.split("?");
-  const [accountIdStr, answer] = data.split("&");
+  const _data = data.split("&");
+  const accountIdStr = _data[0];
+  const answer = _data.slice(1).join("&");
 
   if (!accountIdStr) return;
 
