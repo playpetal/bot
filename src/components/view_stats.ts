@@ -1,6 +1,7 @@
 import { getAccountStatsEmbed } from "../lib/embed/stats/account";
 import { getIdolsStatsEmbed } from "../lib/embed/stats/minigame/idols";
 import { getSongsStatsEmbed } from "../lib/embed/stats/minigame/songs";
+import { getTriviaStatsEmbed } from "../lib/embed/stats/minigame/trivia";
 import { getUser } from "../lib/graphql/query/GET_USER";
 import { getMinigameStats } from "../lib/graphql/query/profile/getMinigameStats";
 import { row, button, select, selectOption } from "../lib/util/component";
@@ -8,7 +9,7 @@ import { Component, RunComponent } from "../struct/component";
 import { Embed } from "../struct/embed";
 import { BotError } from "../struct/error";
 
-type StatisticsType = "account" | "idols" | "songs";
+type StatisticsType = "account" | "idols" | "songs" | "trivia";
 
 const run: RunComponent = async function ({ interaction, user }) {
   const [_customId, accountIdStr] = interaction.data.custom_id.split("?");
@@ -45,6 +46,13 @@ const run: RunComponent = async function ({ interaction, user }) {
       );
 
       embed = getSongsStatsEmbed(stats, account);
+    } else if (statisticsType === "trivia") {
+      const stats = await getMinigameStats<"TRIVIA">(
+        { id: account.id },
+        "TRIVIA"
+      );
+
+      embed = getTriviaStatsEmbed(stats, account);
     }
   } else {
     embed = await getAccountStatsEmbed(account);
@@ -77,6 +85,13 @@ const run: RunComponent = async function ({ interaction, user }) {
               description:
                 "shows a variety of statistics related to the songs minigame",
               isDefault: statisticsType === "songs",
+            }),
+            selectOption({
+              label: "minigame stats (trivia)",
+              value: "trivia",
+              description:
+                "shows a variety of statistics related to the trivia minigame",
+              isDefault: statisticsType === "trivia",
             }),
           ],
         })
