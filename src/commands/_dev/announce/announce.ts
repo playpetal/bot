@@ -16,4 +16,5 @@ export default slashCommand("announce")
     description:
       "whether or not to publish the announcement to all following servers",
   })
-  .run(announceRun);
+  .run(announceRun)
+  .modOnly(true);
