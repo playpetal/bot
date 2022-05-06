@@ -21,6 +21,7 @@ export class SlashCommand {
   private _run: Run | undefined;
 
   private _modOnly: boolean = false;
+  private _mainOnly: boolean = false;
 
   constructor(name: string) {
     this.name = name;
@@ -44,6 +45,11 @@ export class SlashCommand {
 
   public modOnly(modOnly: boolean) {
     this._modOnly = modOnly;
+    return this;
+  }
+
+  public mainOnly(mainOnly: boolean) {
+    this._mainOnly = mainOnly;
     return this;
   }
 
@@ -157,6 +163,10 @@ export class SlashCommand {
 
   public isModOnly() {
     return this._modOnly;
+  }
+
+  public isMainOnly() {
+    return this._mainOnly;
   }
 
   public ephemeral() {

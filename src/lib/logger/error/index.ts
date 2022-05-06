@@ -1,8 +1,13 @@
-import { CommandInteraction, ComponentInteraction } from "eris";
+import {
+  CommandInteraction,
+  ComponentInteraction,
+  ModalSubmitInteraction,
+} from "eris";
 import { PartialUser } from "petal";
 import { logger } from "..";
 import { SlashCommand } from "../../../struct/command";
 import { Component } from "../../../struct/component";
+import { Modal } from "../../../struct/modal";
 import { dd } from "../../statsd";
 
 export function logCommandError(
@@ -26,9 +31,9 @@ export function logCommandError(
 }
 
 export function logComponentError(
-  interaction: ComponentInteraction,
+  interaction: ComponentInteraction | ModalSubmitInteraction,
   user: PartialUser | null,
-  component: Component,
+  component: Component | Modal,
   error: unknown
 ): void {
   dd.increment(`petal.error.component`);

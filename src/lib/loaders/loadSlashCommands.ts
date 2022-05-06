@@ -2,7 +2,6 @@ import glob from "glob-promise";
 import path from "path";
 import { bot } from "../..";
 import { SlashCommand } from "../../struct/command";
-import { logger } from "../logger";
 
 export async function loadSlashCommands() {
   const dir = path.join(__dirname, "../../commands");
@@ -11,17 +10,13 @@ export async function loadSlashCommands() {
   const commands: SlashCommand[] = [];
 
   for (let match of matches) {
-    try {
-      const command = require(match).default as unknown;
+    const command = require(match).default as unknown;
 
-      if (!(command instanceof SlashCommand)) continue;
+    if (!(command instanceof SlashCommand)) continue;
 
-      if (match.includes("commands/_mod")) command.modOnly(true);
+    if (match.includes("commands/_mod")) command.modOnly(true);
 
-      commands.push(command);
-    } catch (e) {
-      logger.error(`Command failed to load at ${match}\n${e}`);
-    }
+    commands.push(command);
   }
 
   bot.commands = commands;

@@ -553,4 +553,18 @@ declare module "petal" {
     discordId?: string;
     username?: string;
   };
+
+  export type CardSuggestion = {
+    id: number;
+    groupName: string;
+    subgroupName: string;
+    suggestedBy: PartialUser;
+    fulfilledBy: PartialUser | null;
+    fulfilled: boolean;
+    votes: CardSuggestionVote[];
+    publicMessageId: string;
+    privateMessageId: string;
+  };
+
+  export type CardSuggestionVote = { id: number; account: PartialUser };
 }

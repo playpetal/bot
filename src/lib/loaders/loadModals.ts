@@ -5,7 +5,7 @@ import { Modal } from "../../struct/modal";
 import { logger } from "../logger";
 
 export async function loadModals() {
-  const dir = path.join(__dirname, "../../modals");
+  const dir = path.join(__dirname, "../../components/modals");
   const matches = await glob(`${dir}/**/*.[jt]s`);
 
   const modals: Modal[] = [];

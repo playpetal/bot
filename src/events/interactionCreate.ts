@@ -211,8 +211,40 @@ const run = async function (interaction: UnknownInteraction) {
     const modal = bot.findModal(interaction.data.custom_id);
     if (!modal) return;
 
-    modal.execute({ interaction, user });
-    return;
+    try {
+      await interaction.acknowledge();
+      if (!interaction.member) return;
+
+      if (!user)
+        throw new BotError(
+          "please sign up by using **/register `username`** to play petal!"
+        );
+
+      await modal.execute({ interaction, user });
+      return;
+    } catch (e) {
+      if (e instanceof BotError) {
+        await interaction.createMessage({
+          embeds: [new ErrorEmbed(e.message)],
+          components: e.components,
+          flags: 64,
+        });
+
+        return;
+      } else {
+        logComponentError(interaction, user, modal, e);
+
+        await interaction.createMessage({
+          embeds: [
+            new ErrorEmbed(
+              "**an unexpected error occurred.**\nplease try again in a few moments."
+            ),
+          ],
+          flags: 64,
+        });
+        return;
+      }
+    }
   }
 };
 
