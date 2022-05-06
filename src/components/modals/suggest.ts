@@ -29,7 +29,7 @@ const a: RunModal = async ({ interaction, user }) => {
         user
       )} suggested **${groupName} *${subgroupName}***!`
     )
-    .setFooter(`Votes: 1`);
+    .setFooter(`votes: 1`);
 
   const publicMessage = await bot.createMessage(
     process.env.PUBLIC_SUGGESTION_CHANNEL!,

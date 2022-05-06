@@ -22,7 +22,7 @@ const run: RunComponent = async ({ interaction, user }) => {
         suggestion.groupName
       } *${suggestion.subgroupName}***!`
     )
-    .setFooter(`Votes: ${votes.length}`);
+    .setFooter(`votes: ${votes.length}`);
 
   const publicMessage = await bot.getMessage(
     process.env.PUBLIC_SUGGESTION_CHANNEL!,
