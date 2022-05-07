@@ -90,17 +90,25 @@ declare module "petal" {
 
   type Components = {
     type: 1;
-    components: (Button | Select)[];
+    components: (Button | LinkButton | Select)[];
   }[];
 
   type Button = {
     type: 2;
-    label: string;
+    label?: string;
     custom_id: string;
     style: 1 | 2 | 3 | 4;
     emoji?: {
       id: string;
     };
+    disabled: boolean;
+  };
+
+  type LinkButton = {
+    type: 2;
+    style: 5;
+    label: string;
+    url: string;
     disabled: boolean;
   };
 
