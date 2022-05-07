@@ -1,4 +1,4 @@
-import { Button, Emoji, Select, SelectOption } from "petal";
+import { Button, Emoji, LinkButton, Select, SelectOption } from "petal";
 
 const buttonStyles = {
   blue: 1,
@@ -22,12 +22,25 @@ export function button({
 }): Button {
   return {
     type: 2 as const,
-    label: label as string,
+    label: label,
     custom_id: customId,
     style: buttonStyles[style],
     disabled,
     emoji: emoji ? { id: emoji } : undefined,
   };
+}
+
+export function linkButton({
+  label,
+  url,
+  disabled = false,
+}: {
+  label: string;
+  url: string;
+  disabled?: boolean;
+}): LinkButton {
+  const button: LinkButton = { type: 2, label, url, disabled, style: 5 };
+  return button;
 }
 
 export function select({
@@ -72,7 +85,7 @@ export function selectOption({
   return { label, value, description, emoji, default: isDefault };
 }
 
-export function row(...components: (Button | Select)[]) {
+export function row(...components: (Button | LinkButton | Select)[]) {
   return {
     type: 1 as const,
     components,
