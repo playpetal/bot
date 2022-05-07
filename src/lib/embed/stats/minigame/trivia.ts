@@ -3,7 +3,7 @@ import { Embed } from "../../../../struct/embed";
 import { displayName } from "../../../util/displayName";
 import { emoji } from "../../../util/formatting/emoji";
 import { emphasis } from "../../../util/formatting/emphasis";
-import { plural } from "../../../util/formatting/plural";
+import { plural, pluralWord } from "../../../util/formatting/plural";
 
 export function getTriviaStatsEmbed(
   stats: Maybe<MinigameStats<"TRIVIA">>,
@@ -22,7 +22,7 @@ export function getTriviaStatsEmbed(
       "\n\n**no stats here... yet!**\nuse **/trivia play** to start filling this out!";
   } else {
     desc +=
-      `\n\n${emphasis(stats.totalGames)} ${plural(
+      `\n\n${emphasis(stats.totalGames)} ${pluralWord(
         stats.totalGames,
         "game"
       )} played` +

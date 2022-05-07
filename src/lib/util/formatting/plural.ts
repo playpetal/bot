@@ -3,6 +3,15 @@ export function plural(number: number, unit: string, suffix?: string): string {
   return `${number} ${unit}${suffix || "s"}`;
 }
 
+export function pluralWord(
+  number: number,
+  unit: string,
+  suffix?: string
+): string {
+  if (number === 1) return unit;
+  return `${unit}${suffix || "s"}`;
+}
+
 export function pluralOr(
   number: number,
   singular: string,

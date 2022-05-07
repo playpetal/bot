@@ -5,7 +5,7 @@ import { displayName } from "../../util/displayName";
 import { hasFlag } from "../../util/flags";
 import { emoji } from "../../util/formatting/emoji";
 import { emphasis } from "../../util/formatting/emphasis";
-import { plural } from "../../util/formatting/plural";
+import { plural, pluralWord } from "../../util/formatting/plural";
 
 export async function getAccountStatsEmbed(account: Account) {
   const embed = new Embed()
@@ -16,7 +16,7 @@ export async function getAccountStatsEmbed(account: Account) {
 
   const { rollCount } = account.stats;
   if (rollCount > 0)
-    desc += `\n${emoji.dice} ${emphasis(rollCount)} ${plural(
+    desc += `\n${emoji.dice} ${emphasis(rollCount)} ${pluralWord(
       rollCount,
       "roll"
     )}`;

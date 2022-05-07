@@ -3,7 +3,7 @@ import { Embed } from "../../struct/embed";
 import { displayName } from "../util/displayName";
 import { emoji } from "../util/formatting/emoji";
 import { emphasis } from "../util/formatting/emphasis";
-import { plural } from "../util/formatting/plural";
+import { pluralWord } from "../util/formatting/plural";
 
 export function getProfileEmbed(account: Account) {
   const {
@@ -20,7 +20,10 @@ export function getProfileEmbed(account: Account) {
         `\nregistered <t:${Math.floor(createdAt / 1000)}:R>` +
         (account.bio ? `\n\n${bio}` : ``) +
         `\n\n${emoji.petals} ${emphasis(currency)}` +
-        `\n${emoji.cards} ${emphasis(cardCount)} ${plural(cardCount, "card")}` +
+        `\n${emoji.cards} ${emphasis(cardCount)} ${pluralWord(
+          cardCount,
+          "card"
+        )}` +
         (premiumCurrency !== 0
           ? `\n${emoji.lily} ${emphasis(premiumCurrency)}`
           : "") +

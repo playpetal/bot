@@ -3,7 +3,7 @@ import { Embed } from "../../../../struct/embed";
 import { displayName } from "../../../util/displayName";
 import { emoji } from "../../../util/formatting/emoji";
 import { emphasis } from "../../../util/formatting/emphasis";
-import { plural } from "../../../util/formatting/plural";
+import { plural, pluralWord } from "../../../util/formatting/plural";
 
 export function getSongsStatsEmbed(
   stats: Maybe<MinigameStats<"GUESS_THE_SONG">>,
@@ -22,11 +22,11 @@ export function getSongsStatsEmbed(
       "\n\n**no stats here... yet!**\nuse **/song play** to start filling this out!";
   } else {
     desc +=
-      `\n\n${emphasis(stats.totalGames)} ${plural(
+      `\n\n${emphasis(stats.totalGames)} ${pluralWord(
         stats.totalGames,
         "game"
       )} played` +
-      `\n${emphasis(stats.totalAttempts)} ${plural(
+      `\n${emphasis(stats.totalAttempts)} ${pluralWord(
         stats.totalAttempts,
         "guess",
         "es"
