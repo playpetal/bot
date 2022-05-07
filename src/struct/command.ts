@@ -8,7 +8,10 @@ import {
   SlashCommandSubcommand,
   SlashCommandSubcommandGroup,
 } from "petal";
+import { logger } from "../lib/logger";
+import { emoji } from "../lib/util/formatting/emoji";
 import { Courier } from "./courier";
+import { BotError } from "./error";
 import { InteractionOptions } from "./options";
 
 export class SlashCommand {
@@ -89,10 +92,13 @@ export class SlashCommand {
       return;
     }
 
-    if (!this._run)
-      throw new Error(
-        `'this._run' not specified in slash command '${this.name}'`
+    if (!this._run) {
+      logger.error(`'this._run' not specified in slash command '${this.name}'`);
+
+      throw new BotError(
+        `${emoji.cross} **this command hasn't been implemented yet!**\nthis is most likely in error, please notify staff!`
       );
+    }
 
     return this._run({
       courier,
