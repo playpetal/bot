@@ -3,7 +3,7 @@ import { Embed } from "../../../../struct/embed";
 import { displayName } from "../../../util/displayName";
 import { emoji } from "../../../util/formatting/emoji";
 import { emphasis } from "../../../util/formatting/emphasis";
-import { plural, pluralWord } from "../../../util/formatting/plural";
+import { pluralWord } from "../../../util/formatting/plural";
 
 export function getIdolsStatsEmbed(
   stats: Maybe<MinigameStats<"GUESS_THE_IDOL">>,

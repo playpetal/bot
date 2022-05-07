@@ -5,7 +5,7 @@ import { displayName } from "../../util/displayName";
 import { hasFlag } from "../../util/flags";
 import { emoji } from "../../util/formatting/emoji";
 import { emphasis } from "../../util/formatting/emphasis";
-import { plural, pluralWord } from "../../util/formatting/plural";
+import { pluralWord } from "../../util/formatting/plural";
 
 export async function getAccountStatsEmbed(account: Account) {
   const embed = new Embed()
