@@ -4,6 +4,7 @@ import { claimCardSuggestion } from "../../../lib/graphql/mutation/meta/card-sug
 import { getCardSuggestion } from "../../../lib/graphql/query/meta/card-suggestion/getCardSuggestion";
 import { button, row } from "../../../lib/util/component";
 import { emoji } from "../../../lib/util/formatting/emoji";
+import { emphasis } from "../../../lib/util/formatting/emphasis";
 import { Component, RunComponent } from "../../../struct/component";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
@@ -48,7 +49,11 @@ const run: RunComponent = async ({ interaction, user }) => {
   });
 
   const followupEmbed = new Embed().setDescription(
-    `${emoji.check} **suggestion claimed!**\nyou are now responsible for **${suggestion.groupName} *${suggestion.subgroupName}***!`
+    `${
+      emoji.check
+    } **suggestion claimed!**\nyou are now responsible for ${emphasis(
+      suggestion.groupName
+    )} ${emphasis(suggestion.subgroupName, "bi")}!`
   );
 
   await interaction.createFollowup({ embeds: [followupEmbed], flags: 64 });

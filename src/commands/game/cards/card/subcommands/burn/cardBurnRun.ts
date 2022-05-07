@@ -3,7 +3,7 @@ import { burnCard } from "../../../../../../lib/graphql/mutation/game/BURN_CARD"
 import { getCard } from "../../../../../../lib/graphql/query/GET_CARD";
 import { getCardImage } from "../../../../../../lib/img";
 import { emoji } from "../../../../../../lib/util/formatting/emoji";
-import { strong } from "../../../../../../lib/util/formatting/strong";
+import { emphasis } from "../../../../../../lib/util/formatting/emphasis";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
@@ -34,7 +34,7 @@ const run: Run = async ({ courier, user, options }) => {
   const embed = new Embed()
     .setDescription(
       `${emoji.burn} **the card crackles as it turns to dust...**` +
-        `\nin its ashes you find ${emoji.petals} ${strong(reward)}!`
+        `\nin its ashes you find ${emoji.petals} ${emphasis(reward)}!`
     )
     .setThumbnail(`attachment://${card.id.toString(16)}.png`);
 

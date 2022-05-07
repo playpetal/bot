@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { displayName } from "../../src/lib/util/displayName";
-import { strong } from "../../src/lib/util/formatting/strong";
+import { emphasis } from "../../src/lib/util/formatting/emphasis";
 
 describe("lib", () => {
   describe("formatting", () => {
@@ -17,8 +17,8 @@ describe("lib", () => {
     });
 
     it("should correctly strong-ify text and numbers", () => {
-      expect(strong("Test!")).to.equal("**Test!**");
-      expect(strong(7270)).to.equal("**7,270**");
+      expect(emphasis("Test!")).to.equal("**Test!**");
+      expect(emphasis(7270)).to.equal("**7,270**");
     });
   });
 });

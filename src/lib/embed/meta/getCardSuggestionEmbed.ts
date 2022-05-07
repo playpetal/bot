@@ -2,7 +2,7 @@ import { CardSuggestion } from "petal";
 import { Embed } from "../../../struct/embed";
 import { displayName } from "../../util/displayName";
 import { emoji } from "../../util/formatting/emoji";
-import { escape } from "../../util/formatting/escape";
+import { emphasis } from "../../util/formatting/emphasis";
 
 export function getCardSuggestionEmbed(
   suggestion: CardSuggestion,
@@ -11,9 +11,9 @@ export function getCardSuggestionEmbed(
   const embed = new Embed();
 
   embed.setDescription(
-    `${emoji.user} ${displayName(suggestion.suggestedBy)} suggested **${escape(
+    `${emoji.user} ${displayName(suggestion.suggestedBy)} suggested ${emphasis(
       suggestion.groupName
-    )} *${escape(suggestion.subgroupName)}***!` +
+    )} ${emphasis(suggestion.subgroupName, "bi")}!` +
       (isPrivate && suggestion.fulfilledBy !== null
         ? `\n\n**claimed by <@${suggestion.fulfilledBy.discordId}>**`
         : ``)

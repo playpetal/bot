@@ -4,7 +4,8 @@ import { gift } from "../../../../lib/graphql/mutation/game/economy/GIFT";
 import { getUser } from "../../../../lib/graphql/query/GET_USER";
 import { displayName } from "../../../../lib/util/displayName";
 import { emoji } from "../../../../lib/util/formatting/emoji";
-import { strong } from "../../../../lib/util/formatting/strong";
+import { emphasis } from "../../../../lib/util/formatting/emphasis";
+import { plural } from "../../../../lib/util/formatting/plural";
 import { Embed } from "../../../../struct/embed";
 import { BotError } from "../../../../struct/error";
 
@@ -49,15 +50,15 @@ export const giftRun: Run = async ({ courier, options, user }) => {
     const gifts: string[] = [];
 
     if (petals) {
-      gifts.push(`${emoji.petals} ${strong(petals)}`);
+      gifts.push(`${emoji.petals} ${emphasis(petals)}`);
     }
 
     if (lilies) {
-      gifts.push(`${emoji.lily} ${strong(lilies)}`);
+      gifts.push(`${emoji.lily} ${emphasis(lilies)}`);
     }
 
     if (cards.length > 0) {
-      gifts.push(`**${cards.length}** card${cards.length === 1 ? "" : "s"}`);
+      gifts.push(emphasis(plural(cards.length, "card")));
     }
 
     const embed = new Embed().setDescription(

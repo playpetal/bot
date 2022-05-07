@@ -9,7 +9,8 @@ import { handleGTSEnd } from "../../../../../lib/minigame/gts";
 import { dd } from "../../../../../lib/statsd";
 import { row, button } from "../../../../../lib/util/component";
 import { emoji } from "../../../../../lib/util/formatting/emoji";
-import { strong } from "../../../../../lib/util/formatting/strong";
+import { emphasis } from "../../../../../lib/util/formatting/emphasis";
+import { plural } from "../../../../../lib/util/formatting/plural";
 import { Embed } from "../../../../../struct/embed";
 
 export const songPlayRun: Run = async function run({ courier, user, options }) {
@@ -44,16 +45,17 @@ export const songPlayRun: Run = async function run({ courier, user, options }) {
     const embed = new Embed()
       .setDescription(
         `${emoji.song} **Guess the song by using \`/song guess\`!**` +
-          `\nTime limit: ${strong(minigame.timeLimit / 1000)} seconds` +
-          `\nMaximum guesses: ${strong(minigame.maxAttempts)}`
+          `\nTime limit: ${emphasis(minigame.timeLimit / 1000)} seconds` +
+          `\nMaximum guesses: ${emphasis(minigame.maxAttempts)}`
       )
       .setImage("https://cdn.playpetal.com/banners/default.png");
 
     if (canClaim)
       embed.setFooter(
-        `You can claim ${canClaim} more reward${
-          canClaim !== 1 ? "s" : ""
-        } this hour!`
+        `You can claim ${canClaim} more ${plural(
+          canClaim,
+          "reward"
+        )} this hour!`
       );
 
     const message = await courier.edit(

@@ -4,7 +4,8 @@ import { getSupporterTime } from "../../graphql/query/GET_SUPPORTER_TIME";
 import { displayName } from "../../util/displayName";
 import { hasFlag } from "../../util/flags";
 import { emoji } from "../../util/formatting/emoji";
-import { strong } from "../../util/formatting/strong";
+import { emphasis } from "../../util/formatting/emphasis";
+import { plural } from "../../util/formatting/plural";
 
 export async function getAccountStatsEmbed(account: Account) {
   const embed = new Embed()
@@ -14,7 +15,11 @@ export async function getAccountStatsEmbed(account: Account) {
   let desc = `${emoji.user} ${displayName(account)}\nstatistics: **account**\n`;
 
   const { rollCount } = account.stats;
-  if (rollCount > 0) desc += `\n${emoji.dice} ${strong(rollCount)} rolls`;
+  if (rollCount > 0)
+    desc += `\n${emoji.dice} ${emphasis(rollCount)} ${plural(
+      rollCount,
+      "roll"
+    )}`;
 
   if (hasFlag("PUBLIC_SUPPORTER", account.flags)) {
     const supporterTime = await getSupporterTime({ id: account.id });

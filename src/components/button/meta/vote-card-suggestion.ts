@@ -3,6 +3,7 @@ import { getCardSuggestionEmbed } from "../../../lib/embed/meta/getCardSuggestio
 import { voteCardSuggestion } from "../../../lib/graphql/mutation/meta/card-suggestion/voteCardSuggestion";
 import { getCardSuggestion } from "../../../lib/graphql/query/meta/card-suggestion/getCardSuggestion";
 import { emoji } from "../../../lib/util/formatting/emoji";
+import { emphasis } from "../../../lib/util/formatting/emphasis";
 import { Component, RunComponent } from "../../../struct/component";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
@@ -37,7 +38,9 @@ const run: RunComponent = async ({ interaction, user }) => {
   });
 
   const followupEmbed = new Embed().setDescription(
-    `${emoji.check} **vote added!**\nyou gave one vote to **${suggestion.groupName} *${suggestion.subgroupName}***!`
+    `${emoji.check} **vote added!**\nyou gave one vote to ${emphasis(
+      suggestion.groupName
+    )} ${emphasis(suggestion.subgroupName, "bi")}!`
   );
 
   await interaction.createFollowup({ embeds: [followupEmbed], flags: 64 });

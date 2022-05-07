@@ -5,7 +5,8 @@ import { createCardSuggestion } from "../../lib/graphql/mutation/meta/card-sugge
 import { getCardSuggestion } from "../../lib/graphql/query/meta/card-suggestion/getCardSuggestion";
 import { button, row } from "../../lib/util/component";
 import { emoji } from "../../lib/util/formatting/emoji";
-import { escape } from "../../lib/util/formatting/escape";
+import { emphasis } from "../../lib/util/formatting/emphasis";
+import { plural } from "../../lib/util/formatting/plural";
 import { Embed } from "../../struct/embed";
 import { BotError } from "../../struct/error";
 import { Modal, RunModal } from "../../struct/modal";
@@ -102,11 +103,11 @@ const a: RunModal = async ({ interaction, user }) => {
   });
 
   const privateEmbed = new Embed().setDescription(
-    `${emoji.check} **your suggestion has been submitted!**\n**${escape(
+    `${emoji.check} **your suggestion has been submitted!**\n${emphasis(
       suggestion.groupName
-    )} *${escape(suggestion.subgroupName)}*** has **${
-      suggestion.votes.length
-    }** vote${suggestion.votes.length === 1 ? "" : "s"}!`
+    )} ${emphasis(suggestion.subgroupName, "bi")} has ${emphasis(
+      plural(suggestion.votes.length, "vote")
+    )}!`
   );
 
   await interaction.createFollowup({ embeds: [privateEmbed], flags: 64 });

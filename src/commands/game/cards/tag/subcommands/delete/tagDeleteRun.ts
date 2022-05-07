@@ -2,7 +2,8 @@ import { Run } from "petal";
 import { deleteTag } from "../../../../../../lib/graphql/mutation/game/card/tag/DELETE_TAG";
 import { getTag } from "../../../../../../lib/graphql/query/game/card/tag/GET_TAG";
 import { button, row } from "../../../../../../lib/util/component";
-import { strong } from "../../../../../../lib/util/formatting/strong";
+import { emphasis } from "../../../../../../lib/util/formatting/emphasis";
+import { plural, pluralOr } from "../../../../../../lib/util/formatting/plural";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
@@ -31,9 +32,11 @@ const run: Run = async function tagDeleteRun({ courier, user, options }) {
   const embed = new Embed().setDescription(
     `**wait a sec!**\nare you sure you want to delete ${targetTag.emoji} \`${
       targetTag.tag
-    }\`?\n${strong(targetTag.cardCount)} card${
-      targetTag.cardCount === 1 ? " has" : "s have"
-    } this tag, and this can't be reversed!`
+    }\`?\n${emphasis(plural(targetTag.cardCount, "card"))} ${pluralOr(
+      targetTag.cardCount,
+      "has",
+      "have"
+    )} this tag, and this can't be reversed!`
   );
 
   return courier.send({

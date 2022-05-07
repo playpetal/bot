@@ -2,7 +2,8 @@ import { Maybe, MinigameStats, PartialUser } from "petal";
 import { Embed } from "../../../../struct/embed";
 import { displayName } from "../../../util/displayName";
 import { emoji } from "../../../util/formatting/emoji";
-import { strong } from "../../../util/formatting/strong";
+import { emphasis } from "../../../util/formatting/emphasis";
+import { plural } from "../../../util/formatting/plural";
 
 export function getTriviaStatsEmbed(
   stats: Maybe<MinigameStats<"TRIVIA">>,
@@ -21,23 +22,26 @@ export function getTriviaStatsEmbed(
       "\n\n**no stats here... yet!**\nuse **/trivia play** to start filling this out!";
   } else {
     desc +=
-      `\n\n${strong(stats.totalGames)} games played` +
-      `\n**${(stats.totalTime / 1000).toFixed(2)}s** spent guessing (**${(
-        stats.totalTime /
-        stats.totalGames /
-        1000
-      ).toFixed(2)}s** per game)`;
+      `\n\n${emphasis(stats.totalGames)} ${plural(
+        stats.totalGames,
+        "game"
+      )} played` +
+      `\n${emphasis(
+        (stats.totalTime / 1000).toFixed(2) + "s"
+      )} spent guessing (${emphasis(
+        (stats.totalTime / stats.totalGames / 1000).toFixed(2) + "s"
+      )} per game)`;
 
     if (stats.totalCurrency > 0) {
-      desc += `\n${emoji.petals} ${strong(stats.totalCurrency)} earned`;
+      desc += `\n${emoji.petals} ${emphasis(stats.totalCurrency)} earned`;
     }
 
     if (stats.totalPremiumCurrency > 0) {
-      desc += `\n${emoji.lily} ${strong(stats.totalPremiumCurrency)} earned`;
+      desc += `\n${emoji.lily} ${emphasis(stats.totalPremiumCurrency)} earned`;
     }
 
     if (stats.totalCards > 0) {
-      desc += `\n${emoji.cards} ${strong(stats.totalCards)} claimed`;
+      desc += `\n${emoji.cards} ${emphasis(stats.totalCards)} claimed`;
     }
   }
 

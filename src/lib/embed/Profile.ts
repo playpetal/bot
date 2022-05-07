@@ -2,7 +2,8 @@ import { Account } from "petal";
 import { Embed } from "../../struct/embed";
 import { displayName } from "../util/displayName";
 import { emoji } from "../util/formatting/emoji";
-import { strong } from "../util/formatting/strong";
+import { emphasis } from "../util/formatting/emphasis";
+import { plural } from "../util/formatting/plural";
 
 export function getProfileEmbed(account: Account) {
   const {
@@ -18,10 +19,10 @@ export function getProfileEmbed(account: Account) {
       `${emoji.user} ${displayName(account)}` +
         `\nregistered <t:${Math.floor(createdAt / 1000)}:R>` +
         (account.bio ? `\n\n${bio}` : ``) +
-        `\n\n${emoji.petals} ${strong(currency)}` +
-        `\n${emoji.cards} ${strong(cardCount)} cards` +
+        `\n\n${emoji.petals} ${emphasis(currency)}` +
+        `\n${emoji.cards} ${emphasis(cardCount)} ${plural(cardCount, "card")}` +
         (premiumCurrency !== 0
-          ? `\n${emoji.lily} ${strong(premiumCurrency)}`
+          ? `\n${emoji.lily} ${emphasis(premiumCurrency)}`
           : "") +
         `\n\n[[view on website]](https://playpetal.com/profile/${account.id})`
     )

@@ -3,7 +3,8 @@ import { TitleError } from "../../../../../lib/error/title-error";
 import { searchTitles } from "../../../../../lib/graphql/query/SEARCH_TITLES";
 import { displayName } from "../../../../../lib/util/displayName";
 import { emoji } from "../../../../../lib/util/formatting/emoji";
-import { strong } from "../../../../../lib/util/formatting/strong";
+import { emphasis } from "../../../../../lib/util/formatting/emphasis";
+import { plural } from "../../../../../lib/util/formatting/plural";
 import { Embed } from "../../../../../struct/embed";
 
 const run: Run = async ({ courier, user, options }) => {
@@ -20,7 +21,9 @@ const run: Run = async ({ courier, user, options }) => {
       ...user,
       title: { title: title.title },
     })}` +
-      `\n${emoji.user} *owned by ${strong(title.ownedCount)} players*` +
+      `\n${emoji.user} *owned by ${emphasis(
+        plural(title.ownedCount, "player")
+      )}*` +
       `\n\n${title.description || "this title has no description!"}`
   );
 

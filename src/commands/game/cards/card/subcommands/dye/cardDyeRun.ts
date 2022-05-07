@@ -4,7 +4,7 @@ import { getCard } from "../../../../../../lib/graphql/query/GET_CARD";
 import { getUser } from "../../../../../../lib/graphql/query/GET_USER";
 import { getCardImage } from "../../../../../../lib/img";
 import { emoji } from "../../../../../../lib/util/formatting/emoji";
-import { strong } from "../../../../../../lib/util/formatting/strong";
+import { emphasis } from "../../../../../../lib/util/formatting/emphasis";
 import { Embed } from "../../../../../../struct/embed";
 import { BotError } from "../../../../../../struct/error";
 
@@ -24,7 +24,7 @@ const run: Run = async ({ courier, user, options }) => {
 
   if (premiumCurrency < 1) {
     throw new BotError(
-      `**woah there!**` + `\nyou need ${emoji.lily} ${strong(1)} to do that.`
+      `**woah there!**` + `\nyou need ${emoji.lily} ${emphasis(1)} to do that.`
     );
   }
 

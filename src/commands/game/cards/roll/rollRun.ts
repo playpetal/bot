@@ -4,8 +4,8 @@ import { getUser } from "../../../../lib/graphql/query/GET_USER";
 import { getCollage } from "../../../../lib/img";
 import { logger } from "../../../../lib/logger";
 import { emoji } from "../../../../lib/util/formatting/emoji";
+import { emphasis } from "../../../../lib/util/formatting/emphasis";
 import { formatCard } from "../../../../lib/util/formatting/format";
-import { strong } from "../../../../lib/util/formatting/strong";
 import { Embed } from "../../../../struct/embed";
 import { BotError } from "../../../../struct/error";
 
@@ -27,7 +27,7 @@ const run: Run = async function ({ courier, user, options }) {
   if (currency < cost) {
     throw new BotError(
       `**woah there!**` +
-        `\nyou need ${emoji.petals} ${strong(cost)} to do that.`
+        `\nyou need ${emoji.petals} ${emphasis(cost)} to do that.`
     );
   }
 
@@ -57,9 +57,9 @@ const run: Run = async function ({ courier, user, options }) {
   const humanFriendly = cards.map((c) => formatCard(c));
 
   const embed = new Embed().setDescription(
-    `${emoji.dice} you rolled **${counter}** for ${emoji.petals} ${strong(
-      cost
-    )} and got...` + `\n\n${humanFriendly.join("\n")}`
+    `${emoji.dice} you rolled ${emphasis(counter)} for ${
+      emoji.petals
+    } ${emphasis(cost)} and got...` + `\n\n${humanFriendly.join("\n")}`
   );
 
   const collage = await getCollage(cards);

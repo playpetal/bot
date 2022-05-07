@@ -2,6 +2,8 @@ import { bot } from "../../..";
 import { deleteCardSuggestion } from "../../../lib/graphql/mutation/meta/card-suggestion/deleteCardSuggestion";
 import { getCardSuggestion } from "../../../lib/graphql/query/meta/card-suggestion/getCardSuggestion";
 import { emoji } from "../../../lib/util/formatting/emoji";
+import { emphasis } from "../../../lib/util/formatting/emphasis";
+import { plural } from "../../../lib/util/formatting/plural";
 import { Component, RunComponent } from "../../../struct/component";
 import { Embed } from "../../../struct/embed";
 import { BotError } from "../../../struct/error";
@@ -16,11 +18,12 @@ const run: RunComponent = async ({ interaction, user }) => {
   await deleteCardSuggestion(user.discordId, suggestion.id);
 
   const embed = new Embed().setDescription(
-    `${emoji.check} the suggestion **${suggestion.groupName} *${
-      suggestion.subgroupName
-    }*** has been deleted with **${suggestion.votes.length}** vote${
-      suggestion.votes.length === 1 ? "" : "s"
-    }!`
+    `${emoji.check} the suggestion ${emphasis(suggestion.groupName)} ${emphasis(
+      suggestion.subgroupName,
+      "bi"
+    )} has been deleted with ${emphasis(
+      plural(suggestion.votes.length, "vote")
+    )}!`
   );
 
   await interaction.createMessage({ embeds: [embed] });
